@@ -29,3 +29,4 @@ thunderdome = { version = "^0.6", optional = true }
 
 [dev-dependencies]
 stable-vec = "^0.4"
+thunderdome = "^0.6"

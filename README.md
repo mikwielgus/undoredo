@@ -26,7 +26,9 @@ First, add `undoredo` to your `Cargo.toml`:
 undoredo = "0.1"
 ```
 
-Following is a basic usage example of `undoredo` over `std::collections::HashMap`:
+Following is a basic usage example of `undoredo` over
+`std::collections::HashMap`. You can find more examples in our
+[examples/](./examples) directory.
 
 ```rust
 use std::collections::HashMap;
@@ -82,8 +84,12 @@ default `std` feature.
 In addition to the standard library, `undoredo` has feature-gated convenience
 implementations for data structures from some external crates:
 
-- [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
-- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
+- [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
+  behind the `stable-vec` feature. (example usage:
+  [examples/stable_vec.rs](./examples/stable_vec.rs))
+- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html)
+  behind the `thunderdome` feature. (example usage:
+  [examples/thunderdome.rs](./examples/thunderdome.rs))
 
 To use these, specify them next to your `undoredo` dependency in your
 `Cargo.toml`. For example, to enable all foreign implementations, write

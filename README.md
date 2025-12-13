@@ -19,6 +19,15 @@ bugs, on which the Command pattern operates.
 
 ## Basic usage
 
+First, add `undoredo` to your `Cargo.toml`:
+
+```
+[dependencies]
+undoredo = "0.1"
+```
+
+Following is a basic usage example of `undoredo` over `std::collections::HashMap`:
+
 ```rust
 use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
@@ -70,17 +79,25 @@ default `std` feature.
 
 ### Foreign implementations
 
-In addition to the standard library, `undoredo` has implementations for data
-structures from some external crates:
+In addition to the standard library, `undoredo` has feature-gated convenience
+implementations for data structures from some external crates:
 
 - [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
 
-Unlike maps, which support insertion and removal at arbitrary keys, a
-stable-vec-style data structure can be only supported if it allows to insert
-elements at arbitrary indexes, including indexes that are out of bounds at the
-time of insertion. For `StableVec`, this is achieved by changing the length
-before insertion using the
+To use these, specify them next to your `undoredo` dependency in your
+`Cargo.toml`. For example, to enable all foreign implementations, write
+
+```
+[dependencies]
+undoredo = { version = "0.1", features = ["stable-vec", "thunderdome"]}
+```
+
+**Technical detail:** Unlike maps, which support insertion and removal at
+arbitrary keys, a stable-vec-style data structure can be only supported if
+it allows to insert elements at arbitrary indexes, including indexes that are
+out of bounds at the time of insertion. For `StableVec`, this is achieved by
+changing the length before insertion using the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
 method. With `thunderdome::Arena`, this is achieved directly by inserting via the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
@@ -89,12 +106,12 @@ method.
 ## Unsupported collections
 
 [`Slab`](https://docs.rs/slab/latest/slab/),
-[`SlotMap`](https://docs.rs/slotmap/latest/slotmap/)
-[`generational-arena`](https://docs.rs/generational-arena/latest/generational_arena/),
+[`SlotMap`](https://docs.rs/slotmap/latest/slotmap/),
+[`generational-arena`](https://docs.rs/generational-arena/latest/generational_arena/)
 cannot be supported because they lack interfaces for insertion at an arbitrary
 key.
 
-For `Slab`, this is apparently
+**Technical detail:** For `Slab`, this is apparently
 [because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
 the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
 track of its vacant indexes is only singly-linked, not doubly-linked. Inserting

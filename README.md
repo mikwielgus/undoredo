@@ -84,11 +84,13 @@ method.
 
 ## Unsupported collections
 
-[Slab](https://docs.rs/slab/latest/slab/) and
-[SlotMap](https://docs.rs/slotmap/latest/slotmap/) cannot be supported as they
-lack interfaces for insertion at an arbitrary key.
+[Slab](https://docs.rs/slab/latest/slab/),
+[SlotMap](https://docs.rs/slotmap/latest/slotmap/)
+[generational-arena](https://docs.rs/generational-arena/latest/generational_arena/),
+cannot be supported because they lack interfaces for insertion at an arbitrary
+key.
 
-For Slab, this is apparently
+For `Slab`, this is apparently
 [because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
 the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
 track of its vacant indexes is only singly-linked, not doubly-linked. Inserting

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
 
+#[allow(unused_mut)]
 #[test]
 fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
@@ -29,4 +30,9 @@ fn main() {
 
     // The elements are back in the collection; the action has been redone.
     assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+
+    // Once you are done recording, you can dissolve the recorder to regain
+    // ownership and mutability over the underlying collection.
+    let (mut hashmap, ..) = recorder.dissolve();
+    assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }

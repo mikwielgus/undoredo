@@ -66,27 +66,37 @@ default `std` feature.
 
 ### Foreign implementations
 
-In addition to the standard library, `undoredo` is implemented for data
+In addition to the standard library, `undoredo` has implementations for data
 structures from some external crates:
 
 - [StableVec](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
 - [thunderdome::Arena](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
 
-Unlike maps, which support insertion and removal under arbitrary keys, a
-stable-vec-style data structure can be only supported if it has an interface
-to add values at indexes that are equal or greater than the current length. For
-`StableVec`, this is achieved by changing the length before insertion using the
+Unlike maps, which support insertion and removal at arbitrary keys, a
+stable-vec-style data structure can be only supported if it allows to insert
+elements at arbitrary indexes, including indexes that are out of bounds at the
+time of insertion. For `StableVec`, this is achieved by changing the length
+before insertion using the
 [.reserve_for](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
-method. In `thunderdome::Arena`, this is achieved by inserting via the
+method. With `thunderdome::Arena`, this is achieved directly by inserting via the
 [.insert_at](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
 method.
 
 ## Unsupported collections
 
 [Slab](https://docs.rs/slab/latest/slab/) and
-[SlotMap](https://docs.rs/slotmap/latest/slotmap/) cannot be supported because
-they do not have an interface to insert values at indexes that are equal or
-greater than the current length.
+[SlotMap](https://docs.rs/slotmap/latest/slotmap/) cannot be supported as they
+lack interfaces for insertion at an arbitrary key.
+
+For Slab, this is apparently
+[because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
+the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
+track of its vacant indexes is only singly-linked, not doubly-linked. Inserting
+an element at an arbitrary vacant index would require removing that index from
+the freelist. But since there is no backwards link available at a given key,
+doing so would require traversing the freelist from the beginning to find the
+position of the previous node, which would incur an overly slow `O(n)` time
+cost.
 
 ## Contributing
 

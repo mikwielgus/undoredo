@@ -17,6 +17,11 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
     pub fn new(container: C) -> Self {
         Self::new_with_edit(container, Default::default())
     }
+
+    #[inline(always)]
+    pub fn flush(&mut self) -> Edit<EC> {
+        std::mem::replace(&mut self.edit, Edit::new())
+    }
 }
 
 impl<K, V, C, EC> Recorder<K, V, C, EC> {

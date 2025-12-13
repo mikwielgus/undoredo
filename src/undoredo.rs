@@ -16,9 +16,18 @@ impl<Cmd, EC> UndoRedo<EC, Cmd> {
             undone: Vec::new(),
         }
     }
+}
 
-    pub fn commit(&mut self, command: Cmd, edit: Edit<EC>) {
-        self.done.push((command, edit));
+impl<Cmd: Default, EC> UndoRedo<EC, Cmd> {
+    pub fn commit(&mut self, edit: Edit<EC>) {
+        self.done.push((Default::default(), edit));
+        self.undone.clear();
+    }
+}
+
+impl<Cmd, EC> UndoRedo<EC, Cmd> {
+    pub fn cmd_commit(&mut self, cmd: Cmd, edit: Edit<EC>) {
+        self.done.push((cmd, edit));
         self.undone.clear();
     }
 }
@@ -38,7 +47,7 @@ impl<Cmd, EC: Default> UndoRedo<EC, Cmd> {
         let cmd = f(&mut recorder);
         let (container, edit) = recorder.dissolve();
 
-        self.commit(cmd, edit);
+        self.cmd_commit(cmd, edit);
 
         container
     }

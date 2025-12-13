@@ -13,9 +13,9 @@ the changes in a reversible incremental diff structure.
 This approach makes `undoredo` easier to use than other undo-redo libraries.
 Storing incremental diffs is much more succint and reliable than the
 commonly used [Command pattern](https://en.wikipedia.org/wiki/Command_pattern).
-This is because the Command pattern requires implementing custom commands
-and their behavior using traits, which results in having to maintain verbose,
-application-specific logic that is prone to elusive runtime bugs.
+The programmer is relieved from having to maintain application-specific
+implementations of commands, often complicated and prone to elusive runtime
+bugs, on which the Command pattern operates.
 
 ## Basic usage
 
@@ -63,8 +63,8 @@ fn main() {
 ### Standard library
 
 Standard library maps
-[HashMap](https://doc.rust-lang.org/std/collections/struct.HashMap.html) and
-[BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) are
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) and
+[`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) are
 supported via built-in implementations. You can disable them by turning off the
 default `std` feature.
 
@@ -73,24 +73,24 @@ default `std` feature.
 In addition to the standard library, `undoredo` has implementations for data
 structures from some external crates:
 
-- [StableVec](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
-- [thunderdome::Arena](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
+- [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
+- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
 
 Unlike maps, which support insertion and removal at arbitrary keys, a
 stable-vec-style data structure can be only supported if it allows to insert
 elements at arbitrary indexes, including indexes that are out of bounds at the
 time of insertion. For `StableVec`, this is achieved by changing the length
 before insertion using the
-[.reserve_for](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
+[`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
 method. With `thunderdome::Arena`, this is achieved directly by inserting via the
-[.insert_at](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
+[`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
 method.
 
 ## Unsupported collections
 
-[Slab](https://docs.rs/slab/latest/slab/),
-[SlotMap](https://docs.rs/slotmap/latest/slotmap/)
-[generational-arena](https://docs.rs/generational-arena/latest/generational_arena/),
+[`Slab`](https://docs.rs/slab/latest/slab/),
+[`SlotMap`](https://docs.rs/slotmap/latest/slotmap/)
+[`generational-arena`](https://docs.rs/generational-arena/latest/generational_arena/),
 cannot be supported because they lack interfaces for insertion at an arbitrary
 key.
 

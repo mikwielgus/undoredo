@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 undoredo Developers
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use crate::collection::{Insert, IntoIter, Keyed, Remove};
 
 pub struct Edit<EC> {

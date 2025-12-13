@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 undoredo Developers
+
+SPDX-License-Identifier: MIT OR Apache-2.0
+-->
+
 # undoredo
 
 `undoredo` is an undo-redo library that works by wrapping a collection inside
@@ -62,7 +68,7 @@ fn main() {
 }
 ```
 
-## Supported containers
+## Supported collections
 
 ### Standard library
 
@@ -95,3 +101,12 @@ method.
 [SlotMap](https://docs.rs/slotmap/latest/slotmap/) cannot be supported because
 they do not have an interface to insert values at indexes that are equal or
 greater than the current length.
+
+## Licence
+
+Licensed under either of
+
+- Apache License, Version 2.0, (LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license (LICENSE-MIT or http://opensource.org/licenses/MIT)
+
+at your option.

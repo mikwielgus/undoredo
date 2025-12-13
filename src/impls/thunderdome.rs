@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 undoredo Developers
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use thunderdome::{Arena, Index};
 
 use crate::collection::{Collection, Get, Insert, IntoIter, Keyed, Push, Remove};

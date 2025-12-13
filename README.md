@@ -6,18 +6,18 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is an undo-redo library that works by wrapping a collection inside
-a decorator that observes the incoming insertions, removals, and pushes, and
-records the changes in a reversible incremental diff structure.
+`undoredo` is an undo-redo library that works by wrapping a collection inside a
+decorator that observes the incoming insertions, removals, and pushes, recording
+the changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo libraries.
-Storing incremental diffs is much more succinct and reliable than the commonly
-used [Command pattern](https://en.wikipedia.org/wiki/Command_pattern). This
-is because the Command pattern requires implementing custom commands and
-their behavior using traits, which results in having to maintain verbose,
+Storing incremental diffs is much more succint and reliable than the
+commonly used [Command pattern](https://en.wikipedia.org/wiki/Command_pattern).
+This is because the Command pattern requires implementing custom commands
+and their behavior using traits, which results in having to maintain verbose,
 application-specific logic that is prone to elusive runtime bugs.
 
-## Usage
+## Basic usage
 
 ```rust
 use stable_vec::StableVec;
@@ -82,12 +82,12 @@ default `std` feature.
 In addition to the standard library, `undoredo` is implemented for data
 structures from some external crates:
 
-- [StableVec](https://docs.rs/stable-vec/latest/stable_vec/) behind `stable-vec` feature.
-- [thunderdome::Arena](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind `thunderdome` feature.
+- [StableVec](https://docs.rs/stable-vec/latest/stable_vec/) behind the `stable-vec` feature.
+- [thunderdome::Arena](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html) behind the `thunderdome` feature.
 
 Unlike maps, which support insertion and removal under arbitrary keys, a
 stable-vec-style data structure can be only supported if it has an interface
-to add values at indexes that are equal or greater than the current length. In
+to add values at indexes that are equal or greater than the current length. For
 `StableVec`, this is achieved by changing the length before insertion using the
 [.reserve_for](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
 method. In `thunderdome::Arena`, this is achieved by inserting via the
@@ -100,6 +100,12 @@ method.
 [SlotMap](https://docs.rs/slotmap/latest/slotmap/) cannot be supported because
 they do not have an interface to insert values at indexes that are equal or
 greater than the current length.
+
+## Contributing
+
+We welcome issues and pull requests from anyone both to our canonical
+[repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
+[mirror](https://github.com/mikwielgus/undoredo).
 
 ## Licence
 

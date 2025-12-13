@@ -28,6 +28,7 @@ impl<V, C: stable_vec::core::Core<V>> Insert<usize> for StableVecFacade<V, C> {
 impl<V, C: stable_vec::core::Core<V>> Remove<usize> for StableVecFacade<V, C> {
     #[inline(always)]
     fn remove(&mut self, index: &usize) -> Option<V> {
+        self.get(*index)?;
         StableVecFacade::remove(self, *index)
     }
 }

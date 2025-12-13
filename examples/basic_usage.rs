@@ -1,0 +1,32 @@
+use std::collections::HashMap;
+use undoredo::{Insert, Recorder, UndoRedo};
+
+#[test]
+fn main() {
+    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
+
+    // Push elements while recording this into an action.
+    recorder.insert(1, 'A');
+    recorder.insert(2, 'B');
+    recorder.insert(3, 'C');
+
+    // Commit the recorded action of pushing ['A', 'B', 'C'] into the undo-redo
+    // history.
+    undoredo.commit(recorder.flush());
+
+    // The pushed elements are now present in the collection.
+    assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+
+    // Now undo the action.
+    undoredo.undo(&mut recorder);
+
+    // The collection is now empty; the action of pushing elements has been undone.
+    assert!(*recorder.collection() == HashMap::from([]));
+
+    // Now redo the action.
+    undoredo.redo(&mut recorder);
+
+    // The elements are back in the collection; the action has been redone.
+    assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+}

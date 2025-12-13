@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub struct Recorder<K, V = (), C = HashMap<K, V>, EC = C> {
-    container: C,
+    collection: C,
     edit: Edit<EC>,
     key_marker: std::marker::PhantomData<K>,
     value_marker: std::marker::PhantomData<V>,
@@ -32,7 +32,7 @@ impl<K, V, C, EC> Recorder<K, V, C, EC> {
     #[inline(always)]
     fn new_with_edit(container: C, edit: Edit<EC>) -> Self {
         Self {
-            container,
+            collection: container,
             edit,
             key_marker: PhantomData,
             value_marker: PhantomData,
@@ -40,13 +40,13 @@ impl<K, V, C, EC> Recorder<K, V, C, EC> {
     }
 
     #[inline(always)]
-    pub fn container(&self) -> &C {
-        &self.container
+    pub fn collection(&self) -> &C {
+        &self.collection
     }
 
     #[inline(always)]
     pub fn dissolve(self) -> (C, Edit<EC>) {
-        (self.container, self.edit)
+        (self.collection, self.edit)
     }
 }
 
@@ -54,7 +54,7 @@ impl<K, V, C: Default, EC: Default> Default for Recorder<K, V, C, EC> {
     #[inline(always)]
     fn default() -> Self {
         Self {
-            container: Default::default(),
+            collection: Default::default(),
             edit: Default::default(),
             key_marker: std::marker::PhantomData,
             value_marker: std::marker::PhantomData,
@@ -69,7 +69,7 @@ impl<K, V, C, EC> Collection for Recorder<K, V, C, EC> {
 impl<K, V, C: Get<K, Item = V>, EC> Get<K> for Recorder<K, V, C, EC> {
     #[inline(always)]
     fn get(&self, key: &K) -> Option<&V> {
-        self.container.get(key)
+        self.collection.get(key)
     }
 }
 
@@ -78,14 +78,14 @@ impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Insert<K, Item = V
 {
     #[inline(always)]
     fn insert(&mut self, key: K, value: V) {
-        if let Some(value_to_remove) = self.container.get(&key) {
+        if let Some(value_to_remove) = self.collection.get(&key) {
             self.edit
                 .removed
                 .insert(key.clone(), value_to_remove.clone());
         }
 
         self.edit.inserted.insert(key.clone(), value.clone());
-        self.container.insert(key, value.clone());
+        self.collection.insert(key, value.clone());
     }
 }
 
@@ -94,7 +94,7 @@ impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remov
 {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
-        let value = self.container.remove(key)?;
+        let value = self.collection.remove(key)?;
 
         if self.edit.inserted.remove(key).is_none() {
             self.edit.removed.insert(key.clone(), value.clone());
@@ -109,7 +109,7 @@ impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Push<K>
 {
     #[inline(always)]
     fn push(&mut self, value: V) -> K {
-        let key = self.container.push(value.clone());
+        let key = self.collection.push(value.clone());
         self.edit.inserted.insert(key.clone(), value);
 
         key

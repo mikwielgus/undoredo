@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use stable_vec::{StableVec, StableVecFacade};
+use stable_vec::StableVecFacade;
 
 use crate::collection::{Collection, Get, Insert, IntoIter, Keyed, Push, Remove};
 

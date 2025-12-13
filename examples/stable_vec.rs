@@ -24,25 +24,25 @@ fn main() {
 
     assert!(
         recorder
-            .container()
+            .collection()
             .values()
             .copied()
             .eq(['A', 'B', 'B', 'C'])
     );
 
     undoredo.undo(&mut recorder);
-    assert!(recorder.container().values().copied().eq(['A', 'B', 'B']));
+    assert!(recorder.collection().values().copied().eq(['A', 'B', 'B']));
 
     undoredo.undo(&mut recorder);
-    assert!(recorder.container().values().copied().eq(['A']));
+    assert!(recorder.collection().values().copied().eq(['A']));
 
     undoredo.redo(&mut recorder);
-    assert!(recorder.container().values().copied().eq(['A', 'B', 'B']));
+    assert!(recorder.collection().values().copied().eq(['A', 'B', 'B']));
 
     undoredo.redo(&mut recorder);
     assert!(
         recorder
-            .container()
+            .collection()
             .values()
             .copied()
             .eq(['A', 'B', 'B', 'C'])

@@ -91,7 +91,10 @@ impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remov
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
         let value = self.container.remove(key)?;
-        self.edit.removed.insert(key.clone(), value.clone());
+
+        if self.edit.inserted.remove(key).is_none() {
+            self.edit.removed.insert(key.clone(), value.clone());
+        }
 
         Some(value)
     }

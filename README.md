@@ -23,7 +23,6 @@ application-specific logic that is prone to elusive runtime bugs.
 use stable_vec::StableVec;
 use undoredo::{Push, Recorder, Remove, UndoRedo};
 
-#[test]
 fn main() {
     let mut recorder: Recorder<usize, char, StableVec<char>> = Recorder::new(StableVec::new());
     let mut undoredo: UndoRedo<StableVec<char>> = UndoRedo::new();

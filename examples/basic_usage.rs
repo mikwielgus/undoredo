@@ -7,13 +7,13 @@ fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
 
-    // Push elements while recording this into an action.
+    // Push elements while recording the changes in an edit.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
-    // Commit the recorded action of pushing ['A', 'B', 'C'] into the undo-redo
-    // history.
+    // Flush the recorder and Commit the recorded edit of pushing 'A', 'B', 'C'
+    // into the undo-redo history.
     undoredo.commit(recorder.flush());
 
     // The pushed elements are now present in the collection.

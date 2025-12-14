@@ -8,9 +8,14 @@ use crate::{
     edit::ApplyEdit,
 };
 
+pub struct CmdEdit<Cmd, EC> {
+    pub cmd: Cmd,
+    pub edit: Edit<EC>,
+}
+
 pub struct UndoRedo<EC, Cmd = ()> {
-    done: Vec<(Cmd, Edit<EC>)>,
-    undone: Vec<(Cmd, Edit<EC>)>,
+    done: Vec<CmdEdit<Cmd, EC>>,
+    undone: Vec<CmdEdit<Cmd, EC>>,
 }
 
 impl<Cmd, EC> UndoRedo<EC, Cmd> {
@@ -20,18 +25,29 @@ impl<Cmd, EC> UndoRedo<EC, Cmd> {
             undone: Vec::new(),
         }
     }
+
+    pub fn done(&self) -> &[CmdEdit<Cmd, EC>] {
+        &self.done
+    }
+
+    pub fn undone(&self) -> &[CmdEdit<Cmd, EC>] {
+        &self.undone
+    }
 }
 
 impl<Cmd: Default, EC> UndoRedo<EC, Cmd> {
     pub fn commit(&mut self, edit: Edit<EC>) {
-        self.done.push((Default::default(), edit));
+        self.done.push(CmdEdit {
+            cmd: Default::default(),
+            edit,
+        });
         self.undone.clear();
     }
 }
 
 impl<Cmd, EC> UndoRedo<EC, Cmd> {
     pub fn cmd_commit(&mut self, cmd: Cmd, edit: Edit<EC>) {
-        self.done.push((cmd, edit));
+        self.done.push(CmdEdit { cmd, edit });
         self.undone.clear();
     }
 }
@@ -59,21 +75,27 @@ impl<Cmd, EC: Default> UndoRedo<EC, Cmd> {
 
 impl<Cmd: Clone, EC: Clone> UndoRedo<EC, Cmd> {
     pub fn undo(&mut self, target: &mut impl ApplyEdit<EC>) -> Option<Cmd> {
-        let (cmd, edit) = self.done.pop()?;
+        let CmdEdit { cmd, edit } = self.done.pop()?;
         let reverse_edit = edit.reverse();
 
         target.apply_edit(&reverse_edit);
-        self.undone.push((cmd.clone(), reverse_edit));
+        self.undone.push(CmdEdit {
+            cmd: cmd.clone(),
+            edit: reverse_edit,
+        });
 
         Some(cmd)
     }
 
     pub fn redo(&mut self, target: &mut impl ApplyEdit<EC>) -> Option<Cmd> {
-        let (cmd, edit) = self.undone.pop()?;
+        let CmdEdit { cmd, edit } = self.undone.pop()?;
         let reverse_edit = edit.reverse();
 
         target.apply_edit(&reverse_edit);
-        self.done.push((cmd.clone(), reverse_edit));
+        self.done.push(CmdEdit {
+            cmd: cmd.clone(),
+            edit: reverse_edit,
+        });
 
         Some(cmd)
     }

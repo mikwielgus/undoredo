@@ -6,18 +6,18 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is an undo-redo library that works by wrapping a collection inside a
-decorator that observes the incoming insertions, removals, and pushes, recording
-the changes in a reversible incremental diff structure.
+`undoredo` is an undo-redo Rust library that works by wrapping a collection
+inside a decorator that observes the incoming insertions, removals, and pushes,
+recording the changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo libraries.
 Storing incremental diffs is much more succint and reliable than the
 commonly used [Command pattern](https://en.wikipedia.org/wiki/Command_pattern).
 The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
-bugs, on which the Command pattern operates.
+bugs, on which the Command pattern has to operate.
 
-## Basic usage
+## Usage
 
 First, add `undoredo` to your `Cargo.toml`:
 
@@ -26,8 +26,10 @@ First, add `undoredo` to your `Cargo.toml`:
 undoredo = "0.1"
 ```
 
+### Basic usage
+
 Following is a basic usage example of `undoredo` over
-`std::collections::HashMap`. You can find more examples in our
+`std::collections::HashMap`. You can find more examples in the
 [examples/](./examples) directory.
 
 ```rust
@@ -38,13 +40,13 @@ fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
 
-    // Push elements while recording this into an action.
+    // Push elements while recording this in an edit.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
-    // Commit the recorded action of pushing ['A', 'B', 'C'] into the undo-redo
-    // history.
+    // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
+    // into the undo-redo history.
     undoredo.commit(recorder.flush());
 
     // The pushed elements are now present in the collection.
@@ -66,6 +68,48 @@ fn main() {
     // ownership and mutability over the underlying collection.
     let (mut hashmap, ..) = recorder.dissolve();
     assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+}
+```
+
+### Storing and accessing command metadata along with edits
+
+It is often desirable to store some metadata along with every recorded edit,
+usually a description of the command that originated it. This can be done by
+instead committing the edit using the `.cmd_commit()` method.
+
+The stacks of done and undone committed edits, together with their command
+metadata ("cmd") if present, can be accessed as slices from the `.done()` and
+`.undone()` accessor methods.
+
+```rust
+use std::collections::HashMap;
+use undoredo::{Insert, Recorder, UndoRedo};
+
+#[derive(Debug, Clone, PartialEq)]
+enum Command {
+    PushChars,
+}
+
+#[test]
+fn main() {
+    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
+
+    // Push an element while recording.
+    recorder.insert(1, 'A');
+
+    // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
+    // with the recorded edit.
+    undoredo.cmd_commit(Command::PushChars, recorder.flush());
+
+    // `Command::PushChar` is now the top element of the stack of done cmd-edits.
+    assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChars);
+
+    // Now undo the action.
+    undoredo.undo(&mut recorder);
+
+    // `Command::PushChar` is now the top element of the stack of undone cmd-edits.
+    assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChars);
 }
 ```
 

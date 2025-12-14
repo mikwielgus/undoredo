@@ -7,7 +7,7 @@ matrix:
     - stable
     - nightly
   FEATURE_FLAGS:
-    - 
+    - ""
     - --no-default-features
     - --all-features
   FEATURES:

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 undoredo Developers
+// SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 use alloc::vec::Vec;

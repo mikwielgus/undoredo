@@ -17,10 +17,10 @@ The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
 bugs, on which the Command pattern has to operate.
 
-This library has no mandatory dependencies and is `no_std`-compatible. For
-ease of use, `undoredo` has built-in implementations for standard library
-collections, as well as feature-gated convenience implementations for foreign
-types, `StableVec` and `thunderdome::Arena` (read more in
+This library has no mandatory dependencies. For ease of use, `undoredo`
+has built-in implementations for standard library collections, as well as
+feature-gated convenience implementations for foreign types, `StableVec` and
+`thunderdome::Arena` (read more in
 [Supported collections](#supported-collections) section).
 
 ## Usage
@@ -126,8 +126,7 @@ fn main() {
 Standard library maps
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) and
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) are
-supported via built-in implementations. You can disable them by turning off the
-default `std` feature.
+supported via built-in implementations.
 
 ### Convenience implementations on foreign types
 

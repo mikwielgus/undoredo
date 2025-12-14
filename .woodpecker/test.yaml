@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2025 undoredo contributors
+#
+# SPDX-License-Identifier: MIT
+
+matrix:
+  CHANNEL:
+    - stable
+    - nightly
+  FEATURE_FLAGS:
+    - --no-default-features
+    - --all-features
+  FEATURES:
+    - stable-vec
+    - thunderdome
+
+steps:
+  test_with_default_features:
+    image: rust
+    environment:
+      RUST_BACKTRACE: 1
+      CARGO_TEST_COLOR: always
+    commands:
+      - rustup default "$CHANNEL"
+      - cargo test $FEATURE_FLAGS --features "$FEATURES"
+    when:
+      event: [pull_request, push, tag]

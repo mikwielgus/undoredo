@@ -21,7 +21,6 @@ maintenance = { status = "actively-developed" }
 default = ["std", "alloc"]
 std = ["alloc"]
 alloc = []
-all-impls = ["std", "alloc", "stable-vec", "thunderdome"]
 
 [dependencies]
 stable-vec = { version = "^0.4", optional = true }

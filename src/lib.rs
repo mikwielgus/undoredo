@@ -11,7 +11,7 @@
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "alloc")]
+// No feature for alloc because it would be always enabled anyway.
 extern crate alloc;
 
 mod edit;

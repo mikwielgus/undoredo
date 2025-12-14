@@ -45,7 +45,7 @@ impl<K, V> MapIntoIter<K> for BTreeMap<K, V> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
+    use alloc::collections::BTreeMap;
 
     use crate::Recorder;
 

@@ -18,9 +18,8 @@ edition = "2024"
 maintenance = { status = "actively-developed" }
 
 [features]
-default = ["std", "alloc"]
-std = ["alloc"]
-alloc = []
+default = ["std"]
+std = []
 
 [dependencies]
 stable-vec = { version = "^0.4", optional = true }
@@ -29,6 +28,14 @@ thunderdome = { version = "^0.6", optional = true }
 [dev-dependencies]
 stable-vec = "^0.4"
 thunderdome = "^0.6"
+
+[[example]]
+name = "basic_usage"
+required-features = ["std"]
+
+[[example]]
+name = "cmd_commit"
+required-features = ["std"]
 
 [[example]]
 name = "stable_vec"

@@ -5,7 +5,7 @@
 #[cfg(feature = "std")]
 mod std;
 
-#[cfg(feature = "alloc")]
+// No feature for alloc because it would be always enabled anyway.
 mod alloc;
 
 #[cfg(feature = "stable-vec")]

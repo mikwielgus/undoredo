@@ -123,7 +123,7 @@ impl<K: Clone, V: Clone, C: MapPush<K, Item = V>, EC: MapInsert<K, Item = V>> Ma
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::collections::BTreeMap;
+    use alloc::collections::BTreeMap;
 
     use crate::{
         Edit, Recorder,

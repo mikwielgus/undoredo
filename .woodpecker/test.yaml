@@ -7,7 +7,7 @@ matrix:
     - stable
     - nightly
   FEATURE_FLAGS:
-    - --no-default-features
+    - --no-default-features --features alloc
     - --features stable-vec
     - --features thunderdome
     - --all-features

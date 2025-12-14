@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::HashMap;
-use undoredo::{MapInsert, Recorder, UndoRedo};
+use undoredo::{Insert, Recorder, UndoRedo};
 
 #[derive(Debug, Clone, PartialEq)]
 enum Command {

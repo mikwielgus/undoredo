@@ -4,7 +4,7 @@
 
 use alloc::collections::BTreeMap;
 
-use crate::map::{Keyed, Map, MapGet, MapInsert, MapIntoIter, MapRemove};
+use crate::map::{Get, Insert, IntoIter, Keyed, Map, Remove};
 
 impl<K, V> Map for BTreeMap<K, V> {
     type Item = V;
@@ -14,28 +14,28 @@ impl<K, V> Keyed for BTreeMap<K, V> {
     type Key = K;
 }
 
-impl<K: Ord, V> MapGet<K> for BTreeMap<K, V> {
+impl<K: Ord, V> Get<K> for BTreeMap<K, V> {
     #[inline(always)]
     fn get(&self, key: &K) -> Option<&V> {
         BTreeMap::get(self, key)
     }
 }
 
-impl<K: Ord, V> MapInsert<K> for BTreeMap<K, V> {
+impl<K: Ord, V> Insert<K> for BTreeMap<K, V> {
     #[inline(always)]
     fn insert(&mut self, key: K, value: V) {
         BTreeMap::insert(self, key, value);
     }
 }
 
-impl<K: Ord, V> MapRemove<K> for BTreeMap<K, V> {
+impl<K: Ord, V> Remove<K> for BTreeMap<K, V> {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
         BTreeMap::remove(self, key)
     }
 }
 
-impl<K, V> MapIntoIter<K> for BTreeMap<K, V> {
+impl<K, V> IntoIter<K> for BTreeMap<K, V> {
     type IntoIter = alloc::collections::btree_map::IntoIter<K, V>;
 
     fn into_iter(self) -> alloc::collections::btree_map::IntoIter<K, V> {

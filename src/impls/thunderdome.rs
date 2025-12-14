@@ -4,7 +4,7 @@
 
 use thunderdome::{Arena, Index};
 
-use crate::map::{Keyed, Map, MapGet, MapInsert, MapIntoIter, MapPush, MapRemove};
+use crate::map::{Keyed, Map, Get, Insert, IntoIter, Push, Remove};
 
 impl<V> Map for Arena<V> {
     type Item = V;
@@ -14,35 +14,35 @@ impl<V> Keyed for Arena<V> {
     type Key = Index;
 }
 
-impl<V> MapGet<Index> for Arena<V> {
+impl<V> Get<Index> for Arena<V> {
     #[inline(always)]
     fn get(&self, key: &Index) -> Option<&V> {
         Arena::get(self, *key)
     }
 }
 
-impl<V> MapInsert<Index> for Arena<V> {
+impl<V> Insert<Index> for Arena<V> {
     #[inline(always)]
     fn insert(&mut self, key: Index, value: V) {
         Arena::insert_at(self, key, value);
     }
 }
 
-impl<V> MapRemove<Index> for Arena<V> {
+impl<V> Remove<Index> for Arena<V> {
     #[inline(always)]
     fn remove(&mut self, key: &Index) -> Option<V> {
         Arena::remove(self, *key)
     }
 }
 
-impl<V> MapPush<Index> for Arena<V> {
+impl<V> Push<Index> for Arena<V> {
     #[inline(always)]
     fn push(&mut self, value: V) -> Index {
         Arena::insert(self, value)
     }
 }
 
-impl<V> MapIntoIter<Index> for Arena<V> {
+impl<V> IntoIter<Index> for Arena<V> {
     type IntoIter = thunderdome::iter::IntoIter<V>;
 
     #[inline(always)]

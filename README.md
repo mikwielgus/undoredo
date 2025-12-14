@@ -17,6 +17,11 @@ The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
 bugs, on which the Command pattern has to operate.
 
+`undoredo` has no mandatory dependencies, is `no_std`-compatible, has built-in
+implementations for standard library collections and feature-gated convenience
+implementations for `StableVec` and `thunderdome::Arena` (learn more in
+[Supported collections](#supported-collections) section).
+
 ## Usage
 
 First, add `undoredo` to your `Cargo.toml`:

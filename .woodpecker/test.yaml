@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: 2025 undoredo contributors
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT OR Apache-2.0
 
 matrix:
   CHANNEL:
     - stable
     - nightly
   FEATURE_FLAGS:
+    -
     - --no-default-features
     - --all-features
   FEATURES:
@@ -14,7 +15,7 @@ matrix:
     - thunderdome
 
 steps:
-  test_with_default_features:
+  test:
     image: rust
     environment:
       RUST_BACKTRACE: 1

@@ -19,9 +19,9 @@ bugs, on which the Command pattern has to operate.
 
 This library is `no_std`-compatible and has no mandatory dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
-`undoredo` has feature-gated convenience implementations for standard library
-collections, `HashMap` and `BTreeMap`, and for some foreign types, `StableVec`
-and `thunderdome::Arena` (read more in
+`undoredo` has convenience implementations for standard library
+collections, `HashMap` and `BTreeMap`, and for some foreign feature-gated types,
+`StableVec` and `thunderdome::Arena` (read more in
 [Supported collections](#supported-collections) section).
 
 ## Usage
@@ -126,8 +126,8 @@ fn main() {
 
 Standard library maps are supported via built-in implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature,
-- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) behind the `alloc` feature.
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default),
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated).
 
 ### Convenience implementations on foreign types
 

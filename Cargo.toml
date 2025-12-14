@@ -4,14 +4,14 @@
 
 [package]
 name = "undoredo"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Incremental-diff undo-redo decorator for collections such as HashMap, BTreeMap, StableVec, thunderdome::Arena."
 documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["undo", "redo", "no_std"]
-categories = ["data-structures", "gui", "no-std"]
+categories = ["data-structures", "gui"]
 edition = "2024"
 
 [badges]

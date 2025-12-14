@@ -10,7 +10,7 @@ description = "Incremental-diff undo-redo decorator for collections such as Hash
 documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
-keywords = ["undo", "redo"]
+keywords = ["undo", "redo", "no_std"]
 categories = ["data-structures", "gui", "no-std"]
 edition = "2024"
 

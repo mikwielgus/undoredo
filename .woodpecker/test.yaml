@@ -7,8 +7,9 @@ matrix:
     - stable
     - nightly
   FEATURE_FLAGS:
-    - ""
     - --no-default-features
+    - --features stable-vec
+    - --features thunderdome
     - --all-features
   FEATURES:
     - stable-vec
@@ -22,6 +23,6 @@ steps:
       CARGO_TEST_COLOR: always
     commands:
       - rustup default "$CHANNEL"
-      - cargo test $FEATURE_FLAGS --features "$FEATURES"
+      - cargo test $FEATURE_FLAGS
     when:
       event: [pull_request, push, tag]

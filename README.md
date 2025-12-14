@@ -17,9 +17,10 @@ The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
 bugs, on which the Command pattern has to operate.
 
-`undoredo` has no mandatory dependencies, is `no_std`-compatible, has built-in
-implementations for standard library collections and feature-gated convenience
-implementations for `StableVec` and `thunderdome::Arena` (learn more in
+This library has no mandatory dependencies and is `no_std`-compatible. For
+ease of use, `undoredo` has built-in implementations for standard library
+collections, as well as feature-gated convenience implementations for foreign
+types, `StableVec` and `thunderdome::Arena` (read more in
 [Supported collections](#supported-collections) section).
 
 ## Usage
@@ -128,7 +129,7 @@ Standard library maps
 supported via built-in implementations. You can disable them by turning off the
 default `std` feature.
 
-### Foreign implementations
+### Convenience implementations on foreign types
 
 In addition to the standard library, `undoredo` has feature-gated convenience
 implementations for data structures from some external crates:
@@ -166,7 +167,7 @@ method.
 cannot be supported because they lack interfaces for insertion at an arbitrary
 key.
 
-**Technical detail:** For `Slab`, this is apparently
+**Technical detail:** For `Slab`, such interface is missing apparently
 [because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
 the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
 track of its vacant indexes is only singly-linked, not doubly-linked. Inserting
@@ -184,7 +185,7 @@ We welcome issues and pull requests from anyone both to our canonical
 
 ## Licence
 
-Licensed under either of
+`undoredo` is dual-licensed as under either of
 
 - Apache License, Version 2.0, (LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0)
 - MIT license (LICENSE-MIT or http://opensource.org/licenses/MIT)

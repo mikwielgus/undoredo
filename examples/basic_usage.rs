@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use undoredo::{MapInsert, Recorder, UndoRedo};
 
 #[allow(unused_mut)]
-#[test]
 fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();

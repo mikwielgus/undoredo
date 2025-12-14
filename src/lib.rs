@@ -5,7 +5,14 @@
 /*#![doc(html_root_url = "https://docs.rs/undoredo")]
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]*/
-#![cfg_attr(not(feature = "std"), no_std)]
+//#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 mod edit;
 mod impls;

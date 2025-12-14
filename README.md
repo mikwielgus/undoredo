@@ -17,10 +17,11 @@ The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
 bugs, on which the Command pattern has to operate.
 
-This library has no mandatory dependencies. For ease of use, `undoredo`
-has built-in implementations for standard library collections, as well as
-feature-gated convenience implementations for foreign types, `StableVec` and
-`thunderdome::Arena` (read more in
+This library is `no_std`-compatible and has no mandatory dependencies except
+for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
+`undoredo` has feature-gated convenience implementations for standard library
+collections, `HashMap` and `BTreeMap`, and for some foreign types, `StableVec`
+and `thunderdome::Arena` (read more in
 [Supported collections](#supported-collections) section).
 
 ## Usage
@@ -123,10 +124,10 @@ fn main() {
 
 ### Standard library
 
-Standard library maps
-[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) and
-[`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) are
-supported via built-in implementations.
+Standard library maps are supported via built-in implementations:
+
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature,
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) behind the `alloc` feature.
 
 ### Convenience implementations on foreign types
 
@@ -135,10 +136,10 @@ implementations for data structures from some external crates:
 
 - [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
   behind the `stable-vec` feature. (example usage:
-  [examples/stable_vec.rs](./examples/stable_vec.rs))
+  [examples/stable_vec.rs](./examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html)
   behind the `thunderdome` feature. (example usage:
-  [examples/thunderdome.rs](./examples/thunderdome.rs))
+  [examples/thunderdome.rs](./examples/thunderdome.rs)).
 
 To use these, specify them next to your `undoredo` dependency in your
 `Cargo.toml`. For example, to enable all foreign implementations, write

@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use stable_vec::StableVec;
-use undoredo::{MapPush, Recorder, MapRemove, UndoRedo};
+use undoredo::{MapPush, MapRemove, Recorder, UndoRedo};
 
-#[test]
 fn main() {
     let mut recorder: Recorder<usize, char, StableVec<char>> = Recorder::new(StableVec::new());
     let mut undoredo: UndoRedo<StableVec<char>> = UndoRedo::new();

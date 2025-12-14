@@ -6,7 +6,6 @@ enum Command {
     PushChars,
 }
 
-#[test]
 fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();

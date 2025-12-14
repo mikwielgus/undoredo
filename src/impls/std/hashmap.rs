@@ -51,13 +51,13 @@ mod tests {
 
     #[test]
     fn test_apply_edit_at_specified_indexes() {
-        let recorder = Recorder::<usize, i32>::new(HashMap::new());
+        let recorder = Recorder::<usize, i32, HashMap<usize, i32>>::new(HashMap::new());
         crate::recorder::tests::test_apply_edit_at_specified_indexes(recorder);
     }
 
     #[test]
     fn test_insert_and_remove_at_specified_indexes() {
-        let recorder = Recorder::<usize, i32>::new(HashMap::new());
+        let recorder = Recorder::<usize, i32, HashMap<usize, i32>>::new(HashMap::new());
         crate::recorder::tests::test_insert_and_remove_at_specified_indexes(recorder);
     }
 

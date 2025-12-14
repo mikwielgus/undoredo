@@ -2,18 +2,19 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::{collections::HashMap, marker::PhantomData};
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
 
 use crate::{
     edit::Edit,
     map::{Map, MapGet, MapInsert, MapPush, MapRemove},
 };
 
-pub struct Recorder<K, V = (), C = HashMap<K, V>, EC = C> {
+pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
     collection: C,
     edit: Edit<EC>,
-    key_marker: std::marker::PhantomData<K>,
-    value_marker: std::marker::PhantomData<V>,
+    key_marker: PhantomData<K>,
+    value_marker: PhantomData<V>,
 }
 
 impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
@@ -24,7 +25,7 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
 
     #[inline(always)]
     pub fn flush(&mut self) -> Edit<EC> {
-        std::mem::replace(&mut self.edit, Edit::new())
+        core::mem::replace(&mut self.edit, Edit::new())
     }
 }
 
@@ -56,8 +57,8 @@ impl<K, V, C: Default, EC: Default> Default for Recorder<K, V, C, EC> {
         Self {
             collection: Default::default(),
             edit: Default::default(),
-            key_marker: std::marker::PhantomData,
-            value_marker: std::marker::PhantomData,
+            key_marker: PhantomData,
+            value_marker: PhantomData,
         }
     }
 }

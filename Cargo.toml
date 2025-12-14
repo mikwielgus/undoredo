@@ -11,17 +11,17 @@ documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["undo", "redo", "no_std"]
-categories = ["data-structures", "gui"]
+categories = ["data-structures", "gui", "no-std"]
 edition = "2024"
 
 [badges]
 maintenance = { status = "actively-developed" }
 
 [features]
-default = ["std"]
+default = ["std", "alloc"]
 std = ["alloc"]
 alloc = []
-all-impls = ["std", "stable-vec", "thunderdome"]
+all-impls = ["std", "alloc", "stable-vec", "thunderdome"]
 
 [dependencies]
 stable-vec = { version = "^0.4", optional = true }

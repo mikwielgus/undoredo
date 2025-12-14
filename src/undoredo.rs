@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2025 undoredo Developers
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+use alloc::vec::Vec;
 
 use crate::{
     Edit, Recorder,
@@ -129,7 +130,7 @@ pub(crate) mod tests {
         assert_eq!(undoredo.undo(&mut container), None);
         assert_eq!(undoredo.redo(&mut container), None);
 
-        let mut indexes = vec![];
+        let mut indexes = alloc::vec::Vec::new();
 
         let mut container = undoredo.edit(container, |recorder| {
             indexes.push(recorder.push(10));

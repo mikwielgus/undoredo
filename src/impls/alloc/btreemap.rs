@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::BTreeMap;
+use alloc::collections::BTreeMap;
 
 use crate::map::{Keyed, Map, MapGet, MapInsert, MapIntoIter, MapRemove};
 
@@ -36,9 +36,9 @@ impl<K: Ord, V> MapRemove<K> for BTreeMap<K, V> {
 }
 
 impl<K, V> MapIntoIter<K> for BTreeMap<K, V> {
-    type IntoIter = std::collections::btree_map::IntoIter<K, V>;
+    type IntoIter = alloc::collections::btree_map::IntoIter<K, V>;
 
-    fn into_iter(self) -> std::collections::btree_map::IntoIter<K, V> {
+    fn into_iter(self) -> alloc::collections::btree_map::IntoIter<K, V> {
         IntoIterator::into_iter(self)
     }
 }

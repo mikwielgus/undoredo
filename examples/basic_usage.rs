@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 undoredo contributors
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use std::collections::HashMap;
 use undoredo::{MapInsert, Recorder, UndoRedo};
 

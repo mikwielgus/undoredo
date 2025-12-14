@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::collection::{Insert, IntoIter, Keyed, Remove};
+use crate::map::{Keyed, MapInsert, MapIntoIter, MapRemove};
 
 pub struct Edit<EC> {
     pub(super) removed: EC,
@@ -43,8 +43,8 @@ pub trait ApplyEdit<EC> {
 impl<
     K: Clone,
     V: Clone,
-    C: Insert<K, Item = V> + Remove<K, Item = V>,
-    EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>,
+    C: MapInsert<K, Item = V> + MapRemove<K, Item = V>,
+    EC: Clone + MapIntoIter<K, Item = V> + Keyed<Key = K>,
 > ApplyEdit<EC> for C
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {

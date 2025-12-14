@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use stable_vec::StableVec;
-use undoredo::{Push, Recorder, Remove, UndoRedo};
+use undoredo::{MapPush, Recorder, MapRemove, UndoRedo};
 
 #[test]
 fn main() {

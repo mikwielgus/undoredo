@@ -4,8 +4,8 @@
 
 use crate::{
     Edit, Recorder,
-    collection::{Get, Insert},
     edit::ApplyEdit,
+    map::{MapGet, MapInsert},
 };
 
 pub struct CmdEdit<Cmd, EC> {
@@ -56,7 +56,7 @@ impl<Cmd, EC: Default> UndoRedo<EC, Cmd> {
     pub fn edit<
         K: Clone,
         V: Clone,
-        C: Get<K, Item = V> + Insert<K>,
+        C: MapGet<K, Item = V> + MapInsert<K>,
         F: FnOnce(&mut Recorder<K, V, C, EC>) -> Cmd,
     >(
         &mut self,
@@ -105,7 +105,7 @@ impl<Cmd: Clone, EC: Clone> UndoRedo<EC, Cmd> {
 pub(crate) mod tests {
     use crate::{
         UndoRedo,
-        collection::{Get, Insert, IntoIter, Push, Remove},
+        map::{MapGet, MapInsert, MapIntoIter, MapPush, MapRemove},
     };
 
     pub(crate) trait FromU32 {
@@ -120,8 +120,8 @@ pub(crate) mod tests {
 
     pub(crate) fn test_edit_undo_redo_at_generated_indexes<
         K: Clone,
-        C: Get<K, Item = i32> + Insert<K> + Remove<K> + Push<K> + IntoIter<K>,
-        EC: Clone + Default + Insert<K, Item = i32> + IntoIter<K, Key = K> + Remove<K>,
+        C: MapGet<K, Item = i32> + MapInsert<K> + MapRemove<K> + MapPush<K> + MapIntoIter<K>,
+        EC: Clone + Default + MapInsert<K, Item = i32> + MapIntoIter<K, Key = K> + MapRemove<K>,
     >(
         mut container: C,
     ) {
@@ -219,8 +219,8 @@ pub(crate) mod tests {
 
     pub(crate) fn test_edit_undo_redo_at_specified_indexes<
         K: Clone + FromU32,
-        C: Get<K, Item = i32> + Insert<K> + IntoIter<K, Key = K> + Remove<K>,
-        EC: Clone + Default + Insert<K, Item = i32> + IntoIter<K, Key = K> + Remove<K>,
+        C: MapGet<K, Item = i32> + MapInsert<K> + MapIntoIter<K, Key = K> + MapRemove<K>,
+        EC: Clone + Default + MapInsert<K, Item = i32> + MapIntoIter<K, Key = K> + MapRemove<K>,
     >(
         mut container: C,
     ) {

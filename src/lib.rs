@@ -7,13 +7,13 @@
 #![forbid(unsafe_code)]*/
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod collection;
 mod edit;
 mod impls;
+mod map;
 mod recorder;
 mod undoredo;
 
-pub use crate::collection::{Get, Insert, Push, Remove};
 pub use crate::edit::Edit;
+pub use crate::map::{MapGet, MapInsert, MapPush, MapRemove};
 pub use crate::recorder::Recorder;
 pub use crate::undoredo::UndoRedo;

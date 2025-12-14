@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{MapInsert, Recorder, UndoRedo};
 
 #[allow(unused_mut)]
 #[test]

@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{MapInsert, Recorder, UndoRedo};
 
 #[derive(Debug, Clone, PartialEq)]
 enum Command {

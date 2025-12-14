@@ -5,8 +5,8 @@
 use std::{collections::HashMap, marker::PhantomData};
 
 use crate::{
-    collection::{Collection, Get, Insert, Push, Remove},
     edit::Edit,
+    map::{Map, MapGet, MapInsert, MapPush, MapRemove},
 };
 
 pub struct Recorder<K, V = (), C = HashMap<K, V>, EC = C> {
@@ -62,19 +62,19 @@ impl<K, V, C: Default, EC: Default> Default for Recorder<K, V, C, EC> {
     }
 }
 
-impl<K, V, C, EC> Collection for Recorder<K, V, C, EC> {
+impl<K, V, C, EC> Map for Recorder<K, V, C, EC> {
     type Item = V;
 }
 
-impl<K, V, C: Get<K, Item = V>, EC> Get<K> for Recorder<K, V, C, EC> {
+impl<K, V, C: MapGet<K, Item = V>, EC> MapGet<K> for Recorder<K, V, C, EC> {
     #[inline(always)]
     fn get(&self, key: &K) -> Option<&V> {
         self.collection.get(key)
     }
 }
 
-impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Insert<K, Item = V>> Insert<K>
-    for Recorder<K, V, C, EC>
+impl<K: Clone, V: Clone, C: MapGet<K, Item = V> + MapInsert<K>, EC: MapInsert<K, Item = V>>
+    MapInsert<K> for Recorder<K, V, C, EC>
 {
     #[inline(always)]
     fn insert(&mut self, key: K, value: V) {
@@ -89,8 +89,12 @@ impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Insert<K, Item = V
     }
 }
 
-impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remove<K, Item = V>>
-    Remove<K> for Recorder<K, V, C, EC>
+impl<
+    K: Clone,
+    V: Clone,
+    C: MapRemove<K, Item = V>,
+    EC: MapInsert<K, Item = V> + MapRemove<K, Item = V>,
+> MapRemove<K> for Recorder<K, V, C, EC>
 {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
@@ -104,7 +108,7 @@ impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remov
     }
 }
 
-impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Push<K>
+impl<K: Clone, V: Clone, C: MapPush<K, Item = V>, EC: MapInsert<K, Item = V>> MapPush<K>
     for Recorder<K, V, C, EC>
 {
     #[inline(always)]
@@ -122,14 +126,14 @@ pub(crate) mod tests {
 
     use crate::{
         Edit, Recorder,
-        collection::{Get, Insert, Push, Remove},
         edit::ApplyEdit,
+        map::{MapGet, MapInsert, MapPush, MapRemove},
     };
 
     pub(crate) fn test_apply_edit_at_generated_indexes<
         K: Ord + Clone,
-        C: Get<K> + Insert<K, Item = i32> + Remove<K> + Push<K>,
-        EC: Insert<K, Item = i32> + Remove<K>,
+        C: MapGet<K> + MapInsert<K, Item = i32> + MapRemove<K> + MapPush<K>,
+        EC: MapInsert<K, Item = i32> + MapRemove<K>,
     >(
         mut recorder: Recorder<K, i32, C, EC>,
     ) {
@@ -156,8 +160,8 @@ pub(crate) mod tests {
     }
 
     pub(crate) fn test_apply_edit_at_specified_indexes<
-        C: Insert<usize, Item = i32> + Remove<usize> + Get<usize>,
-        EC: Insert<usize, Item = i32> + Remove<usize>,
+        C: MapInsert<usize, Item = i32> + MapRemove<usize> + MapGet<usize>,
+        EC: MapInsert<usize, Item = i32> + MapRemove<usize>,
     >(
         mut recorder: Recorder<usize, i32, C, EC>,
     ) {
@@ -183,8 +187,8 @@ pub(crate) mod tests {
 
     pub(crate) fn test_insert_and_remove_at_generated_indexes<
         K: Ord + Clone,
-        C: Insert<K, Item = i32> + Remove<K> + Push<K> + Get<K>,
-        EC: Insert<K, Item = i32> + Remove<K>,
+        C: MapInsert<K, Item = i32> + MapRemove<K> + MapPush<K> + MapGet<K>,
+        EC: MapInsert<K, Item = i32> + MapRemove<K>,
     >(
         mut recorder: Recorder<K, i32, C, EC>,
     ) {
@@ -210,8 +214,8 @@ pub(crate) mod tests {
     }
 
     pub(crate) fn test_insert_and_remove_at_specified_indexes<
-        C: Insert<usize, Item = i32> + Remove<usize, Item = i32> + Get<usize>,
-        EC: Insert<usize, Item = i32> + Remove<usize, Item = i32>,
+        C: MapInsert<usize, Item = i32> + MapRemove<usize, Item = i32> + MapGet<usize>,
+        EC: MapInsert<usize, Item = i32> + MapRemove<usize, Item = i32>,
     >(
         mut recorder: Recorder<usize, i32, C, EC>,
     ) {

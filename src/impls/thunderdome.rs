@@ -71,7 +71,6 @@ mod tests {
 
     #[test]
     fn test_edit_undo_redo_at_generated_indexes() {
-        let recorder = Recorder::<Index, i32, Arena<i32>, Arena<i32>>::new(Arena::new());
         crate::undoredo::tests::test_edit_undo_redo_at_generated_indexes::<
             Index,
             Arena<i32>,

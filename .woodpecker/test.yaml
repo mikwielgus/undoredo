@@ -11,9 +11,6 @@ matrix:
     - --features stable-vec
     - --features thunderdome
     - --all-features
-  FEATURES:
-    - stable-vec
-    - thunderdome
 
 steps:
   test:
@@ -23,6 +20,6 @@ steps:
       CARGO_TEST_COLOR: always
     commands:
       - rustup default "$CHANNEL"
-      - cargo test $FEATURE_FLAGS
+      - cargo test --tests --examples $FEATURE_FLAGS
     when:
       event: [pull_request, push, tag]

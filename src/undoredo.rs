@@ -110,6 +110,7 @@ pub(crate) mod tests {
         map::{Get, Insert, IntoIter, Push, Remove},
     };
 
+    // I think this traits may not be necessary anymore (if it ever was).
     pub(crate) trait FromU32 {
         fn from_u32(u: usize) -> Self;
     }
@@ -308,5 +309,100 @@ pub(crate) mod tests {
         assert_eq!(container.get(&K::from_u32(3)), Some(&33));
         assert_eq!(container.get(&K::from_u32(4)), Some(&40));
         assert_eq!(container.get(&K::from_u32(5)), Some(&50));
+    }
+
+    pub(crate) fn test_edit_undo_redo_on_set<
+        C: Get<i32, Item = ()> + Insert<i32> + IntoIter<i32, Key = i32> + Remove<i32>,
+        EC: Clone
+            + Default
+            + Get<i32, Item = ()>
+            + Insert<i32>
+            + IntoIter<i32, Key = i32>
+            + Remove<i32>,
+    >(
+        mut container: C,
+    ) {
+        let mut undoredo: UndoRedo<EC> = UndoRedo::new();
+        assert_eq!(undoredo.undo(&mut container), None);
+        assert_eq!(undoredo.redo(&mut container), None);
+
+        let mut container = undoredo.edit(container, |recorder| {
+            recorder.insert(10, ());
+            recorder.insert(20, ());
+            recorder.insert(30, ());
+            recorder.insert(40, ());
+            recorder.insert(50, ());
+        });
+
+        assert_eq!(undoredo.redo(&mut container), None);
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), Some(&()));
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+
+        let mut container = undoredo.edit(container, |recorder| {
+            recorder.remove(&20);
+            recorder.insert(10, ()); // Should do nothing.
+            recorder.insert(30, ()); // Should do nothing
+        });
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), None);
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+
+        assert!(undoredo.undo(&mut container).is_some());
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), Some(&()));
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+
+        assert!(undoredo.redo(&mut container).is_some());
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), None);
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+
+        let mut container = undoredo.edit(container, |recorder| {
+            recorder.remove(&30);
+            recorder.insert(60, ());
+        });
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), None);
+        assert_eq!(container.get(&30), None);
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+        assert_eq!(container.get(&60), Some(&()));
+
+        assert_eq!(undoredo.redo(&mut container), None);
+
+        assert!(undoredo.undo(&mut container).is_some());
+        assert!(undoredo.undo(&mut container).is_some());
+        assert!(undoredo.undo(&mut container).is_some());
+        assert_eq!(undoredo.undo(&mut container), None);
+
+        assert!(undoredo.redo(&mut container).is_some());
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), Some(&()));
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
+
+        assert!(undoredo.redo(&mut container).is_some());
+
+        assert_eq!(container.get(&10), Some(&()));
+        assert_eq!(container.get(&20), None);
+        assert_eq!(container.get(&30), Some(&()));
+        assert_eq!(container.get(&40), Some(&()));
+        assert_eq!(container.get(&50), Some(&()));
     }
 }

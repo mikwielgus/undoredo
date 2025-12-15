@@ -184,6 +184,32 @@ pub(crate) mod tests {
         assert_eq!(recorder.get(&6), Some(&60));
     }
 
+    pub(crate) fn test_apply_edit_on_set<
+        C: Insert<i32, Item = ()> + Remove<i32> + Get<i32>,
+        EC: Get<i32, Item = ()> + Insert<i32> + Remove<i32>,
+    >(
+        mut recorder: Recorder<i32, (), C, EC>,
+    ) {
+        recorder.insert(10, ());
+        recorder.insert(20, ());
+        recorder.insert(30, ());
+        recorder.insert(40, ());
+        recorder.insert(50, ());
+
+        let edit = Edit {
+            removed: BTreeMap::from([(20, ())]),
+            inserted: BTreeMap::from([(30, ()), (60, ())]),
+        };
+        recorder.apply_edit(&edit);
+
+        assert_eq!(recorder.get(&10), Some(&()));
+        assert_eq!(recorder.get(&20), None);
+        assert_eq!(recorder.get(&30), Some(&()));
+        assert_eq!(recorder.get(&40), Some(&()));
+        assert_eq!(recorder.get(&50), Some(&()));
+        assert_eq!(recorder.get(&60), Some(&()));
+    }
+
     pub(crate) fn test_insert_and_remove_at_generated_indexes<
         K: Ord + Clone,
         C: Insert<K, Item = i32> + Remove<K> + Push<K> + Get<K>,
@@ -234,5 +260,31 @@ pub(crate) mod tests {
         assert_eq!(recorder.get(&4), None);
         assert_eq!(recorder.get(&5), Some(&50));
         assert_eq!(recorder.get(&6), Some(&60));
+    }
+
+    pub(crate) fn test_insert_and_remove_on_set<
+        C: Insert<i32, Item = ()> + Remove<i32> + Get<i32>,
+        EC: Get<i32, Item = ()> + Insert<i32> + Remove<i32>,
+    >(
+        mut recorder: Recorder<i32, (), C, EC>,
+    ) {
+        recorder.insert(10, ());
+        recorder.insert(20, ());
+        recorder.insert(30, ());
+        recorder.insert(40, ());
+        recorder.insert(50, ());
+        recorder.insert(60, ());
+
+        recorder.remove(&20);
+        recorder.insert(10, ()); // Should do nothing.
+        recorder.remove(&40);
+        recorder.insert(60, ()); // Should do nothing.
+
+        assert_eq!(recorder.get(&10), Some(&()));
+        assert_eq!(recorder.get(&20), None);
+        assert_eq!(recorder.get(&30), Some(&()));
+        assert_eq!(recorder.get(&40), None);
+        assert_eq!(recorder.get(&50), Some(&()));
+        assert_eq!(recorder.get(&60), Some(&()));
     }
 }

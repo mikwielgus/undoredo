@@ -147,7 +147,7 @@ let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
 
 Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
-[examples/btreeset.rs](.examples/btreeset.rs) for a complete example.
+[examples/btreeset.rs](./examples/btreeset.rs) for a complete example.
 
 ## Supported collections
 

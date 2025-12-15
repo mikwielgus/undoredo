@@ -131,11 +131,11 @@ fn main() {
 Some data structures have set semantics: they operate only on values, without
 exposing any usable notion of key or index. `undoredo` can provide its
 functionality to a set by treating it as a `()`-valued map whose keys are the
-set's values. This is actually also how Rust's standard library represents
-[`HashSet`](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115)
-and
-[`BTreeSet`](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html#82)
-internally.
+set's values. This is actually also how Rust's standard library
+[represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115)
+`HashSet`
+[and](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html#82)
+`BTreeSet` internally.
 
 As an example, the following code will construct a recorder and an undo-redo
 bistack for a `BTreeSet`:
@@ -221,7 +221,7 @@ We welcome issues and pull requests from anyone both to our canonical
 
 `undoredo` is dual-licensed as under either of
 
-- Apache License, Version 2.0, ([LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt))
-- MIT license ([LICENSES/MIT.txt](./LICENSES/MIT.txt))
+- [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt),
+- [MIT license](./LICENSES/MIT.txt).
 
 at your option.

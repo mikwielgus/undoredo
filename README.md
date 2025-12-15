@@ -88,11 +88,11 @@ fn main() {
 ### Storing and accessing command metadata along with edits
 
 It is often desirable to store some metadata along with every recorded edit,
-usually the a representation of the command that originated it. This can be done
-by instead committing the edit using the `.cmd_commit()` method.
+usually a representation of the command that originated it. This can be done by
+instead committing the edit using the `.cmd_commit()` method.
 
 The bistack of done and undone committed edits, together with their command
-metadata ("cmd") if present, can be accessed as slices from the `.done()` and
+metadatas ("cmd") if present, can be accessed as slices from the `.done()` and
 `.undone()` accessor methods.
 
 ```rust
@@ -156,9 +156,9 @@ Keeping in mind to pass values as keys, `recorder` and
 Rust's standard library maps and sets are supported via built-in convenience
 implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default);
-- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html) behind the `std` feature (enabled by default);
-- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated);
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default),
+- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html) behind the `std` feature (enabled by default),
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated),
 - [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html) (not feature-gated).
 
 ### Convenience implementations on foreign types
@@ -183,12 +183,12 @@ undoredo = { version = "0.1", features = ["stable-vec", "thunderdome"]}
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures
 allow insertion and removal at arbitrary indexes regardless of whether they are
-vacant, occupied, or out of bounds at the time of insertion. For `StableVec`,
+vacant, occupied, or out of bounds, at the time of insertion. For `StableVec`,
 we managed to insert at out-of-bound indexes by changing the length before
 insertion using the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
-method. For `thunderdome::Arena` we could achieve insertion at arbitrary key by
-inserting via the
+method. For `thunderdome::Arena`, we can insert at arbitrary key directly via
+the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
 method. Collections for which we have not managed to achieve this are documented
 in the section below.
@@ -221,7 +221,7 @@ We welcome issues and pull requests from anyone both to our canonical
 
 `undoredo` is dual-licensed as under either of
 
-- [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt),
-- [MIT license](./LICENSES/MIT.txt).
+- [MIT license](./LICENSES/MIT.txt),
+- [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt).
 
 at your option.

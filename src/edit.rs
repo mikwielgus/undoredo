@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::map::{Keyed, Insert, IntoIter, Remove};
+use crate::map::{Insert, IntoIter, Keyed, Remove};
 
 pub struct Edit<EC> {
     pub(super) removed: EC,
@@ -43,7 +43,7 @@ pub trait ApplyEdit<EC> {
 impl<
     K: Clone,
     V: Clone,
-    C: Insert<K, Item = V> + Remove<K, Item = V>,
+    C: Insert<K, Item = V> + Remove<K>,
     EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>,
 > ApplyEdit<EC> for C
 {

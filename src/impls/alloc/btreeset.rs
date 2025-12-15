@@ -73,7 +73,7 @@ mod tests {
 
     #[test]
     fn test_edit_undo_redo_on_set() {
-        crate::undoredo::tests::test_edit_undo_redo_on_set::<BTreeSet<i32>, BTreeSet<i32>>(
+        crate::undoredo::tests::test_edit_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSet<i32>>(
             BTreeSet::new(),
         );
     }

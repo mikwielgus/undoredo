@@ -4,7 +4,7 @@
 
 use stable_vec::StableVecFacade;
 
-use crate::map::{Keyed, Map, Get, Insert, IntoIter, Push, Remove};
+use crate::map::{Get, Insert, IntoIter, Keyed, Map, Push, Remove};
 
 impl<V, C: stable_vec::core::Core<V>> Map for StableVecFacade<V, C> {
     type Item = V;

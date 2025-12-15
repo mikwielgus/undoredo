@@ -13,3 +13,6 @@ mod stable_vec;
 
 #[cfg(feature = "thunderdome")]
 mod thunderdome;
+
+#[cfg(feature = "rstar")]
+mod rstar;

@@ -73,7 +73,7 @@ mod tests {
 
     #[test]
     fn test_edit_undo_redo_on_set() {
-        crate::undoredo::tests::test_edit_undo_redo_on_set::<HashSet<i32>, HashSet<i32>>(
+        crate::undoredo::tests::test_edit_undo_redo_on_set::<i32, HashSet<i32>, HashSet<i32>>(
             HashSet::new(),
         );
     }

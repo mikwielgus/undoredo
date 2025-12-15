@@ -129,6 +129,22 @@ pub(crate) mod tests {
         map::{Get, Insert, Push, Remove},
     };
 
+    pub(crate) trait FromUsize {
+        fn from_usize(u: usize) -> Self;
+    }
+
+    impl FromUsize for i32 {
+        fn from_usize(u: usize) -> i32 {
+            u.try_into().unwrap()
+        }
+    }
+
+    impl FromUsize for usize {
+        fn from_usize(u: usize) -> usize {
+            u
+        }
+    }
+
     pub(crate) fn test_apply_edit_at_generated_indexes<
         K: Ord + Clone,
         C: Get<K, Item = i32> + Insert<K> + Remove<K> + Push<K>,
@@ -185,33 +201,34 @@ pub(crate) mod tests {
     }
 
     pub(crate) fn test_apply_edit_on_set<
-        C: Insert<i32, Item = ()> + Remove<i32> + Get<i32>,
-        EC: Get<i32, Item = ()> + Insert<i32> + Remove<i32>,
+        K: Clone + FromUsize + Ord,
+        C: Insert<K, Item = ()> + Remove<K> + Get<K>,
+        EC: Get<K, Item = ()> + Insert<K> + Remove<K>,
     >(
-        mut recorder: Recorder<i32, (), C, EC>,
+        mut recorder: Recorder<K, (), C, EC>,
     ) {
-        recorder.insert(10, ());
-        recorder.insert(20, ());
-        recorder.insert(30, ());
-        recorder.insert(40, ());
-        recorder.insert(50, ());
+        recorder.insert(K::from_usize(10), ());
+        recorder.insert(K::from_usize(20), ());
+        recorder.insert(K::from_usize(30), ());
+        recorder.insert(K::from_usize(40), ());
+        recorder.insert(K::from_usize(50), ());
 
         let edit = Edit {
-            removed: BTreeMap::from([(20, ())]),
-            inserted: BTreeMap::from([(30, ()), (60, ())]),
+            removed: BTreeMap::from([(K::from_usize(20), ())]),
+            inserted: BTreeMap::from([(K::from_usize(30), ()), (K::from_usize(60), ())]),
         };
         recorder.apply_edit(&edit);
 
-        assert_eq!(recorder.get(&10), Some(&()));
-        assert_eq!(recorder.get(&20), None);
-        assert_eq!(recorder.get(&30), Some(&()));
-        assert_eq!(recorder.get(&40), Some(&()));
-        assert_eq!(recorder.get(&50), Some(&()));
-        assert_eq!(recorder.get(&60), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(10)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(20)), None);
+        assert_eq!(recorder.get(&K::from_usize(30)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(40)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(50)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
     }
 
     pub(crate) fn test_insert_and_remove_at_generated_indexes<
-        K: Ord + Clone,
+        K: Clone,
         C: Insert<K, Item = i32> + Remove<K> + Push<K> + Get<K>,
         EC: Get<K, Item = i32> + Insert<K> + Remove<K>,
     >(
@@ -263,28 +280,29 @@ pub(crate) mod tests {
     }
 
     pub(crate) fn test_insert_and_remove_on_set<
-        C: Insert<i32, Item = ()> + Remove<i32> + Get<i32>,
-        EC: Get<i32, Item = ()> + Insert<i32> + Remove<i32>,
+        K: Clone + FromUsize,
+        C: Insert<K, Item = ()> + Remove<K> + Get<K>,
+        EC: Get<K, Item = ()> + Insert<K> + Remove<K>,
     >(
-        mut recorder: Recorder<i32, (), C, EC>,
+        mut recorder: Recorder<K, (), C, EC>,
     ) {
-        recorder.insert(10, ());
-        recorder.insert(20, ());
-        recorder.insert(30, ());
-        recorder.insert(40, ());
-        recorder.insert(50, ());
-        recorder.insert(60, ());
+        recorder.insert(K::from_usize(10), ());
+        recorder.insert(K::from_usize(20), ());
+        recorder.insert(K::from_usize(30), ());
+        recorder.insert(K::from_usize(40), ());
+        recorder.insert(K::from_usize(50), ());
+        recorder.insert(K::from_usize(60), ());
 
-        recorder.remove(&20);
-        recorder.insert(10, ()); // Should do nothing.
-        recorder.remove(&40);
-        recorder.insert(60, ()); // Should do nothing.
+        recorder.remove(&K::from_usize(20));
+        recorder.insert(K::from_usize(10), ()); // Should do nothing.
+        recorder.remove(&K::from_usize(40));
+        recorder.insert(K::from_usize(60), ()); // Should do nothing.
 
-        assert_eq!(recorder.get(&10), Some(&()));
-        assert_eq!(recorder.get(&20), None);
-        assert_eq!(recorder.get(&30), Some(&()));
-        assert_eq!(recorder.get(&40), None);
-        assert_eq!(recorder.get(&50), Some(&()));
-        assert_eq!(recorder.get(&60), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(10)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(20)), None);
+        assert_eq!(recorder.get(&K::from_usize(30)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(40)), None);
+        assert_eq!(recorder.get(&K::from_usize(50)), Some(&()));
+        assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
     }
 }

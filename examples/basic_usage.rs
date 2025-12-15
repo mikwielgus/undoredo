@@ -7,7 +7,10 @@ use undoredo::{Insert, Recorder, UndoRedo};
 
 #[allow(unused_mut)]
 fn main() {
+    // The recorder records the ongoing changes to the underlying collection.
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+
+    // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in an edit.
@@ -15,7 +18,7 @@ fn main() {
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
-    // Flush the recorder and Commit the recorded edit of pushing 'A', 'B', 'C'
+    // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
     // into the undo-redo history.
     undoredo.commit(recorder.flush());
 
@@ -38,4 +41,9 @@ fn main() {
     // ownership and mutability over the underlying collection.
     let (mut hashmap, ..) = recorder.dissolve();
     assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+}
+
+#[test]
+fn test() {
+    main();
 }

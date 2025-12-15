@@ -10,12 +10,15 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 inside a decorator that observes the incoming insertions, removals, and pushes,
 recording the changes in a reversible incremental diff structure.
 
-This approach makes `undoredo` easier to use than other undo-redo libraries.
-Storing incremental diffs is much more succint and reliable than the
-commonly used [Command pattern](https://en.wikipedia.org/wiki/Command_pattern).
-The programmer is relieved from having to maintain application-specific
-implementations of commands, often complicated and prone to elusive runtime
-bugs, on which the Command pattern has to operate.
+This approach makes `undoredo` often easier to use than other
+undo-redo libraries. Storing incremental diffs typically results in
+much more succint and reliable code than the commonly used [Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what is
+used by the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/)
+and [`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates. The programmer
+is relieved from having to maintain application-specific implementations of
+commands, often complicated and prone to elusive runtime bugs, on which the
+Command pattern has to operate.
 
 This library is `no_std`-compatible and has no mandatory dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
@@ -43,11 +46,15 @@ Following is a basic usage example of `undoredo` over
 use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
 
+#[allow(unused_mut)]
 fn main() {
+    // The recorder records the ongoing changes to the underlying collection.
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+
+    // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
 
-    // Push elements while recording this in an edit.
+    // Push elements while recording the changes in an edit.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
@@ -81,10 +88,10 @@ fn main() {
 ### Storing and accessing command metadata along with edits
 
 It is often desirable to store some metadata along with every recorded edit,
-usually a description of the command that originated it. This can be done by
-instead committing the edit using the `.cmd_commit()` method.
+usually the a representation of the command that originated it. This can be done
+by instead committing the edit using the `.cmd_commit()` method.
 
-The stacks of done and undone committed edits, together with their command
+The bistack of done and undone committed edits, together with their command
 metadata ("cmd") if present, can be accessed as slices from the `.done()` and
 `.undone()` accessor methods.
 
@@ -92,17 +99,16 @@ metadata ("cmd") if present, can be accessed as slices from the `.done()` and
 use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
 
+// Representation of the command that originated the recorded edit.
 #[derive(Debug, Clone, PartialEq)]
 enum Command {
     PushChars,
 }
 
-#[test]
 fn main() {
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
 
-    // Push an element while recording.
     recorder.insert(1, 'A');
 
     // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
@@ -112,27 +118,53 @@ fn main() {
     // `Command::PushChar` is now the top element of the stack of done cmd-edits.
     assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChars);
 
-    // Now undo the action.
     undoredo.undo(&mut recorder);
 
-    // `Command::PushChar` is now the top element of the stack of undone cmd-edits.
+    // After undo, `Command::PushChar` is now the top element of the stack of
+    // undone cmd-edits.
     assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChars);
 }
 ```
+
+### Undo-redo on sets
+
+Some data structures have set semantics: they operate only on values, without
+exposing any usable notion of key or index. `undoredo` can provide its
+functionality to a set by treating it as a `()`-valued map whose keys are the
+set's values. This is actually also how Rust's standard library represents
+[`HashSet`](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115)
+and
+[`BTreeSet`](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html#82)
+internally.
+
+As an example, the following code will construct a recorder and an undo-redo
+bistack for a `BTreeSet`:
+
+```rust
+let mut recorder: Recorder<usize, char, BTreeSet<char, ()>> = Recorder::new(BTreeSet::new());
+let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
+```
+
+Keeping in mind to pass values as keys, `recorder` and
+`undoredo` can then be used the same way as with maps above. See
+[examples/btreeset.rs](.examples/btreeset.rs) for a complete example.
 
 ## Supported collections
 
 ### Standard library
 
-Standard library maps are supported via built-in implementations:
+Rust's standard library maps and sets are supported via built-in convenience
+implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default),
-- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated).
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default);
+- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html) behind the `std` feature (enabled by default);
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated);
+- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html) (not feature-gated).
 
 ### Convenience implementations on foreign types
 
-In addition to the standard library, `undoredo` has feature-gated convenience
-implementations for data structures from some external crates:
+In addition to the standard library, `undoredo` has built-in feature-gated
+convenience implementations for data structures from certain external crates:
 
 - [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
   behind the `stable-vec` feature. (example usage:
@@ -149,15 +181,17 @@ To use these, specify them next to your `undoredo` dependency in your
 undoredo = { version = "0.1", features = ["stable-vec", "thunderdome"]}
 ```
 
-**Technical detail:** Unlike maps, which support insertion and removal at
-arbitrary keys, a stable-vec-style data structure can be only supported if
-it allows to insert elements at arbitrary indexes, including indexes that are
-out of bounds at the time of insertion. For `StableVec`, this is achieved by
-changing the length before insertion using the
+**Technical sidenote:** Unlike maps and sets, not all stable vec data structures
+allow insertion and removal at arbitrary indexes regardless of whether they are
+vacant, occupied, or out of bounds at the time of insertion. For `StableVec`,
+we managed to insert at out-of-bound indexes by changing the length before
+insertion using the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
-method. With `thunderdome::Arena`, this is achieved directly by inserting via the
+method. For `thunderdome::Arena` we could achieve insertion at arbitrary key by
+inserting via the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
-method.
+method. Collections for which we have not managed to achieve this are documented
+in the section below.
 
 ## Unsupported collections
 
@@ -167,7 +201,7 @@ method.
 cannot be supported because they lack interfaces for insertion at an arbitrary
 key.
 
-**Technical detail:** For `Slab`, such interface is missing apparently
+**Technical sidenote:** For `Slab`, such interface is missing apparently
 [because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
 the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
 track of its vacant indexes is only singly-linked, not doubly-linked. Inserting

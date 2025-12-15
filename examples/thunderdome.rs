@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use thunderdome::{Arena, Index};
-use undoredo::{Push, Remove, Recorder, UndoRedo};
+use undoredo::{Push, Recorder, Remove, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<Index, char, Arena<char>> = Recorder::new(Arena::new());
@@ -39,4 +39,9 @@ fn main() {
     undoredo.redo(&mut recorder);
     let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B', 'C']);
+}
+
+#[test]
+fn test() {
+    main();
 }

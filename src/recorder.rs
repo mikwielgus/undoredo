@@ -51,6 +51,21 @@ impl<K, V, C, EC> Recorder<K, V, C, EC> {
     }
 }
 
+impl<
+    K: Clone,
+    V: Clone,
+    C: Get<K, Item = V> + Insert<K> + Remove<K, Item = V>,
+    EC: Get<K, Item = V> + Insert<K, Item = V> + Remove<K>,
+> Recorder<K, V, C, EC>
+{
+    #[inline(always)]
+    pub fn update<F: FnOnce(Option<V>) -> Option<V>>(&mut self, key: K, f: F) {
+        if let Some(value) = f(self.remove(&key)) {
+            self.insert(key, value);
+        }
+    }
+}
+
 impl<K, V, C: Default, EC: Default> Default for Recorder<K, V, C, EC> {
     #[inline(always)]
     fn default() -> Self {

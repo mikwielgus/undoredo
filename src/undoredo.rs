@@ -62,10 +62,10 @@ impl<Cmd, EC: Default> UndoRedo<EC, Cmd> {
         F: FnOnce(&mut Recorder<K, V, C, EC>) -> Cmd,
     >(
         &mut self,
-        container: C,
+        collection: C,
         f: F,
     ) -> C {
-        let mut recorder = Recorder::<K, V, C, EC>::new(container);
+        let mut recorder = Recorder::<K, V, C, EC>::new(collection);
         let cmd = f(&mut recorder);
         let (container, edit) = recorder.dissolve();
 

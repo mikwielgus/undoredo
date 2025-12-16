@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 inside a recorder decorator that observes the incoming insertions, removals and
 pushes while recording the changes in a reversible incremental diff structure.
 
-This approach makes `undoredo` often easier to use than other
+This decorator approach makes `undoredo` easier to use than other
 undo-redo libraries. Storing incremental diffs typically results in
 much more succint and reliable code than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what

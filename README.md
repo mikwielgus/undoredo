@@ -8,11 +8,12 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
 inside a recorder decorator that observes the incoming insertions, removals and
-pushes while recording the changes in a reversible incremental diff structure.
+pushes while recording the changes in an invertible and reversible incremental
+diff structure.
 
-This decorator approach makes `undoredo` easier to use than other
-undo-redo libraries. Storing incremental diffs typically results in
-much more succint and reliable code than the commonly used [Command
+This recorder decorator approach makes `undoredo` easier to use than
+other undo-redo libraries. Storing incremental diffs typically results
+in much more succint and reliable code than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what
 the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/) and
 [`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates use. The programmer
@@ -46,7 +47,6 @@ Following is a basic usage example of `undoredo` over
 use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
 
-#[allow(unused_mut)]
 fn main() {
     // The recorder records the ongoing changes to the underlying collection.
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
@@ -183,7 +183,7 @@ convenience implementations for data structures from certain external crates:
   [examples/stable_vec.rs](./examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/)
   behind the `thunderdome` feature. (example usage:
-  [examples/thunderdome.rs](./examples/thunderdome.rs)).
+  [examples/thunderdome.rs](./examples/thunderdome.rs)),
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html) behind the
   `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
 

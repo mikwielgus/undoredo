@@ -149,6 +149,10 @@ Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
 [examples/btreeset.rs](./examples/btreeset.rs) for a complete example.
 
+Among supported foreign types, `rstar::RTree` is an instance of a data structure
+with set semantics. See [examples/rstar.rs](./examples/rstar.rs) for an example
+of its usage.
+
 ## Supported collections
 
 ### Standard library
@@ -161,7 +165,7 @@ implementations:
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated),
 - [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html) (not feature-gated).
 
-### Convenience implementations on foreign types
+### Foreign types
 
 In addition to the standard library, `undoredo` has built-in feature-gated
 convenience implementations for data structures from certain external crates:
@@ -169,16 +173,18 @@ convenience implementations for data structures from certain external crates:
 - [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
   behind the `stable-vec` feature. (example usage:
   [examples/stable_vec.rs](./examples/stable_vec.rs)),
-- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html)
+- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/)
   behind the `thunderdome` feature. (example usage:
   [examples/thunderdome.rs](./examples/thunderdome.rs)).
+- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html) behind the
+  `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
 
-To use these, specify them next to your `undoredo` dependency in your
-`Cargo.toml`. For example, to enable all foreign implementations, write
+To use these, enabled their features next to your `undoredo` dependency in your
+`Cargo.toml`. For example, to enable all foreign type implementations, write
 
 ```
 [dependencies]
-undoredo = { version = "0.1", features = ["stable-vec", "thunderdome"]}
+undoredo = { version = "0.1", features = ["stable-vec", "thunderdome", "rstar"]}
 ```
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures

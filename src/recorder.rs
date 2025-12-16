@@ -294,9 +294,11 @@ pub(crate) mod tests {
         recorder.insert(K::from_usize(60), ());
 
         recorder.remove(&K::from_usize(20));
-        recorder.insert(K::from_usize(10), ()); // Should do nothing.
+        // Inserting a value that is already there is implementation-defined.
+        //recorder.insert(K::from_usize(10), ());
         recorder.remove(&K::from_usize(40));
-        recorder.insert(K::from_usize(60), ()); // Should do nothing.
+        // Inserting a value that is already there is implementation-defined.
+        //recorder.insert(K::from_usize(60), ());
 
         assert_eq!(recorder.get(&K::from_usize(10)), Some(&()));
         assert_eq!(recorder.get(&K::from_usize(20)), None);

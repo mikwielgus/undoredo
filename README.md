@@ -7,25 +7,25 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 # undoredo
 
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
-inside a decorator that observes the incoming insertions, removals, and pushes,
-recording the changes in a reversible incremental diff structure.
+inside a recorder decorator that observes the incoming insertions, removals and
+pushes while recording the changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` often easier to use than other
 undo-redo libraries. Storing incremental diffs typically results in
 much more succint and reliable code than the commonly used [Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what is
-used by the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/)
-and [`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates. The programmer
+pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what
+the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/) and
+[`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates use. The programmer
 is relieved from having to maintain application-specific implementations of
 commands, often complicated and prone to elusive runtime bugs, on which the
 Command pattern has to operate.
 
 This library is `no_std`-compatible and has no mandatory dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
-`undoredo` has convenience implementations for standard library
-collections, `HashMap` and `BTreeMap`, and for some foreign feature-gated types,
-`StableVec` and `thunderdome::Arena` (read more in
-[Supported collections](#supported-collections) section).
+`undoredo` has convenience implementations for standard library collections,
+`HashMap` and `BTreeMap`, and for some foreign feature-gated types,
+`StableVec`, `thunderdome::Arena` and `rstar::RTree`  (read more in [Supported
+collections](#supported-collections) section).
 
 ## Usage
 
@@ -149,9 +149,16 @@ Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
 [examples/btreeset.rs](./examples/btreeset.rs) for a complete example.
 
-Among supported foreign types, `rstar::RTree` is an instance of a data structure
-with set semantics. See [examples/rstar.rs](./examples/rstar.rs) for an example
-of its usage.
+Among the supported foreign types, `rstar::RTree` is an instance of a
+data structure with a convenience implementation over set semantics. See
+[examples/rstar.rs](./examples/rstar.rs) for an example of its usage.
+
+**NOTE:** Some set-like data structures are actually multisets: they allow
+to insert the same value multiple times without overriding the first one. In
+fact, `rstar::RTree` is a multiset. `undoredo` will work correctly with such
+data structures, seeing them as sets, but only if you never make use of their
+multiset property: you must never insert a value to the collection that is
+already there.
 
 ## Supported collections
 
@@ -170,7 +177,7 @@ implementations:
 In addition to the standard library, `undoredo` has built-in feature-gated
 convenience implementations for data structures from certain external crates:
 
-- [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
+- [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
   behind the `stable-vec` feature. (example usage:
   [examples/stable_vec.rs](./examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/)
@@ -189,15 +196,14 @@ undoredo = { version = "0.1", features = ["stable-vec", "thunderdome", "rstar"]}
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures
 allow insertion and removal at arbitrary indexes regardless of whether they are
-vacant, occupied, or out of bounds, at the time of insertion. For `StableVec`,
-we managed to insert at out-of-bound indexes by changing the length before
-insertion using the
+vacant, occupied or out of bounds at the time of insertion. For `StableVec`, we
+managed to implement inserting at out-of-bound indexes by changing the length
+before insertion using the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
-method. For `thunderdome::Arena`, we can insert at arbitrary key directly via
-the
+method. For `thunderdome::Arena`, we insert at arbitrary key directly via the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
-method. Collections for which we have not managed to achieve this are documented
-in the section below.
+method. Collections for which we could not achieve this are documented in the
+section below.
 
 ## Unsupported collections
 

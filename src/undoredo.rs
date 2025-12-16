@@ -330,8 +330,7 @@ pub(crate) mod tests {
 
         let mut container = undoredo.edit(container, |recorder| {
             recorder.remove(&K::from_usize(20));
-
-            // Inserting the same object multiple times is undefined behavior.
+            // Inserting a value that is already there is implementation-defined.
             //recorder.insert(K::from_usize(10), ());
             //recorder.insert(K::from_usize(30), ());
         });

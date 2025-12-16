@@ -4,9 +4,10 @@
 
 [package]
 name = "undoredo"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Incremental-diff undo-redo decorator for collections such as HashMap, BTreeMap, StableVec, thunderdome::Arena, rstar::RTree. No need to implement commands."
+repository = "https://codeberg.org/topola/undoredo"
 documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"

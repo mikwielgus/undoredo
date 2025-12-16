@@ -33,7 +33,7 @@ First, add `undoredo` to your `Cargo.toml`:
 
 ```
 [dependencies]
-undoredo = "0.1"
+undoredo = "0.2"
 ```
 
 ### Basic usage
@@ -191,7 +191,7 @@ To use these, enabled their features next to your `undoredo` dependency in your
 
 ```
 [dependencies]
-undoredo = { version = "0.1", features = ["stable-vec", "thunderdome", "rstar"]}
+undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar"]}
 ```
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures

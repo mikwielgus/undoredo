@@ -20,7 +20,7 @@ pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
 impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
     #[inline(always)]
     pub fn new(container: C) -> Self {
-        Self::new_with_edit(container, Default::default())
+        Self::with_edit(container, Default::default())
     }
 
     #[inline(always)]
@@ -31,7 +31,7 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
 
 impl<K, V, C, EC> Recorder<K, V, C, EC> {
     #[inline(always)]
-    fn new_with_edit(container: C, edit: Edit<EC>) -> Self {
+    pub fn with_edit(container: C, edit: Edit<EC>) -> Self {
         Self {
             collection: container,
             edit,

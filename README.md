@@ -102,7 +102,7 @@ use undoredo::{Insert, Recorder, UndoRedo};
 // Representation of the command that originated the recorded edit.
 #[derive(Debug, Clone, PartialEq)]
 enum Command {
-    PushChars,
+    PushChar,
 }
 
 fn main() {
@@ -110,19 +110,20 @@ fn main() {
     let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
+    recorder.insert(2, 'B');
 
     // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
     // with the recorded edit.
-    undoredo.cmd_commit(Command::PushChars, recorder.flush());
+    undoredo.cmd_commit(Command::PushChar, recorder.flush());
 
     // `Command::PushChar` is now the top element of the stack of done cmd-edits.
-    assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChars);
+    assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChar);
 
     undoredo.undo(&mut recorder);
 
     // After undo, `Command::PushChar` is now the top element of the stack of
     // undone cmd-edits.
-    assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChars);
+    assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChar);
 }
 ```
 

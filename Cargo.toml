@@ -48,6 +48,6 @@ required-features = ["stable-vec"]
 name = "thunderdome"
 required-features = ["thunderdome"]
 
-#[[example]]
-#name = "rstar"
-#required-features = ["rstar"]
+[[example]]
+name = "rstar"
+required-features = ["rstar"]

@@ -32,22 +32,30 @@ stable-vec = "^0.4"
 thunderdome = "^0.6"
 rstar = "^0.12"
 
+[package.metadata.docs.rs]
+cargo-arcs = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]
+
 [[example]]
 name = "basic_usage"
 required-features = ["std"]
+doc-scrape-examples = true
 
 [[example]]
 name = "cmd_commit"
 required-features = ["std"]
+doc-scrape-examples = true
 
 [[example]]
 name = "stable_vec"
 required-features = ["stable-vec"]
+doc-scrape-examples = true
 
 [[example]]
 name = "thunderdome"
 required-features = ["thunderdome"]
+doc-scrape-examples = true
 
 [[example]]
 name = "rstar"
 required-features = ["rstar"]
+doc-scrape-examples = true

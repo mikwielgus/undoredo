@@ -97,8 +97,10 @@ instead committing the edit using the
 [`.cmd_commit()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.cmd_commit)
 method.
 
-The bistack of done and undone committed edits, together with their command
-metadatas ("cmd") if present, can be accessed as slices from the `.done()` and
+The bistack of done and undone committed edits, together with their
+command metadatas ("cmd") if present, can be accessed as slices from the
+[`.done()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
+and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 accessor methods.
 

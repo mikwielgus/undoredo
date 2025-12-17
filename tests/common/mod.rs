@@ -1,5 +1,9 @@
 #![allow(dead_code)]
 
+// SPDX-FileCopyrightText: 2025 undoredo contributors
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use std::collections::BTreeMap;
 
 use undoredo::{ApplyEdit, Edit, Get, Insert, IntoIter, Push, Recorder, Remove, UndoRedo};

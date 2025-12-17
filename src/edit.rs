@@ -4,12 +4,17 @@
 
 use crate::maplike::{Insert, IntoIter, Keyed, Remove};
 
+/// A reversible set of changes to a collection.
+///
+/// Consists of a collection of removed elements and another collection of
+/// inserted elements.
 pub struct Edit<EC> {
     pub(super) removed: EC,
     pub(super) inserted: EC,
 }
 
 impl<EC: Default> Edit<EC> {
+    /// Create a new empty edit with no recorded changes.
     pub fn new() -> Self {
         Self {
             removed: Default::default(),
@@ -19,10 +24,15 @@ impl<EC: Default> Edit<EC> {
 }
 
 impl<EC> Edit<EC> {
+    /// Create an new edit from collections of removals and insertions.
     pub fn with_removed_inserted(removed: EC, inserted: EC) -> Self {
         Self { removed, inserted }
     }
 
+    /// Reverse the edit.
+    ///
+    /// This is done by swapping the collections of removed and inserted
+    /// elements.
     pub fn reverse(self) -> Self {
         Self {
             removed: self.inserted,
@@ -41,6 +51,10 @@ impl<EC: Default> Default for Edit<EC> {
 }
 
 pub trait ApplyEdit<EC> {
+    /// Apply the changes in an edit to a collection.
+    ///
+    /// This can be used to revert a previously recorded edit. The edit has to
+    /// be reversed first with [`Edit::reverse()`].
     fn apply_edit(&mut self, edit: &Edit<EC>);
 }
 

@@ -8,8 +8,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
 inside a recorder decorator that observes the incoming insertions, removals and
-pushes while recording the changes in an invertible and reversible incremental
-diff structure.
+pushes while recording the changes in an reversible incremental diff structure.
 
 This recorder decorator approach makes `undoredo` easier to use than
 other undo-redo libraries. Storing incremental diffs typically results
@@ -48,7 +47,7 @@ use std::collections::HashMap;
 use undoredo::{Insert, Recorder, UndoRedo};
 
 fn main() {
-    // The recorder records the ongoing changes to the underlying collection.
+    // The recorder records the ongoing changes to the recorded collection.
     let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
@@ -79,7 +78,7 @@ fn main() {
     assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Once you are done recording, you can dissolve the recorder to regain
-    // ownership and mutability over the underlying collection.
+    // ownership and mutability over the recorded collection.
     let (mut hashmap, ..) = recorder.dissolve();
     assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }

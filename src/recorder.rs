@@ -10,6 +10,7 @@ use crate::{
     maplike::{Get, Insert, Map, Push, Remove},
 };
 
+/// Records edits applied to a collection so they can be replayed or reverted.
 pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
     collection: C,
     edit: Edit<EC>,
@@ -18,11 +19,14 @@ pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
 }
 
 impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
+    /// Create a new recorder owning and recording a collection.
     #[inline(always)]
-    pub fn new(container: C) -> Self {
-        Self::with_edit(container, Default::default())
+    pub fn new(collection: C) -> Self {
+        Self::with_edit(collection, Default::default())
     }
 
+    /// Flush the recorder, returning the currently recorded edit and replacing
+    /// it with a new empty one.
     #[inline(always)]
     pub fn flush(&mut self) -> Edit<EC> {
         core::mem::replace(&mut self.edit, Edit::new())
@@ -30,21 +34,26 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
 }
 
 impl<K, V, C, EC> Recorder<K, V, C, EC> {
+    /// Create a new recorder owning and recording a collection to an already
+    /// existing edit.
     #[inline(always)]
-    pub fn with_edit(container: C, edit: Edit<EC>) -> Self {
+    pub fn with_edit(collection: C, edit: Edit<EC>) -> Self {
         Self {
-            collection: container,
+            collection,
             edit,
             key_marker: PhantomData,
             value_marker: PhantomData,
         }
     }
 
+    /// Returns a reference to the recorded collection.
     #[inline(always)]
     pub fn collection(&self) -> &C {
         &self.collection
     }
 
+    /// Dissolve the recorder, returning and ceding ownership of its recorded
+    /// collection and edit.
     #[inline(always)]
     pub fn dissolve(self) -> (C, Edit<EC>) {
         (self.collection, self.edit)
@@ -58,6 +67,7 @@ impl<
     EC: Get<K, Item = V> + Insert<K, Item = V> + Remove<K>,
 > Recorder<K, V, C, EC>
 {
+    /// Remove an element, pass it through a closure, then insert it back.
     #[inline(always)]
     pub fn update<F: FnOnce(Option<V>) -> Option<V>>(&mut self, key: K, f: F) {
         if let Some(value) = f(self.remove(&key)) {

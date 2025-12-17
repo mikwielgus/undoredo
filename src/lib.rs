@@ -4,8 +4,8 @@
 
 #![doc(html_root_url = "https://docs.rs/undoredo")]
 #![doc = include_str!("../README.md")]
-/*#![deny(missing_docs)]
-#![forbid(unsafe_code)]*/
+#![deny(missing_docs)]
+#![forbid(unsafe_code)]
 #![no_std]
 
 #[cfg(feature = "std")]

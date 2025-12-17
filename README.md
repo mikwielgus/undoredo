@@ -10,9 +10,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 inside a recorder decorator that observes the incoming insertions, removals and
 pushes while recording the changes in an reversible incremental diff structure.
 
-This recorder decorator approach makes `undoredo` easier to use than
-other undo-redo libraries. Storing incremental diffs typically results
-in much more succint and reliable code than the commonly used [Command
+This approach makes `undoredo` easier to use than other undo-redo
+libraries. Storing incremental diffs typically results in much
+more succint and reliable code than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what
 the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/) and
 [`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates use. The programmer
@@ -27,11 +27,11 @@ for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
 [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
 [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html),
-and for some foreign feature-gated types:
+and for some third-party feature-gated types:
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
-[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/) and
+[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html) (read
-more in [Supported collections](#supported-collections) section).
+more in the [Supported collections](#supported-collections) section).
 
 ## Usage
 
@@ -64,7 +64,7 @@ fn main() {
     recorder.insert(3, 'C');
 
     // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
-    // into the undo-redo history.
+    // into the undo-redo bistack.
     undoredo.commit(recorder.flush());
 
     // The pushed elements are now present in the collection.
@@ -157,7 +157,7 @@ Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
 [examples/btreeset.rs](./examples/btreeset.rs) for a complete example.
 
-Among the supported foreign types, `rstar::RTree` is an instance of a
+Among the supported third-party types, `rstar::RTree` is an instance of a
 data structure with a convenience implementation over set semantics. See
 [examples/rstar.rs](./examples/rstar.rs) for an example of its usage.
 
@@ -180,7 +180,7 @@ implementations:
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated),
 - [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html) (not feature-gated).
 
-### Foreign types
+### Third-party types
 
 In addition to the standard library, `undoredo` has built-in feature-gated
 convenience implementations for data structures from certain external crates:
@@ -195,7 +195,7 @@ convenience implementations for data structures from certain external crates:
   `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
 
 To use these, enable their corresponding features next to your `undoredo`
-dependency in your `Cargo.toml`. For example, to enable all foreign type
+dependency in your `Cargo.toml`. For example, to enable all third-party type
 implementations, write
 
 ```
@@ -204,10 +204,10 @@ undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar"]}
 ```
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures
-allow insertion and removal at arbitrary indexes regardless of whether they are
-vacant, occupied or out of bounds at the time of insertion. For `StableVec`, we
-managed to implement inserting at out-of-bound indexes by changing the length
-before insertion using the
+allow insertion and removal at arbitrary indexes regardless of whether they
+are vacant, occupied or out of bounds. For `StableVec`, we managed to implement
+inserting at out-of-bound indexes by changing the length before insertion using
+the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
 method. For `thunderdome::Arena`, we insert at arbitrary key directly via the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
@@ -244,11 +244,6 @@ After `git clone`, remember to run
 ```
 git submodule update --init
 ```
-
-We share the `src/maplike` module with another crate,
-[`rstared`](https://docs.rs/rstared/latest/rstared/), via a Git submodule
-instead of making it a Cargo dependency because we are not yet sure how it
-should be called and what interface it should have.
 
 ## Licence
 

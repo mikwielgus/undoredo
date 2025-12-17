@@ -19,7 +19,7 @@ fn main() {
     recorder.insert(3, 'C');
 
     // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
-    // into the undo-redo history.
+    // into the undo-redo bistack.
     undoredo.commit(recorder.flush());
 
     // The pushed elements are now present in the collection.

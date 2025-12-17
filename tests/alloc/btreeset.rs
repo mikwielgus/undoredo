@@ -1,0 +1,24 @@
+#[path = "../common/mod.rs"]
+mod common;
+
+use std::collections::BTreeSet;
+use undoredo::Recorder;
+
+#[test]
+fn test_apply_edit_on_set() {
+    let recorder = Recorder::<i32, (), BTreeSet<i32>, BTreeSet<i32>>::new(BTreeSet::new());
+    common::test_apply_edit_on_set(recorder);
+}
+
+#[test]
+fn test_insert_and_remove_on_set() {
+    let recorder = Recorder::<i32, (), BTreeSet<i32>, BTreeSet<i32>>::new(BTreeSet::new());
+    common::test_insert_and_remove_on_set(recorder);
+}
+
+#[test]
+fn test_edit_undo_redo_on_set() {
+    common::test_edit_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSet<i32>>(BTreeSet::new());
+}
+
+

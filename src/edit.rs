@@ -19,6 +19,10 @@ impl<EC: Default> Edit<EC> {
 }
 
 impl<EC> Edit<EC> {
+    pub fn with_removed_inserted(removed: EC, inserted: EC) -> Self {
+        Self { removed, inserted }
+    }
+
     pub fn reverse(self) -> Self {
         Self {
             removed: self.inserted,

@@ -52,29 +52,3 @@ impl<K> IntoIter<K> for HashSet<K> {
         MapIntoIter(IntoIterator::into_iter(self))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashSet;
-
-    use crate::Recorder;
-
-    #[test]
-    fn test_apply_edit_on_set() {
-        let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
-        crate::recorder::tests::test_apply_edit_on_set(recorder);
-    }
-
-    #[test]
-    fn test_insert_and_remove_on_set() {
-        let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
-        crate::recorder::tests::test_insert_and_remove_on_set(recorder);
-    }
-
-    #[test]
-    fn test_edit_undo_redo_on_set() {
-        crate::undoredo::tests::test_edit_undo_redo_on_set::<i32, HashSet<i32>, HashSet<i32>>(
-            HashSet::new(),
-        );
-    }
-}

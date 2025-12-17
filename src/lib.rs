@@ -21,6 +21,7 @@ mod recorder;
 mod undoredo;
 
 pub use crate::edit::Edit;
-pub use crate::map::{Get, Insert, Push, Remove};
+pub use crate::edit::ApplyEdit;
+pub use crate::map::{Get, Insert, IntoIter, Push, Remove};
 pub use crate::recorder::Recorder;
 pub use crate::undoredo::UndoRedo;

@@ -52,39 +52,3 @@ impl<K: RTreeObject> IntoIter<K> for RTree<K> {
         MapIntoIter(IntoIterator::into_iter(self))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use rstar::RTree;
-
-    use crate::Recorder;
-
-    impl crate::recorder::tests::FromUsize for (i32, i32) {
-        fn from_usize(u: usize) -> (i32, i32) {
-            (u as i32, 0)
-        }
-    }
-
-    #[test]
-    fn test_apply_edit_on_set() {
-        let recorder =
-            Recorder::<(i32, i32), (), RTree<(i32, i32)>, RTree<(i32, i32)>>::new(RTree::new());
-        crate::recorder::tests::test_apply_edit_on_set(recorder);
-    }
-
-    #[test]
-    fn test_insert_and_remove_on_set() {
-        let recorder =
-            Recorder::<(i32, i32), (), RTree<(i32, i32)>, RTree<(i32, i32)>>::new(RTree::new());
-        crate::recorder::tests::test_insert_and_remove_on_set(recorder);
-    }
-
-    #[test]
-    fn test_edit_undo_redo_on_set() {
-        crate::undoredo::tests::test_edit_undo_redo_on_set::<
-            (i32, i32),
-            RTree<(i32, i32)>,
-            RTree<(i32, i32)>,
-        >(RTree::new());
-    }
-}

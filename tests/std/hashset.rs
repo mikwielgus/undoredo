@@ -1,0 +1,26 @@
+#![cfg(feature = "std")]
+
+#[path = "../common/mod.rs"]
+mod common;
+
+use std::collections::HashSet;
+
+use undoredo::Recorder;
+
+#[test]
+fn test_apply_edit_on_set() {
+    let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
+    common::test_apply_edit_on_set(recorder);
+}
+
+#[test]
+fn test_insert_and_remove_on_set() {
+    let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
+    common::test_insert_and_remove_on_set(recorder);
+}
+
+#[test]
+fn test_edit_undo_redo_on_set() {
+    common::test_edit_undo_redo_on_set::<i32, HashSet<i32>, HashSet<i32>>(HashSet::new());
+}
+

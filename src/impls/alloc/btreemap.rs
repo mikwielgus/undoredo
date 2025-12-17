@@ -42,35 +42,3 @@ impl<K, V> IntoIter<K> for BTreeMap<K, V> {
         IntoIterator::into_iter(self)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use alloc::collections::BTreeMap;
-
-    use crate::Recorder;
-
-    #[test]
-    fn test_apply_edit_at_specified_indexes() {
-        let recorder = Recorder::<usize, i32, BTreeMap<usize, i32>, BTreeMap<usize, i32>>::new(
-            BTreeMap::new(),
-        );
-        crate::recorder::tests::test_apply_edit_at_specified_indexes(recorder);
-    }
-
-    #[test]
-    fn test_insert_and_remove_at_specified_indexes() {
-        let recorder = Recorder::<usize, i32, BTreeMap<usize, i32>, BTreeMap<usize, i32>>::new(
-            BTreeMap::new(),
-        );
-        crate::recorder::tests::test_insert_and_remove_at_specified_indexes(recorder);
-    }
-
-    #[test]
-    fn test_edit_undo_redo_at_specified_indexes() {
-        crate::undoredo::tests::test_edit_undo_redo_at_specified_indexes::<
-            usize,
-            BTreeMap<usize, i32>,
-            BTreeMap<usize, i32>,
-        >(BTreeMap::new());
-    }
-}

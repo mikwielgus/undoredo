@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 use crate::{
     Edit, Recorder,
     edit::ApplyEdit,
-    map::{Get, Insert},
+    maplike::{Get, Insert},
 };
 
 pub struct CmdEdit<Cmd, EC> {

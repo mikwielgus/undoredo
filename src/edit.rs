@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::map::{Insert, IntoIter, Keyed, Remove};
+use crate::maplike::{Insert, IntoIter, Keyed, Remove};
 
 pub struct Edit<EC> {
     pub(super) removed: EC,

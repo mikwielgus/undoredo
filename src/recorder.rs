@@ -7,7 +7,7 @@ use core::marker::PhantomData;
 
 use crate::{
     edit::Edit,
-    map::{Get, Insert, Map, Push, Remove},
+    maplike::{Get, Insert, Map, Push, Remove},
 };
 
 pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {

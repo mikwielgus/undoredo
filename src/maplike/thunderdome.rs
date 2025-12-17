@@ -4,7 +4,7 @@
 
 use thunderdome::{Arena, Index};
 
-use crate::map::{Get, Insert, IntoIter, Keyed, Map, Push, Remove};
+use crate::maplike::{Get, Insert, IntoIter, Keyed, Map, Push, Remove};
 
 impl<V> Map for Arena<V> {
     type Item = V;

@@ -4,7 +4,7 @@
 
 use std::{collections::HashMap, hash::Hash};
 
-use crate::map::{Get, Insert, IntoIter, Keyed, Map, Remove};
+use crate::maplike::{Get, Insert, IntoIter, Keyed, Map, Remove};
 
 impl<K, V> Map for HashMap<K, V> {
     type Item = V;

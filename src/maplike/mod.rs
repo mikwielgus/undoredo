@@ -31,3 +31,18 @@ pub trait IntoIter<K>: Map + Keyed {
 
     fn into_iter(self) -> Self::IntoIter;
 }
+
+#[cfg(feature = "std")]
+mod std;
+
+// No feature for alloc because it would be always enabled anyway.
+mod alloc;
+
+#[cfg(feature = "stable-vec")]
+mod stable_vec;
+
+#[cfg(feature = "thunderdome")]
+mod thunderdome;
+
+#[cfg(feature = "rstar")]
+mod rstar;

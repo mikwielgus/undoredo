@@ -2,42 +2,42 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use rstar::{RTree, RTreeObject};
+use std::{collections::HashSet, hash::Hash};
 
-use crate::map::{Get, Insert, IntoIter, Keyed, Map, Remove};
+use crate::maplike::{Get, Insert, IntoIter, Keyed, Map, Remove};
 
-impl<K: RTreeObject> Map for RTree<K> {
+impl<K> Map for HashSet<K> {
     type Item = ();
 }
 
-impl<K: RTreeObject> Keyed for RTree<K> {
+impl<K> Keyed for HashSet<K> {
     type Key = K;
 }
 
-impl<K: RTreeObject + PartialEq> Get<K> for RTree<K> {
+impl<K: Eq + Hash> Get<K> for HashSet<K> {
     #[inline(always)]
     fn get(&self, key: &K) -> Option<&()> {
-        RTree::contains(self, key).then_some(&())
+        HashSet::get(self, key).map(|_| &())
     }
 }
 
-impl<K: RTreeObject> Insert<K> for RTree<K> {
+impl<K: Eq + Hash> Insert<K> for HashSet<K> {
     #[inline(always)]
     fn insert(&mut self, key: K, _value: ()) {
-        RTree::insert(self, key);
+        HashSet::insert(self, key);
     }
 }
 
-impl<K: RTreeObject + PartialEq> Remove<K> for RTree<K> {
+impl<K: Eq + Hash> Remove<K> for HashSet<K> {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<()> {
-        RTree::remove(self, key).map(|_| ())
+        HashSet::remove(self, key).then_some(())
     }
 }
 
-pub struct MapIntoIter<K: RTreeObject>(rstar::iterators::IntoIter<K>);
+pub struct MapIntoIter<K>(std::collections::hash_set::IntoIter<K>);
 
-impl<K: RTreeObject> Iterator for MapIntoIter<K> {
+impl<K> Iterator for MapIntoIter<K> {
     type Item = (K, ());
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -45,7 +45,7 @@ impl<K: RTreeObject> Iterator for MapIntoIter<K> {
     }
 }
 
-impl<K: RTreeObject> IntoIter<K> for RTree<K> {
+impl<K> IntoIter<K> for HashSet<K> {
     type IntoIter = MapIntoIter<K>;
 
     fn into_iter(self) -> MapIntoIter<K> {

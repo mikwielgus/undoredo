@@ -4,7 +4,7 @@
 
 use alloc::collections::BTreeMap;
 
-use crate::map::{Get, Insert, IntoIter, Keyed, Map, Remove};
+use crate::maplike::{Get, Insert, IntoIter, Keyed, Map, Remove};
 
 impl<K, V> Map for BTreeMap<K, V> {
     type Item = V;

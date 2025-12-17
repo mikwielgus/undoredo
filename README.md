@@ -22,10 +22,16 @@ Command pattern has to operate.
 
 This library is `no_std`-compatible and has no mandatory dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
-`undoredo` has convenience implementations for standard library collections,
-`HashMap` and `BTreeMap`, and for some foreign feature-gated types:
-`StableVec`, `thunderdome::Arena` and `rstar::RTree`  (read more in [Supported
-collections](#supported-collections) section).
+`undoredo` has convenience implementations for standard library collections:
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
+[`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html),
+[`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
+[`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html),
+and for some foreign feature-gated types:
+[`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
+[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/) and
+[`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html) (read
+more in [Supported collections](#supported-collections) section).
 
 ## Usage
 
@@ -38,9 +44,8 @@ undoredo = "0.2"
 
 ### Basic usage
 
-Following is a basic usage example of `undoredo` over
-`std::collections::HashMap`. You can find more examples in the
-[examples/](./examples) directory.
+Following is a basic usage example of `undoredo` over `HashMap`. You can find
+more examples in the [examples/](./examples) directory.
 
 ```rust
 use std::collections::HashMap;
@@ -88,11 +93,14 @@ fn main() {
 
 It is often desirable to store some metadata along with every recorded edit,
 usually a representation of the command that originated it. This can be done by
-instead committing the edit using the `.cmd_commit()` method.
+instead committing the edit using the
+[`.cmd_commit()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.cmd_commit)
+method.
 
 The bistack of done and undone committed edits, together with their command
 metadatas ("cmd") if present, can be accessed as slices from the `.done()` and
-`.undone()` accessor methods.
+[`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
+accessor methods.
 
 ```rust
 use std::collections::HashMap;
@@ -157,7 +165,7 @@ data structure with a convenience implementation over set semantics. See
 to insert the same value multiple times without overriding the first one. In
 fact, `rstar::RTree` is a multiset. `undoredo` will work correctly with such
 data structures, seeing them as sets, but only if you never make use of their
-multiset property: you must never insert a value to the collection that is
+multiset property: you must never insert a key to such a collection if it is
 already there.
 
 ## Supported collections
@@ -186,8 +194,9 @@ convenience implementations for data structures from certain external crates:
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html) behind the
   `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
 
-To use these, enabled their features next to your `undoredo` dependency in your
-`Cargo.toml`. For example, to enable all foreign type implementations, write
+To use these, enable their corresponding features next to your `undoredo`
+dependency in your `Cargo.toml`. For example, to enable all foreign type
+implementations, write
 
 ```
 [dependencies]
@@ -229,22 +238,23 @@ We welcome issues and pull requests from anyone both to our canonical
 [repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
 [mirror](https://github.com/mikwielgus/undoredo).
 
-**NOTE:** This repository contains a Git submodule: `src/maplike`. After `git
-clone`, remember to run
+**NOTE:** This repository currently contains a Git submodule: `src/maplike`.
+After `git clone`, remember to run
 
 ```
 git submodule update --init
 ```
 
-We share the `src/maplike` module with another crate, `rstared`, via a Git
-submodule instead of making it a Cargo dependency because we are not yet sure
-how it should be called and what interface it should have.
+We share the `src/maplike` module with another crate,
+[`rstared`](https://docs.rs/rstared/latest/rstared/), via a Git submodule
+instead of making it a Cargo dependency because we are not yet sure how it
+should be called and what interface it should have.
 
 ## Licence
 
 `undoredo` is dual-licensed as under either of
 
 - [MIT license](./LICENSES/MIT.txt),
-- [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt).
+- [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt),
 
 at your option.

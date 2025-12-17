@@ -24,8 +24,5 @@ fn test_insert_and_remove_at_generated_indexes() {
 
 #[test]
 fn test_edit_undo_redo_at_generated_indexes() {
-    common::test_edit_undo_redo_at_generated_indexes::<Index, Arena<i32>, Arena<i32>>(
-        Arena::new(),
-    );
+    common::test_edit_undo_redo_at_generated_indexes::<Index, Arena<i32>, Arena<i32>>(Arena::new());
 }
-

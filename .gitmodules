@@ -1,0 +1,3 @@
+[submodule "maplike"]
+	path = src/maplike
+	url = https://codeberg.org/topola/maplike

@@ -24,7 +24,7 @@ Command pattern has to operate.
 This library is `no_std`-compatible and has no mandatory dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
 `undoredo` has convenience implementations for standard library collections,
-`HashMap` and `BTreeMap`, and for some foreign feature-gated types,
+`HashMap` and `BTreeMap`, and for some foreign feature-gated types:
 `StableVec`, `thunderdome::Arena` and `rstar::RTree`  (read more in [Supported
 collections](#supported-collections) section).
 
@@ -229,6 +229,17 @@ cost.
 We welcome issues and pull requests from anyone both to our canonical
 [repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
 [mirror](https://github.com/mikwielgus/undoredo).
+
+**NOTE:** This repository contains a Git submodule: `src/maplike`. After `git
+clone`, remember to run
+
+```
+git submodule update --init
+```
+
+We share the `src/maplike` module with another crate, `rstared`, via a Git
+submodule instead of making it a Cargo dependency because we are not yet sure
+how it should be called and what interface it should have.
 
 ## Licence
 

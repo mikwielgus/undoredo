@@ -50,6 +50,7 @@ impl<EC: Default> Default for Edit<EC> {
     }
 }
 
+/// Apply the changes in an edit to a collection.
 pub trait ApplyEdit<EC> {
     /// Apply the changes in an edit to a collection.
     ///

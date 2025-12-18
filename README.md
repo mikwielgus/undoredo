@@ -7,8 +7,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 # undoredo
 
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
-inside a recorder decorator that observes the incoming insertions, removals and
-pushes while recording the changes in an reversible incremental diff structure.
+inside a recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern)
+that observes the incoming insertions, removals and pushes while recording the
+changes in an reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo
 libraries. Storing incremental diffs typically results in much

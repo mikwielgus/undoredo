@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2025 undoredo contributors
 SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
-[![CI Status](https://ci.codeberg.org/api/badges/undoredo/status.svg)](https://ci.codeberg.org/repos/15760)
+[![CI Status](https://ci.codeberg.org/api/badges/15760/status.svg)](https://ci.codeberg.org/repos/15760)
 [![Docs](https://docs.rs/undoredo/badge.svg)](https://docs.rs/undoredo/)
 [![Crates.io](https://img.shields.io/crates/v/undoredo.svg)](https://crates.io/crates/undoredo)
 [![MIT OR Apache 2.0](https://img.shields.io/crates/l/undoredo.svg)](#licence)

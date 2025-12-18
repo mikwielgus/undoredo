@@ -4,6 +4,11 @@ SPDX-FileCopyrightText: 2025 undoredo contributors
 SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
+[![CI Status](https://ci.codeberg.org/undoredo/badge.svg)](https://ci.codeberg.org/repos/15760)
+[![Docs](https://docs.rs/undoredo/badge.svg)](https://docs.rs/undoredo/)
+[![Crates.io](https://img.shields.io/crates/v/undoredo.svg)](https://crates.io/crates/undoredo)
+[![MIT OR Apache 2.0](https://img.shields.io/crates/l/undoredo.svg)](#licence)
+
 # undoredo
 
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
@@ -22,8 +27,8 @@ commands, often complicated and prone to elusive runtime bugs, on which the
 Command pattern has to operate.
 
 This library is `no_std`-compatible and has no mandatory dependencies except
-for [`alloc`](https://doc.rust-lang.org/alloc/index.html). For ease of use,
-`undoredo` has convenience implementations for standard library collections:
+for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has
+convenience implementations for standard library collections:
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
@@ -36,7 +41,7 @@ more in the [Supported collections](#supported-collections) section).
 
 ## Usage
 
-First, add `undoredo` to your `Cargo.toml`:
+First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
@@ -168,8 +173,8 @@ data structure with a convenience implementation over set semantics. See
 to insert the same value multiple times without overriding the first one. In
 fact, `rstar::RTree` is a multiset. `undoredo` will work correctly with such
 data structures, seeing them as sets, but only if you never make use of their
-multiset property: you must never insert a key to such a collection if it is
-already there.
+multiset property: you must never insert a key that is already present in
+a multiset.
 
 ## Supported collections
 
@@ -178,23 +183,23 @@ already there.
 Rust's standard library maps and sets are supported via built-in convenience
 implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) behind the `std` feature (enabled by default),
-- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html) behind the `std` feature (enabled by default),
-- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) (not feature-gated),
-- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html) (not feature-gated).
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
+- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
+- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html), not feature-gated;
 
 ### Third-party types
 
 In addition to the standard library, `undoredo` has built-in feature-gated
 convenience implementations for data structures from certain external crates:
 
-- [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/)
-  behind the `stable-vec` feature. (example usage:
+- [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
+  gated by the `stable-vec` feature; (example usage:
   [examples/stable_vec.rs](./examples/stable_vec.rs)),
-- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/)
-  behind the `thunderdome` feature. (example usage:
+- [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
+  gated by the `thunderdome` feature; (example usage:
   [examples/thunderdome.rs](./examples/thunderdome.rs)),
-- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html) behind the
+- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
   `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
 
 To use these, enable their corresponding features next to your `undoredo`
@@ -203,7 +208,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar"]}
+undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
 **Technical sidenote:** Unlike maps and sets, not all stable vec data structures
@@ -241,12 +246,16 @@ We welcome issues and pull requests from anyone both to our canonical
 [repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
 [mirror](https://github.com/mikwielgus/undoredo).
 
-**NOTE:** This repository currently contains a Git submodule: `src/maplike`.
-After `git clone`, remember to run
+**NOTE:** This repository currently contains a Git submodule:
+`src/maplike`, which we currently use to share functionality with the
+[`rstared`](https://docs.rs/rstared/) crate to avoid creating another crate for
+now. After `git clone`, remember to run
 
 ```bash
 git submodule update --init
 ```
+
+in the cloned directory.
 
 ## Licence
 

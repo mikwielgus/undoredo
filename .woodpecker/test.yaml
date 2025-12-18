@@ -10,6 +10,7 @@ matrix:
     - --no-default-features
     - --features stable-vec
     - --features thunderdome
+    - --features rstar
     - --all-features
 
 steps:

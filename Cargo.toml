@@ -33,7 +33,7 @@ thunderdome = "^0.6"
 rstar = "^0.12"
 
 [package.metadata.docs.rs]
-cargo-arcs = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]
+cargo-args = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]
 
 [[example]]
 name = "basic_usage"

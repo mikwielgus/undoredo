@@ -38,7 +38,7 @@ more in the [Supported collections](#supported-collections) section).
 
 First, add `undoredo` to your `Cargo.toml`:
 
-```
+```toml
 [dependencies]
 undoredo = "0.2"
 ```
@@ -151,7 +151,7 @@ set's values. This is actually also how Rust's standard library
 As an example, the following code will construct a recorder and an undo-redo
 bistack for a `BTreeSet`:
 
-```rust
+```rust-ignore
 let mut recorder: Recorder<usize, char, BTreeSet<char, ()>> = Recorder::new(BTreeSet::new());
 let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
 ```
@@ -201,7 +201,7 @@ To use these, enable their corresponding features next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type
 implementations, write
 
-```
+```toml
 [dependencies]
 undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar"]}
 ```
@@ -244,7 +244,7 @@ We welcome issues and pull requests from anyone both to our canonical
 **NOTE:** This repository currently contains a Git submodule: `src/maplike`.
 After `git clone`, remember to run
 
-```
+```bash
 git submodule update --init
 ```
 

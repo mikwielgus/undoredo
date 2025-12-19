@@ -14,7 +14,10 @@ fn main() {
     undoredo.commit(recorder.flush());
 
     recorder.insert('B', ());
-    recorder.insert('B', ()); // Inserting is idempotent: repeating the same insert does nothing.
+    // Inserting to a set is idempotent: repeating the same insert does nothing.
+    // It is, however, a logic error if the recorded collection is a multiset,
+    // e.g. `rstar::RTree`.
+    recorder.insert('B', ());
     undoredo.commit(recorder.flush());
 
     recorder.insert('C', ());

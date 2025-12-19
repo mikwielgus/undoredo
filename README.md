@@ -198,6 +198,18 @@ data structures, seeing them as sets, but only if you never make use of their
 multiset property: you must never insert a key that is already present in
 a multiset.
 
+### Undo-redo on custom types
+
+To make `undoredo` work with a map-like data structure for which there is no
+convenience implementation, you can create one on your own by implementing
+the traits from the [maplike](https://docs.rs/maplike/latest/maplike/) crate.
+Refer to that crate's documentation for details. These traits are also
+re-exported by `undoredo`, so it is not necessary to add another dependency.
+
+If you believe that other people could benefit from your implementation,
+consider contributing it to `maplike`. We will integrate it in `undoredo` on our
+own afterwards (no need to open more than one pull request).
+
 ## Supported collections
 
 ### Standard library

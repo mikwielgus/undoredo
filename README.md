@@ -246,6 +246,11 @@ section below.
 
 ## Unsupported collections
 
+Standard library's `Vec` and `VecDeque` cannot be supported because they lack
+an interface to remove elements without invalidating indexes of other elements.
+Stable vectors do not have this limitation.
+
+However, among stable vector data structures,
 [`Slab`](https://docs.rs/slab/latest/slab/),
 [`SlotMap`](https://docs.rs/slotmap/latest/slotmap/),
 [`generational-arena`](https://docs.rs/generational-arena/latest/generational_arena/)

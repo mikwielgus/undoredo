@@ -21,6 +21,6 @@ steps:
       CARGO_TEST_COLOR: always
     commands:
       - rustup default "$CHANNEL"
-      - cargo test --tests --examples $FEATURE_FLAGS
+      - cargo test -j4 --tests --examples $FEATURE_FLAGS
     when:
       event: [pull_request, push, tag]

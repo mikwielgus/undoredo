@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::maplike::{Insert, IntoIter, Keyed, Remove};
+use maplike::{Insert, IntoIter, Keyed, Remove};
 
 /// A reversible set of changes to a collection.
 ///

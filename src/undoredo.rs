@@ -3,12 +3,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
+use maplike::{Get, Insert};
 
-use crate::{
-    Edit, Recorder,
-    edit::ApplyEdit,
-    maplike::{Get, Insert},
-};
+use crate::{Edit, Recorder, edit::ApplyEdit};
 
 /// An edit along with metadata.
 ///

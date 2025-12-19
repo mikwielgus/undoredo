@@ -26,7 +26,7 @@ is relieved from having to maintain application-specific implementations of
 commands, often complicated and prone to elusive runtime bugs, on which the
 Command pattern has to operate.
 
-This library is `no_std`-compatible and has no mandatory dependencies except
+This library is `no_std`-compatible and has no mandatory third-party dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has
 convenience implementations for standard library collections:
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
@@ -267,17 +267,6 @@ cost.
 We welcome issues and pull requests from anyone both to our canonical
 [repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
 [mirror](https://github.com/mikwielgus/undoredo).
-
-**NOTE:** This repository currently contains a Git submodule:
-`src/maplike`, which we currently use to share functionality with the
-[`rstared`](https://docs.rs/rstared/) crate to avoid creating another crate for
-now. After `git clone`, remember to run
-
-```bash
-git submodule update --init
-```
-
-in the cloned directory.
 
 ## Licence
 

@@ -4,11 +4,9 @@
 
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
+use maplike::{Get, Insert, Map, Push, Remove};
 
-use crate::{
-    edit::Edit,
-    maplike::{Get, Insert, Map, Push, Remove},
-};
+use crate::edit::Edit;
 
 /// Records edits applied to a collection so they can be replayed or reverted.
 pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {

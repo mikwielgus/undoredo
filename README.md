@@ -159,8 +159,9 @@ recorder.push('A');
 ```
 
 `StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
-[examples/stable_vec.rs](./examples/stable_vec.rs) and [examples/thunderdome.rs]
-for complete examples of their usage.
+[examples/stable_vec.rs](./examples/stable_vec.rs) and
+[examples/thunderdome.rs](./examples/thunderdome.rs) for complete examples of
+their usage.
 
 ### Undo-redo on sets
 

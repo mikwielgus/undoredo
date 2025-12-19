@@ -142,16 +142,37 @@ fn main() {
 }
 ```
 
+### Undo-redo on maps with pushing
+
+Some data structures with map semantics also provide a special type of insertion
+where a value is inserted without specifying a key, which the structure
+instead automatically generates and returns by itself. This operation is called
+"pushing".
+
+If a supported type has a push interface, you can record its changes just as
+easily as insertions and removals by calling
+[`.push()`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html#impl-Push%3CK%3E-for-Recorder%3CK,+V,+C,+EC%3E)
+on the recorder, like this:
+
+```rust-ignore
+recorder.push('A');
+```
+
+`StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
+[examples/stable_vec.rs](./examples/stable_vec.rs) and [examples/thunderdome.rs]
+for complete examples of their usage.
+
 ### Undo-redo on sets
 
 Some data structures have set semantics: they operate only on values, without
 exposing any usable notion of key or index. `undoredo` can provide its
 functionality to a set by treating it as a `()`-valued map whose keys are the
 set's values. This is actually also how Rust's standard library
-[represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115)
-`HashSet`
+internally
+[represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115) its
+two set types, `HashSet`
 [and](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html#82)
-`BTreeSet` internally.
+`BTreeSet`.
 
 As an example, the following code will construct a recorder and an undo-redo
 bistack for a `BTreeSet`:
@@ -211,11 +232,11 @@ implementations, write
 undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
-**Technical sidenote:** Unlike maps and sets, not all stable vec data structures
-allow insertion and removal at arbitrary indexes regardless of whether they
-are vacant, occupied or out of bounds. For `StableVec`, we managed to implement
-inserting at out-of-bound indexes by changing the length before insertion using
-the
+**Technical sidenote:** Unlike maps and sets, not all stable vector data
+structures allow insertion and removal at arbitrary indexes regardless of
+whether they are vacant, occupied or out of bounds. For `StableVec`, we managed
+to implement inserting at out-of-bound indexes by changing the length before
+insertion using the
 [`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
 method. For `thunderdome::Arena`, we insert at arbitrary key directly via the
 [`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)

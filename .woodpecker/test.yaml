@@ -11,6 +11,7 @@ matrix:
     - --features stable-vec
     - --features thunderdome
     - --features rstar
+    - --features rstared
     - --all-features
 
 steps:

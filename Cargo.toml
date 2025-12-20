@@ -21,17 +21,19 @@ maintenance = { status = "actively-developed" }
 [features]
 default = ["std"]
 std = []
-rstar = ["maplike/rstar"]
 stable-vec = ["maplike/stable-vec"]
 thunderdome = ["maplike/thunderdome"]
+rstar = ["maplike/rstar"]
 
 [dependencies]
 maplike = "0.1"
+rstared = { version = "0.2", optional = true }
 
 [dev-dependencies]
 stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
+rstared = "0.2"
 
 [package.metadata.docs.rs]
 cargo-args = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]

@@ -36,8 +36,9 @@ convenience implementations for standard library collections:
 and for some third-party feature-gated types:
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
-[`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html) (read
-more in the [Supported collections](#supported-collections) section).
+[`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
+[`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
+[Supported collections](#supported-collections) section).
 
 ## Usage
 
@@ -235,6 +236,8 @@ convenience implementations for data structures from certain external crates:
   [examples/thunderdome.rs](./examples/thunderdome.rs)),
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
   `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
+- [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
+  `rstared` feature.
 
 To use these, enable their corresponding features next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type

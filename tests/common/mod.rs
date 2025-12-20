@@ -54,29 +54,34 @@ pub fn test_apply_edit_at_generated_indexes<
 }
 
 pub fn test_apply_edit_at_specified_indexes<
-    C: Insert<usize, Item = i32> + Remove<usize> + Get<usize>,
-    EC: Get<usize, Item = i32> + Insert<usize> + Remove<usize>,
+    K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
+    V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
+    C: Insert<K, Item = V> + Remove<K> + Get<K>,
+    EC: Get<K, Item = V> + Insert<K> + Remove<K>,
 >(
-    mut recorder: Recorder<usize, i32, C, EC>,
+    mut recorder: Recorder<K, V, C, EC>,
 ) {
-    recorder.insert(1, 10);
-    recorder.insert(2, 20);
-    recorder.insert(3, 30);
-    recorder.insert(4, 40);
-    recorder.insert(5, 50);
+    recorder.insert(K::from_usize(1), V::from_usize(10));
+    recorder.insert(K::from_usize(2), V::from_usize(20));
+    recorder.insert(K::from_usize(3), V::from_usize(30));
+    recorder.insert(K::from_usize(4), V::from_usize(40));
+    recorder.insert(K::from_usize(5), V::from_usize(50));
 
     let edit = Edit::with_removed_inserted(
-        BTreeMap::from([(2, 20)]),
-        BTreeMap::from([(3, 33), (6, 60)]),
+        BTreeMap::from([(K::from_usize(2), V::from_usize(20))]),
+        BTreeMap::from([
+            (K::from_usize(3), V::from_usize(33)),
+            (K::from_usize(6), V::from_usize(60)),
+        ]),
     );
     recorder.apply_edit(&edit);
 
-    assert_eq!(recorder.get(&1), Some(&10));
-    assert_eq!(recorder.get(&2), None);
-    assert_eq!(recorder.get(&3), Some(&33));
-    assert_eq!(recorder.get(&4), Some(&40));
-    assert_eq!(recorder.get(&5), Some(&50));
-    assert_eq!(recorder.get(&6), Some(&60));
+    assert_eq!(recorder.get(&K::from_usize(1)), Some(&V::from_usize(10)));
+    assert_eq!(recorder.get(&K::from_usize(2)), None);
+    assert_eq!(recorder.get(&K::from_usize(3)), Some(&V::from_usize(33)));
+    assert_eq!(recorder.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(recorder.get(&K::from_usize(5)), Some(&V::from_usize(50)));
+    assert_eq!(recorder.get(&K::from_usize(6)), Some(&V::from_usize(60)));
 }
 
 pub fn test_apply_edit_on_set<
@@ -283,9 +288,10 @@ pub fn test_edit_undo_redo_at_generated_indexes<
 }
 
 pub fn test_edit_undo_redo_at_specified_indexes<
-    K: Clone + FromUsize,
-    C: Get<K, Item = i32> + Insert<K> + IntoIter<K, Key = K> + Remove<K>,
-    EC: Clone + Default + Get<K, Item = i32> + Insert<K> + IntoIter<K, Key = K> + Remove<K>,
+    K: Clone + FromUsize + std::fmt::Debug + PartialEq,
+    V: Clone + FromUsize + std::fmt::Debug + PartialEq,
+    C: Get<K, Item = V> + Insert<K> + IntoIter<K, Key = K> + Remove<K>,
+    EC: Clone + Default + Get<K, Item = V> + Insert<K> + IntoIter<K, Key = K> + Remove<K>,
 >(
     mut collection: C,
 ) {
@@ -294,60 +300,60 @@ pub fn test_edit_undo_redo_at_specified_indexes<
     assert_eq!(undoredo.redo(&mut collection), None);
 
     let mut collection = undoredo.edit(collection, |recorder| {
-        recorder.insert(K::from_usize(1), 10);
-        recorder.insert(K::from_usize(2), 20);
-        recorder.insert(K::from_usize(3), 30);
-        recorder.insert(K::from_usize(4), 40);
-        recorder.insert(K::from_usize(5), 50);
+        recorder.insert(K::from_usize(1), V::from_usize(10));
+        recorder.insert(K::from_usize(2), V::from_usize(20));
+        recorder.insert(K::from_usize(3), V::from_usize(30));
+        recorder.insert(K::from_usize(4), V::from_usize(40));
+        recorder.insert(K::from_usize(5), V::from_usize(50));
     });
 
     assert_eq!(undoredo.redo(&mut collection), None);
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&10));
-    assert_eq!(collection.get(&K::from_usize(2)), Some(&20));
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&30));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(10)));
+    assert_eq!(collection.get(&K::from_usize(2)), Some(&V::from_usize(20)));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(30)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
     let mut collection = undoredo.edit(collection, |recorder| {
         recorder.remove(&K::from_usize(2));
-        recorder.insert(K::from_usize(1), 11);
-        recorder.insert(K::from_usize(3), 33);
+        recorder.insert(K::from_usize(1), V::from_usize(11));
+        recorder.insert(K::from_usize(3), V::from_usize(33));
     });
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&11));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(11)));
     assert_eq!(collection.get(&K::from_usize(2)), None);
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&33));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(33)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
     assert!(undoredo.undo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&10));
-    assert_eq!(collection.get(&K::from_usize(2)), Some(&20));
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&30));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(10)));
+    assert_eq!(collection.get(&K::from_usize(2)), Some(&V::from_usize(20)));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(30)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&11));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(11)));
     assert_eq!(collection.get(&K::from_usize(2)), None);
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&33));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(33)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
     let mut collection = undoredo.edit(collection, |recorder| {
         recorder.remove(&K::from_usize(3));
-        recorder.insert(K::from_usize(6), 60);
+        recorder.insert(K::from_usize(6), V::from_usize(60));
     });
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&11));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(11)));
     assert_eq!(collection.get(&K::from_usize(2)), None);
     assert_eq!(collection.get(&K::from_usize(3)), None);
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
-    assert_eq!(collection.get(&K::from_usize(6)), Some(&60));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
+    assert_eq!(collection.get(&K::from_usize(6)), Some(&V::from_usize(60)));
 
     assert_eq!(undoredo.redo(&mut collection), None);
 
@@ -358,19 +364,19 @@ pub fn test_edit_undo_redo_at_specified_indexes<
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&10));
-    assert_eq!(collection.get(&K::from_usize(2)), Some(&20));
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&30));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(10)));
+    assert_eq!(collection.get(&K::from_usize(2)), Some(&V::from_usize(20)));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(30)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&K::from_usize(1)), Some(&11));
+    assert_eq!(collection.get(&K::from_usize(1)), Some(&V::from_usize(11)));
     assert_eq!(collection.get(&K::from_usize(2)), None);
-    assert_eq!(collection.get(&K::from_usize(3)), Some(&33));
-    assert_eq!(collection.get(&K::from_usize(4)), Some(&40));
-    assert_eq!(collection.get(&K::from_usize(5)), Some(&50));
+    assert_eq!(collection.get(&K::from_usize(3)), Some(&V::from_usize(33)));
+    assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 }
 
 pub fn test_edit_undo_redo_on_set<

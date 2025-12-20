@@ -1,0 +1,37 @@
+// SPDX-FileCopyrightText: 2025 undoredo contributors
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![cfg(feature = "rstared")]
+
+use std::collections::HashMap;
+
+use rstar::primitives::Rectangle;
+use rstared::RTreed;
+use undoredo::Recorder;
+
+#[path = "common/mod.rs"]
+mod common;
+
+impl common::FromUsize for (i32, i32) {
+    fn from_usize(u: usize) -> (i32, i32) {
+        (u as i32, 0)
+    }
+}
+
+impl common::FromUsize for Rectangle<(i32, i32)> {
+    fn from_usize(u: usize) -> Rectangle<(i32, i32)> {
+        Rectangle::from_corners((u as i32, 0), (u as i32, 0))
+    }
+}
+
+#[test]
+fn test_apply_edit_on_set() {
+    let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
+    let recorder = Recorder::<
+        i32,
+        Rectangle<(i32, i32)>,
+        RTreed<i32, Rectangle<(i32, i32)>, HashMap<i32, Rectangle<(i32, i32)>>>,
+    >::new(RTreed::new(rect_hashmap));
+    common::test_apply_edit_at_specified_indexes(recorder);
+}

@@ -1,8 +1,8 @@
-#![cfg(feature = "std")]
-
 // SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![cfg(feature = "std")]
 
 #[path = "../common/mod.rs"]
 mod common;
@@ -27,4 +27,3 @@ fn test_insert_and_remove_on_set() {
 fn test_edit_undo_redo_on_set() {
     common::test_edit_undo_redo_on_set::<i32, HashSet<i32>, HashSet<i32>>(HashSet::new());
 }
-

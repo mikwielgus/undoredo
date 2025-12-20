@@ -1,8 +1,8 @@
-#![cfg(feature = "thunderdome")]
-
 // SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![cfg(feature = "thunderdome")]
 
 #[path = "common/mod.rs"]
 mod common;

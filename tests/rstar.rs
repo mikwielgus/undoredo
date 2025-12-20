@@ -1,8 +1,8 @@
-#![cfg(feature = "rstar")]
-
 // SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![cfg(feature = "rstar")]
 
 #[path = "common/mod.rs"]
 mod common;

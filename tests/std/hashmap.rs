@@ -1,8 +1,8 @@
-#![cfg(feature = "std")]
-
 // SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![cfg(feature = "std")]
 
 #[path = "../common/mod.rs"]
 mod common;
@@ -31,4 +31,3 @@ fn test_edit_undo_redo_at_specified_indexes() {
         HashMap<usize, i32>,
     >(HashMap::new());
 }
-

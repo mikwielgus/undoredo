@@ -43,7 +43,7 @@ fn test_edit_undo_redo_at_generated_indexes() {
 
 #[test]
 fn test_edit_undo_redo_at_specified_indexes() {
-    common::test_edit_undo_redo_at_specified_indexes::<usize, StableVec<i32>, StableVec<i32>>(
+    common::test_edit_undo_redo_at_specified_indexes::<usize, i32, StableVec<i32>, StableVec<i32>>(
         StableVec::new(),
     );
 }

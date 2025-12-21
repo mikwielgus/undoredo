@@ -11,9 +11,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is an undo-redo Rust library that works by wrapping a collection
-inside a recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern)
-that observes the incoming insertions, removals and pushes while recording the
+`undoredo` is an undo-redo Rust library that wraps a collection inside a
+recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern) that
+observes the incoming insertions, removals and pushes while recording the
 changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo
@@ -46,7 +46,7 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = "0.2"
+undoredo = "0.3"
 ```
 
 ### Basic usage
@@ -251,7 +251,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
+undoredo = { version = "0.3", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
 ## Unsupported collections

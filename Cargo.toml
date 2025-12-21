@@ -4,7 +4,7 @@
 
 [package]
 name = "undoredo"
-version = "0.2.3"
+version = "0.3.0"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Incremental-diff undo-redo decorator for collections such as HashMap, BTreeMap, StableVec, thunderdome::Arena, rstar::RTree. No need to implement commands."
 repository = "https://codeberg.org/topola/undoredo"
@@ -26,14 +26,14 @@ thunderdome = ["maplike/thunderdome"]
 rstar = ["maplike/rstar"]
 
 [dependencies]
-maplike = "0.1"
-rstared = { version = "0.2", optional = true }
+maplike = "0.3"
+rstared = { version = "0.3", optional = true }
 
 [dev-dependencies]
 stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
-rstared = "0.2"
+rstared = "0.3"
 
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]

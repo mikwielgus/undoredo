@@ -51,8 +51,10 @@ undoredo = "0.2"
 
 ### Basic usage
 
-Following is a basic usage example of `undoredo` over `HashMap`. You can find
-more examples in the [examples/](./examples) directory.
+Following is a basic usage example of `undoredo`
+over `HashMap`. You can find more examples in the
+[examples/](https://codeberg.org/topola/undoredo/src/branch/develop/examples)
+directory.
 
 ```rust
 use std::collections::HashMap;
@@ -160,9 +162,10 @@ recorder.push('A');
 ```
 
 `StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
-[examples/stable_vec.rs](./examples/stable_vec.rs) and
-[examples/thunderdome.rs](./examples/thunderdome.rs) for complete examples of
-their usage.
+[examples/stable_vec.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/stable_vec.rs)
+and
+[examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs)
+for complete examples of their usage.
 
 ### Undo-redo on sets
 
@@ -186,11 +189,14 @@ let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
 
 Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
-[examples/btreeset.rs](./examples/btreeset.rs) for a complete example.
 
-Among the supported third-party types, `rstar::RTree` is an instance of a
-data structure with a convenience implementation over set semantics. See
-[examples/rstar.rs](./examples/rstar.rs) for an example of its usage.
+[examples/btreeset.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/btreeset.rs)
+for a complete example.
+
+Among the supported third-party types, `rstar::RTree` is an instance of a data
+structure with a convenience implementation over set semantics. See
+[examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs)
+for an example of its usage.
 
 **NOTE:** Some set-like data structures are actually multisets: they allow
 to insert the same value multiple times without overriding the first one. In
@@ -230,12 +236,12 @@ convenience implementations for data structures from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature; (example usage:
-  [examples/stable_vec.rs](./examples/stable_vec.rs)),
+  [examples/stable_vec.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
   gated by the `thunderdome` feature; (example usage:
-  [examples/thunderdome.rs](./examples/thunderdome.rs)),
+  [examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs)),
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature. (example usage: [examples/rstar.rs](./examples/rstar.rs)).
+  `rstar` feature. (example usage: [examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs)),
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
   `rstared` feature.
 

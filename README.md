@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 `undoredo` is an undo-redo Rust library that works by wrapping a collection
 inside a recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern)
 that observes the incoming insertions, removals and pushes while recording the
-changes in an reversible incremental diff structure.
+changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo
 libraries. Storing incremental diffs typically results in much
@@ -221,7 +221,7 @@ implementations:
 - [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
 - [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
-- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html), not feature-gated;
+- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html), not feature-gated.
 
 ### Third-party types
 
@@ -248,39 +248,12 @@ implementations, write
 undoredo = { version = "0.2", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
-**Technical sidenote:** Unlike maps and sets, not all stable vector data
-structures allow insertion and removal at arbitrary indexes regardless of
-whether they are vacant, occupied or out of bounds. For `StableVec`, we managed
-to implement inserting at out-of-bound indexes by changing the length before
-insertion using the
-[`.reserve_for()`](https://docs.rs/stable-vec/latest/stable_vec/struct.StableVecFacade.html#method.reserve_for)
-method. For `thunderdome::Arena`, we insert at arbitrary key directly via the
-[`.insert_at()`](https://docs.rs/thunderdome/latest/thunderdome/struct.Arena.html#method.insert_at)
-method. Collections for which we could not achieve this are documented in the
-section below.
-
 ## Unsupported collections
 
-Standard library's `Vec` and `VecDeque` cannot be supported because they lack
-an interface to remove elements without invalidating indexes of other elements.
-Stable vectors do not have this limitation.
-
-However, among stable vector data structures,
-[`Slab`](https://docs.rs/slab/latest/slab/),
-[`SlotMap`](https://docs.rs/slotmap/latest/slotmap/),
-[`generational-arena`](https://docs.rs/generational-arena/latest/generational_arena/)
-cannot be supported because they lack interfaces for insertion at an arbitrary
-key.
-
-**Technical sidenote:** For `Slab`, such interface is missing apparently
-[because](https://github.com/tokio-rs/slab/issues/117#issuecomment-1159741097)
-the [freelist](https://en.wikipedia.org/wiki/Free_list) `Slab` uses to keep
-track of its vacant indexes is only singly-linked, not doubly-linked. Inserting
-an element at an arbitrary vacant index would require removing that index from
-the freelist. But since there is no backwards link available at a given key,
-doing so would require traversing the freelist from the beginning to find the
-position of the previous node, which would incur an overly slow `O(n)` time
-cost.
+Some collections cannot be supported because they lack an
+interface on which `maplike`'s traits could be implemented. See the
+[Unsupported collections](https://docs.rs/maplike/latest/maplike/#unsupported-collections)
+section in `maplike`'s documentation for details.
 
 ## Contributing
 

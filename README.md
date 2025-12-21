@@ -235,15 +235,15 @@ In addition to the standard library, `undoredo` has built-in feature-gated
 convenience implementations for data structures from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
-  gated by the `stable-vec` feature; (example usage:
+  gated by the `stable-vec` feature (example usage:
   [examples/stable_vec.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
-  gated by the `thunderdome` feature; (example usage:
-  [examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs)),
+  gated by the `thunderdome` feature (example usage:
+  [examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs));
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature. (example usage: [examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs)),
+  `rstar` feature (example usage: [examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature.
+  `rstared` feature (example usage: [examples/rstared.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstared.rs)).
 
 To use these, enable their corresponding features next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type

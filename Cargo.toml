@@ -33,7 +33,7 @@ rstared = { version = "0.4", optional = true }
 stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
-rstared = "0.3"
+rstared = "0.4"
 
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]

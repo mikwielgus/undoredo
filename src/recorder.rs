@@ -4,7 +4,7 @@
 
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
-use maplike::{Get, Insert, Map, Push, Remove};
+use maplike::{Get, Insert, Map, Push, Remove, StableRemove};
 
 use crate::edit::Edit;
 
@@ -61,8 +61,8 @@ impl<K, V, C, EC> Recorder<K, V, C, EC> {
 impl<
     K: Clone,
     V: Clone,
-    C: Get<K, Item = V> + Insert<K> + Remove<K, Item = V>,
-    EC: Get<K, Item = V> + Insert<K, Item = V> + Remove<K>,
+    C: Get<K, Item = V> + Insert<K> + StableRemove<K, Item = V>,
+    EC: Get<K, Item = V> + Insert<K, Item = V> + StableRemove<K>,
 > Recorder<K, V, C, EC>
 {
     /// Remove an element, pass it through a closure, then insert it back.
@@ -115,8 +115,8 @@ impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> +
     }
 }
 
-impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remove<K>> Remove<K>
-    for Recorder<K, V, C, EC>
+impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
+    Remove<K> for Recorder<K, V, C, EC>
 {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
@@ -128,6 +128,11 @@ impl<K: Clone, V: Clone, C: Remove<K, Item = V>, EC: Insert<K, Item = V> + Remov
 
         Some(value)
     }
+}
+
+impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
+    StableRemove<K> for Recorder<K, V, C, EC>
+{
 }
 
 impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Push<K>

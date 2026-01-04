@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Insert, IntoIter, Keyed, Remove};
+use maplike::{Insert, IntoIter, Keyed, StableRemove};
 
 /// A reversible set of changes to a collection.
 ///
@@ -62,7 +62,7 @@ pub trait ApplyEdit<EC> {
 impl<
     K: Clone,
     V: Clone,
-    C: Insert<K, Item = V> + Remove<K>,
+    C: Insert<K, Item = V> + StableRemove<K>,
     EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>,
 > ApplyEdit<EC> for C
 {

@@ -22,4 +22,4 @@ pub use crate::edit::ApplyEdit;
 pub use crate::edit::Edit;
 pub use crate::recorder::Recorder;
 pub use crate::undoredo::UndoRedo;
-pub use maplike::{Get, Insert, IntoIter, Push, Remove};
+pub use maplike::{Get, Insert, IntoIter, Push, Remove, StableRemove};

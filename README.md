@@ -11,9 +11,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is an undo-redo Rust library that wraps a collection inside a
-recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern) that
-observes the incoming insertions, removals and pushes while recording the
+`undoredo` is an undo-redo Rust library that operates by wrapping a collection
+inside a recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern)
+which observes the incoming insertions, removals and pushes while recording the
 changes in a reversible incremental diff structure.
 
 This approach makes `undoredo` easier to use than other undo-redo
@@ -21,7 +21,7 @@ libraries. Storing incremental diffs typically results in much
 more succint and reliable code than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is what
 the popular and venerable [`undo`](https://docs.rs/undo/latest/undo/) and
-[`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates use. The programmer
+[`undo_2`](https://docs.rs/undo_2/latest/undo_2/) crates rely on. The programmer
 is relieved from having to maintain application-specific implementations of
 commands, often complicated and prone to elusive runtime bugs, on which the
 Command pattern has to operate.

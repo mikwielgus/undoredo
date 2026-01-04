@@ -46,15 +46,11 @@ impl<Cmd, EC> UndoRedo<EC, Cmd> {
 }
 
 impl<Cmd: Default, EC> UndoRedo<EC, Cmd> {
-    /// Push the edit to the done stack.
+    /// Push the edit onto the done stack.
     ///
     /// Clears the undone stack.
     pub fn commit(&mut self, edit: Edit<EC>) {
-        self.done.push(CmdEdit {
-            cmd: Default::default(),
-            edit,
-        });
-        self.undone.clear();
+        self.cmd_commit(Default::default(), edit);
     }
 }
 

@@ -17,14 +17,14 @@ pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
 }
 
 impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
-    /// Create a new recorder owning and recording a collection.
+    /// Create a new recorder recording changes to an owned collection.
     #[inline(always)]
     pub fn new(collection: C) -> Self {
         Self::with_edit(collection, Default::default())
     }
 
-    /// Flush the recorder, returning the currently recorded edit and replacing
-    /// it with a new empty one.
+    /// Flush the recorder, returning the recorded edit and replacing it with a
+    /// new empty one.
     #[inline(always)]
     pub fn flush(&mut self) -> Edit<EC> {
         core::mem::replace(&mut self.edit, Edit::new())
@@ -32,8 +32,8 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
 }
 
 impl<K, V, C, EC> Recorder<K, V, C, EC> {
-    /// Create a new recorder owning and recording a collection to an already
-    /// existing edit.
+    /// Create a new recorder recording changes to an owned collection, storing
+    /// them in an already existing edit.
     #[inline(always)]
     pub fn with_edit(collection: C, edit: Edit<EC>) -> Self {
         Self {

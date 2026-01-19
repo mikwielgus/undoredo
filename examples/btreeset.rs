@@ -4,7 +4,7 @@
 
 use std::collections::BTreeSet;
 
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<char, (), BTreeSet<char>> = Recorder::new(BTreeSet::new());

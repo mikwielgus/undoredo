@@ -58,7 +58,7 @@ directory.
 
 ```rust
 use std::collections::HashMap;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded collection.
@@ -189,7 +189,6 @@ let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
 
 Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
-
 [examples/btreeset.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/btreeset.rs)
 for a complete example.
 

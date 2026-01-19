@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::HashMap;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded edit.
 #[derive(Debug, Clone, PartialEq)]

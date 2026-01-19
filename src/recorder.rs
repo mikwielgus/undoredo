@@ -93,6 +93,14 @@ impl<K, V, C, EC> Map for Recorder<K, V, C, EC> {
 impl<K, V, C: Get<K, Item = V>, EC> Get<K> for Recorder<K, V, C, EC> {
     #[inline(always)]
     fn get(&self, key: &K) -> Option<&V> {
+        self.get(key)
+    }
+}
+
+impl<K, V, C: Get<K, Item = V>, EC> Recorder<K, V, C, EC> {
+    /// Returns a reference to the value corresponding to the key.
+    #[inline(always)]
+    pub fn get(&self, key: &K) -> Option<&V> {
         self.collection.get(key)
     }
 }
@@ -102,6 +110,16 @@ impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> +
 {
     #[inline(always)]
     fn insert(&mut self, key: K, value: V) {
+        self.insert(key, value)
+    }
+}
+
+impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> + Insert<K>>
+    Recorder<K, V, C, EC>
+{
+    /// Insert a key-value pair into the collection.
+    #[inline(always)]
+    pub fn insert(&mut self, key: K, value: V) {
         if self.edit.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.collection.get(&key) {
                 self.edit
@@ -120,6 +138,22 @@ impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> +
 {
     #[inline(always)]
     fn remove(&mut self, key: &K) -> Option<V> {
+        self.remove(key)
+    }
+}
+
+impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
+    StableRemove<K> for Recorder<K, V, C, EC>
+{
+}
+
+impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
+    Recorder<K, V, C, EC>
+{
+    /// Remove an element under a key from the collection, returning the value at
+    /// the key if the key was previously in the map.
+    #[inline(always)]
+    pub fn remove(&mut self, key: &K) -> Option<V> {
         let value = self.collection.remove(key)?;
 
         if self.edit.inserted.remove(key).is_none() {
@@ -130,16 +164,20 @@ impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> +
     }
 }
 
-impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
-    StableRemove<K> for Recorder<K, V, C, EC>
-{
-}
-
 impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Push<K>
     for Recorder<K, V, C, EC>
 {
     #[inline(always)]
     fn push(&mut self, value: V) -> K {
+        self.push(value)
+    }
+}
+
+impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Recorder<K, V, C, EC> {
+    /// Insert a value into the collection without specifying a key, returning
+    /// the key that was automatically generated.
+    #[inline(always)]
+    pub fn push(&mut self, value: V) -> K {
         let key = self.collection.push(value.clone());
         self.edit.inserted.insert(key.clone(), value);
 

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use rstar::{AABB, primitives::Rectangle};
 use rstared::RTreed;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // A hashmap of 2D rectangles will be the underlying collection.

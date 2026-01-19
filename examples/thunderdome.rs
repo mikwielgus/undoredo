@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use thunderdome::{Arena, Index};
-use undoredo::{Push, Recorder, Remove, StableRemove, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<Index, char, Arena<char>> = Recorder::new(Arena::new());

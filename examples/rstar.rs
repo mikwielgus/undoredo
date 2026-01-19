@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use rstar::RTree;
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<(i32, i32), (), RTree<(i32, i32)>> = Recorder::new(RTree::new());

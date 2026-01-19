@@ -7,7 +7,7 @@
 use std::collections::BTreeMap;
 
 use undoredo::{
-    ApplyEdit, Edit, Get, Insert, IntoIter, Push, Recorder, Remove, StableRemove, UndoRedo,
+    ApplyEdit, Edit, Get, Insert, IntoIter, Push, Recorder, StableRemove, UndoRedo,
 };
 
 pub trait FromUsize {

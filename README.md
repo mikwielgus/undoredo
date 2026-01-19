@@ -46,7 +46,7 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = "0.5"
+undoredo = "0.6"
 ```
 
 ### Basic usage
@@ -250,7 +250,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.5", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
+undoredo = { version = "0.6", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
 ## Unsupported collections

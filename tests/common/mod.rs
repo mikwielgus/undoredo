@@ -193,7 +193,14 @@ pub fn test_insert_and_remove_on_set<
 pub fn test_edit_undo_redo_at_generated_indexes<
     K: Clone,
     C: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K> + IntoIter<K>,
-    EC: Clone + Default + Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    EC: Clone
+        + Default
+        + Keyed<Key = K>
+        + Map<Item = i32>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + StableRemove<K>,
 >(
     mut collection: C,
 ) {
@@ -293,7 +300,14 @@ pub fn test_edit_undo_redo_at_specified_indexes<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
     C: Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
-    EC: Clone + Default + Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    EC: Clone
+        + Default
+        + Keyed<Key = K>
+        + Map<Item = V>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + StableRemove<K>,
 >(
     mut collection: C,
 ) {
@@ -384,7 +398,14 @@ pub fn test_edit_undo_redo_at_specified_indexes<
 pub fn test_edit_undo_redo_on_set<
     K: Clone + FromUsize,
     C: Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
-    EC: Clone + Default + Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    EC: Clone
+        + Default
+        + Keyed<Key = K>
+        + Map<Item = ()>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + StableRemove<K>,
 >(
     mut collection: C,
 ) {

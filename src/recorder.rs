@@ -183,10 +183,8 @@ where
     }
 }
 
-impl<
-    C: Keyed + Map + Push<C::Key>,
-    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>,
-> Push<C::Key> for Recorder<C, EC>
+impl<C: Keyed + Map + Push<C::Key>, EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>>
+    Push<C::Key> for Recorder<C, EC>
 where
     C::Key: Clone,
     C::Item: Clone,
@@ -197,10 +195,8 @@ where
     }
 }
 
-impl<
-    C: Keyed + Map + Push<C::Key>,
-    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>,
-> Recorder<C, EC>
+impl<C: Keyed + Map + Push<C::Key>, EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>>
+    Recorder<C, EC>
 where
     C::Key: Clone,
     C::Item: Clone,

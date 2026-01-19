@@ -18,15 +18,13 @@ impl common::FromUsize for (i32, i32) {
 
 #[test]
 fn test_apply_edit_on_set() {
-    let recorder =
-        Recorder::<(i32, i32), (), RTree<(i32, i32)>, RTree<(i32, i32)>>::new(RTree::new());
+    let recorder = Recorder::<RTree<(i32, i32)>>::new(RTree::new());
     common::test_apply_edit_on_set(recorder);
 }
 
 #[test]
 fn test_insert_and_remove_on_set() {
-    let recorder =
-        Recorder::<(i32, i32), (), RTree<(i32, i32)>, RTree<(i32, i32)>>::new(RTree::new());
+    let recorder = Recorder::<RTree<(i32, i32)>>::new(RTree::new());
     common::test_insert_and_remove_on_set(recorder);
 }
 

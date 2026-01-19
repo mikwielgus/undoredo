@@ -62,7 +62,7 @@ use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded collection.
-    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
@@ -124,7 +124,7 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
@@ -183,8 +183,8 @@ As an example, the following code will construct a recorder and an undo-redo
 bistack for a `BTreeSet`:
 
 ```rust-ignore
-let mut recorder: Recorder<usize, char, BTreeSet<char, ()>> = Recorder::new(BTreeSet::new());
-let mut undoredo: UndoRedo<BTreeSet<char, ()>> = UndoRedo::new();
+let mut recorder: Recorder<BTreeSet<char>> = Recorder::new(BTreeSet::new());
+let mut undoredo: UndoRedo<BTreeSet<char>> = UndoRedo::new();
 ```
 
 Keeping in mind to pass values as keys, `recorder` and

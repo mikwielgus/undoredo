@@ -6,7 +6,7 @@ use stable_vec::StableVec;
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<usize, char, StableVec<char>> = Recorder::new(StableVec::new());
+    let mut recorder: Recorder<StableVec<char>> = Recorder::new(StableVec::new());
     let mut undoredo: UndoRedo<StableVec<char>> = UndoRedo::new();
 
     recorder.push('A');

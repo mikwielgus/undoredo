@@ -12,7 +12,7 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
     let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');

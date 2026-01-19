@@ -8,7 +8,7 @@ use undoredo::{Recorder, UndoRedo};
 #[allow(unused_mut)]
 fn main() {
     // The recorder records the ongoing changes to the recorded collection.
-    let mut recorder: Recorder<usize, char, HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();

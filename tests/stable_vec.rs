@@ -12,25 +12,25 @@ use undoredo::Recorder;
 
 #[test]
 fn test_apply_edit_at_generated_indexes() {
-    let recorder = Recorder::<usize, i32, StableVec<i32>, StableVec<i32>>::new(StableVec::new());
-    common::test_apply_edit_at_generated_indexes(recorder);
+    let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
+    common::test_apply_edit_at_generated_indexes::<usize, _, _>(recorder);
 }
 
 #[test]
 fn test_apply_edit_at_specified_indexes() {
-    let recorder = Recorder::<usize, i32, StableVec<i32>, StableVec<i32>>::new(StableVec::new());
+    let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
     common::test_apply_edit_at_specified_indexes(recorder);
 }
 
 #[test]
 fn test_insert_and_remove_at_generated_indexes() {
-    let recorder = Recorder::<usize, i32, StableVec<i32>, StableVec<i32>>::new(StableVec::new());
-    common::test_insert_and_remove_at_generated_indexes(recorder);
+    let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
+    common::test_insert_and_remove_at_generated_indexes::<usize, _, _>(recorder);
 }
 
 #[test]
 fn test_insert_and_remove_at_specified_indexes() {
-    let recorder = Recorder::<usize, i32, StableVec<i32>, StableVec<i32>>::new(StableVec::new());
+    let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
     common::test_insert_and_remove_at_specified_indexes(recorder);
 }
 

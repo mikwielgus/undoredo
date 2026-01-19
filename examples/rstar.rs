@@ -6,7 +6,7 @@ use rstar::RTree;
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<(i32, i32), (), RTree<(i32, i32)>> = Recorder::new(RTree::new());
+    let mut recorder: Recorder<RTree<(i32, i32)>> = Recorder::new(RTree::new());
     let mut undoredo: UndoRedo<RTree<(i32, i32)>> = UndoRedo::new();
 
     recorder.insert((1, 1), ());

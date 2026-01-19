@@ -13,13 +13,13 @@ use undoredo::Recorder;
 
 #[test]
 fn test_apply_edit_on_set() {
-    let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
+    let recorder = Recorder::<HashSet<i32>>::new(HashSet::new());
     common::test_apply_edit_on_set(recorder);
 }
 
 #[test]
 fn test_insert_and_remove_on_set() {
-    let recorder = Recorder::<i32, (), HashSet<i32>, HashSet<i32>>::new(HashSet::new());
+    let recorder = Recorder::<HashSet<i32>>::new(HashSet::new());
     common::test_insert_and_remove_on_set(recorder);
 }
 

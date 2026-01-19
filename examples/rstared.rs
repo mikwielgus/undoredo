@@ -13,8 +13,6 @@ fn main() {
     let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
     // Wrap `RTreed` around the hashmap and then `Recorder` around it.
     let mut recorder = Recorder::<
-        i32,
-        Rectangle<(i32, i32)>,
         RTreed<i32, Rectangle<(i32, i32)>, HashMap<i32, Rectangle<(i32, i32)>>>,
     >::new(RTreed::new(rect_hashmap));
     let mut undoredo: UndoRedo<

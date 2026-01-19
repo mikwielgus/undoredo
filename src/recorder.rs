@@ -2,21 +2,17 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use alloc::collections::BTreeMap;
-use core::marker::PhantomData;
-use maplike::{Get, Insert, Map, Push, Remove, StableRemove};
+use maplike::{Get, Insert, Keyed, Map, Push, Remove, StableRemove};
 
 use crate::edit::Edit;
 
 /// Records edits applied to a collection so they can be replayed or reverted.
-pub struct Recorder<K, V = (), C = BTreeMap<K, V>, EC = C> {
+pub struct Recorder<C: Keyed + Map, EC: Keyed + Map = C> {
     collection: C,
     edit: Edit<EC>,
-    key_marker: PhantomData<K>,
-    value_marker: PhantomData<V>,
 }
 
-impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
+impl<C: Keyed + Map, EC: Keyed + Map + Default> Recorder<C, EC> {
     /// Create a new recorder recording changes to an owned collection.
     #[inline]
     pub fn new(collection: C) -> Self {
@@ -31,17 +27,12 @@ impl<K, V, C, EC: Default> Recorder<K, V, C, EC> {
     }
 }
 
-impl<K, V, C, EC> Recorder<K, V, C, EC> {
+impl<C: Keyed + Map, EC: Keyed + Map> Recorder<C, EC> {
     /// Create a new recorder recording changes to an owned collection, storing
     /// them in an already existing edit.
     #[inline]
     pub fn with_edit(collection: C, edit: Edit<EC>) -> Self {
-        Self {
-            collection,
-            edit,
-            key_marker: PhantomData,
-            value_marker: PhantomData,
-        }
+        Self { collection, edit }
     }
 
     /// Returns a reference to the recorded collection.
@@ -59,67 +50,80 @@ impl<K, V, C, EC> Recorder<K, V, C, EC> {
 }
 
 impl<
-    K: Clone,
-    V: Clone,
-    C: Get<K, Item = V> + Insert<K> + StableRemove<K, Item = V>,
-    EC: Get<K, Item = V> + Insert<K, Item = V> + StableRemove<K>,
-> Recorder<K, V, C, EC>
+    C: Keyed + Map + Get<C::Key> + Insert<C::Key> + StableRemove<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Get<C::Key> + Insert<C::Key> + StableRemove<C::Key>,
+> Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     /// Remove an element, pass it through a closure, then insert it back.
     #[inline]
-    pub fn update<F: FnOnce(Option<V>) -> Option<V>>(&mut self, key: K, f: F) {
+    pub fn update<F: FnOnce(Option<C::Item>) -> Option<C::Item>>(&mut self, key: C::Key, f: F) {
         if let Some(value) = f(self.remove(&key)) {
             self.insert(key, value);
         }
     }
 }
 
-impl<K, V, C: Default, EC: Default> Default for Recorder<K, V, C, EC> {
+impl<C: Keyed + Map + Default, EC: Keyed + Map + Default> Default for Recorder<C, EC> {
     #[inline]
     fn default() -> Self {
         Self {
             collection: Default::default(),
             edit: Default::default(),
-            key_marker: PhantomData,
-            value_marker: PhantomData,
         }
     }
 }
 
-impl<K, V, C, EC> Map for Recorder<K, V, C, EC> {
-    type Item = V;
+impl<C: Keyed + Map, EC: Keyed + Map> Map for Recorder<C, EC> {
+    type Item = C::Item;
 }
 
-impl<K, V, C: Get<K, Item = V>, EC> Get<K> for Recorder<K, V, C, EC> {
+impl<C: Keyed + Map, EC: Keyed + Map> Keyed for Recorder<C, EC> {
+    type Key = C::Key;
+}
+
+impl<C: Keyed + Map + Get<C::Key>, EC: Keyed + Map> Get<C::Key> for Recorder<C, EC> {
     #[inline]
-    fn get(&self, key: &K) -> Option<&V> {
+    fn get(&self, key: &C::Key) -> Option<&C::Item> {
         self.get(key)
     }
 }
 
-impl<K, V, C: Get<K, Item = V>, EC> Recorder<K, V, C, EC> {
+impl<C: Keyed + Map + Get<C::Key>, EC: Keyed + Map> Recorder<C, EC> {
     /// Returns a reference to the value corresponding to the key.
     #[inline]
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get(&self, key: &C::Key) -> Option<&C::Item> {
         self.collection.get(key)
     }
 }
 
-impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> + Insert<K>>
-    Insert<K> for Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + Get<C::Key> + Insert<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Get<C::Key> + Insert<C::Key>,
+> Insert<C::Key> for Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     #[inline]
-    fn insert(&mut self, key: K, value: V) {
+    fn insert(&mut self, key: C::Key, value: C::Item) {
         self.insert(key, value)
     }
 }
 
-impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> + Insert<K>>
-    Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + Get<C::Key> + Insert<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Get<C::Key> + Insert<C::Key>,
+> Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     /// Insert a key-value pair into the collection.
     #[inline]
-    pub fn insert(&mut self, key: K, value: V) {
+    pub fn insert(&mut self, key: C::Key, value: C::Item) {
         if self.edit.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.collection.get(&key) {
                 self.edit
@@ -133,27 +137,42 @@ impl<K: Clone, V: Clone, C: Get<K, Item = V> + Insert<K>, EC: Get<K, Item = V> +
     }
 }
 
-impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
-    Remove<K> for Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + StableRemove<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key> + StableRemove<C::Key>,
+> Remove<C::Key> for Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     #[inline]
-    fn remove(&mut self, key: &K) -> Option<V> {
+    fn remove(&mut self, key: &C::Key) -> Option<C::Item> {
         self.remove(key)
     }
 }
 
-impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
-    StableRemove<K> for Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + StableRemove<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key> + StableRemove<C::Key>,
+> StableRemove<C::Key> for Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
 }
 
-impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> + StableRemove<K>>
-    Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + StableRemove<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key> + StableRemove<C::Key>,
+> Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     /// Remove an element under a key from the collection, returning the value at
     /// the key if the key was previously in the map.
     #[inline]
-    pub fn remove(&mut self, key: &K) -> Option<V> {
+    pub fn remove(&mut self, key: &C::Key) -> Option<C::Item> {
         let value = self.collection.remove(key)?;
 
         if self.edit.inserted.remove(key).is_none() {
@@ -164,20 +183,32 @@ impl<K: Clone, V: Clone, C: StableRemove<K, Item = V>, EC: Insert<K, Item = V> +
     }
 }
 
-impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Push<K>
-    for Recorder<K, V, C, EC>
+impl<
+    C: Keyed + Map + Push<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>,
+> Push<C::Key> for Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
 {
     #[inline]
-    fn push(&mut self, value: V) -> K {
+    fn push(&mut self, value: C::Item) -> C::Key {
         self.push(value)
     }
 }
 
-impl<K: Clone, V: Clone, C: Push<K, Item = V>, EC: Insert<K, Item = V>> Recorder<K, V, C, EC> {
+impl<
+    C: Keyed + Map + Push<C::Key>,
+    EC: Keyed<Key = C::Key> + Map<Item = C::Item> + Insert<C::Key>,
+> Recorder<C, EC>
+where
+    C::Key: Clone,
+    C::Item: Clone,
+{
     /// Insert a value into the collection without specifying a key, returning
     /// the key that was automatically generated.
     #[inline]
-    pub fn push(&mut self, value: V) -> K {
+    pub fn push(&mut self, value: C::Item) -> C::Key {
         let key = self.collection.push(value.clone());
         self.edit.inserted.insert(key.clone(), value);
 

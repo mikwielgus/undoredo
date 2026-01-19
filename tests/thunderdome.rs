@@ -12,14 +12,14 @@ use undoredo::Recorder;
 
 #[test]
 fn test_apply_edit_at_generated_indexes() {
-    let recorder = Recorder::<Index, i32, Arena<i32>, Arena<i32>>::new(Arena::new());
-    common::test_apply_edit_at_generated_indexes(recorder);
+    let recorder = Recorder::<Arena<i32>>::new(Arena::new());
+    common::test_apply_edit_at_generated_indexes::<Index, _, _>(recorder);
 }
 
 #[test]
 fn test_insert_and_remove_at_generated_indexes() {
-    let recorder = Recorder::<Index, i32, Arena<i32>, Arena<i32>>::new(Arena::new());
-    common::test_insert_and_remove_at_generated_indexes(recorder);
+    let recorder = Recorder::<Arena<i32>>::new(Arena::new());
+    common::test_insert_and_remove_at_generated_indexes::<Index, _, _>(recorder);
 }
 
 #[test]

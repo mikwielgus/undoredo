@@ -255,10 +255,20 @@ undoredo = { version = "0.6", features = ["stable-vec", "thunderdome", "rstar", 
 
 ## Unsupported collections
 
-Some collections cannot be supported because they lack an
-interface on which `maplike`'s traits could be implemented. See the
-[Unsupported collections](https://docs.rs/maplike/latest/maplike/#unsupported-collections)
+Some collections cannot be supported because they lack an interface
+on which `maplike`'s traits could be implemented. See the [Unsupported
+collections](https://docs.rs/maplike/latest/maplike/#unsupported-collections)
 section in `maplike`'s documentation for details.
+
+## Documentation
+
+See the [documentation](https://docs.rs/undoredo/latest/undoredo) for more information
+on `undoredo`'s usage.
+
+## Packaging
+
+`undoredo` is published as a [crate](https://crates.io/crates/undoredo) on the
+[Crates.io](https://crates.io/) registry.
 
 ## Contributing
 
@@ -274,3 +284,10 @@ We welcome issues and pull requests from anyone both to our canonical
 - [Apache License, Version 2.0](./LICENSES/Apache-2.0.txt),
 
 at your option.
+
+### Inbound licensing
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the clause 5 of the Apache-2.0
+licence, will be dual-licensed as described above, without any additional terms
+or conditions.

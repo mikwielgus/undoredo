@@ -24,3 +24,4 @@ fn test_insert_and_remove_on_set() {
 fn test_edit_undo_redo_on_set() {
     common::test_edit_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSet<i32>>(BTreeSet::new());
 }
+

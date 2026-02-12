@@ -285,9 +285,8 @@ We welcome issues and pull requests from anyone both to our canonical
 
 at your option.
 
-### Inbound licensing
+### Inbound licence is outbound licence
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the clause 5 of the Apache-2.0
-licence, will be dual-licensed as described above, without any additional terms
-or conditions.
+for inclusion in the work by you will be dual-licensed as described above,
+without any additional terms or conditions.

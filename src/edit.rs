@@ -76,8 +76,8 @@ pub trait ApplyEdit<EC> {
 }
 
 fn apply_edit<
-    K: Clone,
-    V: Clone,
+    K,
+    V,
     C: Insert<K, Item = V> + StableRemove<K>,
     EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>,
 >(
@@ -89,11 +89,11 @@ fn apply_edit<
     }
 
     for (inserted_key, inserted_value) in edit.inserted.clone().into_iter() {
-        collection.insert(inserted_key.clone(), inserted_value.clone());
+        collection.insert(inserted_key, inserted_value);
     }
 }
 
-impl<K: Clone + Ord, V: Clone, EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>> ApplyEdit<EC>
+impl<K: Ord, V, EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>> ApplyEdit<EC>
     for BTreeMap<K, V>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
@@ -101,8 +101,15 @@ impl<K: Clone + Ord, V: Clone, EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K
     }
 }
 
-impl<K: Clone + Ord, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyEdit<EC>
-    for BTreeSet<K>
+impl<K: Ord, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyEdit<EC> for BTreeSet<K> {
+    fn apply_edit(&mut self, edit: &Edit<EC>) {
+        apply_edit(self, edit);
+    }
+}
+
+#[cfg(feature = "std")]
+impl<K: Eq + Hash, V, EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>> ApplyEdit<EC>
+    for HashMap<K, V>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit(self, edit);
@@ -110,16 +117,7 @@ impl<K: Clone + Ord, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyE
 }
 
 #[cfg(feature = "std")]
-impl<K: Clone + Eq + Hash, V: Clone, EC: Clone + IntoIter<K, Item = V> + Keyed<Key = K>>
-    ApplyEdit<EC> for HashMap<K, V>
-{
-    fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
-    }
-}
-
-#[cfg(feature = "std")]
-impl<K: Clone + Eq + Hash, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyEdit<EC>
+impl<K: Eq + Hash, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyEdit<EC>
     for HashSet<K>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
@@ -128,11 +126,8 @@ impl<K: Clone + Eq + Hash, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> 
 }
 
 #[cfg(feature = "stable-vec")]
-impl<
-    V: Clone,
-    C: stable_vec::core::Core<V>,
-    EC: Clone + IntoIter<usize, Item = V> + Keyed<Key = usize>,
-> ApplyEdit<EC> for StableVecFacade<V, C>
+impl<V, C: stable_vec::core::Core<V>, EC: Clone + IntoIter<usize, Item = V> + Keyed<Key = usize>>
+    ApplyEdit<EC> for StableVecFacade<V, C>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit(self, edit);
@@ -140,17 +135,15 @@ impl<
 }
 
 #[cfg(feature = "thunderdome")]
-impl<V: Clone, EC: Clone + IntoIter<Index, Item = V> + Keyed<Key = Index>> ApplyEdit<EC>
-    for Arena<V>
-{
+impl<V, EC: Clone + IntoIter<Index, Item = V> + Keyed<Key = Index>> ApplyEdit<EC> for Arena<V> {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit(self, edit);
     }
 }
 
 #[cfg(feature = "rstar")]
-impl<K: Clone + RTreeObject + PartialEq, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>>
-    ApplyEdit<EC> for RTree<K>
+impl<K: RTreeObject + PartialEq, EC: Clone + IntoIter<K, Item = ()> + Keyed<Key = K>> ApplyEdit<EC>
+    for RTree<K>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit(self, edit);
@@ -164,8 +157,6 @@ impl<
 > ApplyEdit<EC> for crate::recorder::Recorder<C, REC>
 where
     Self: Insert<C::Key, Item = C::Item> + StableRemove<C::Key>,
-    C::Key: Clone,
-    C::Item: Clone,
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit(self, edit);

@@ -29,7 +29,7 @@ impl FromUsize for usize {
 pub fn test_apply_edit_at_generated_indexes<
     K: Ord + Clone,
     C: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K>,
-    EC: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K>,
+    EC: Clone + Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -59,7 +59,7 @@ pub fn test_apply_edit_at_specified_indexes<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     C: Keyed<Key = K> + Map<Item = V> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + StableRemove<K>,
+    EC: Clone + Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -89,7 +89,7 @@ pub fn test_apply_edit_at_specified_indexes<
 pub fn test_apply_edit_on_set<
     K: Clone + FromUsize + Ord,
     C: Keyed<Key = K> + Map<Item = ()> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + StableRemove<K>,
+    EC: Clone + Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -192,7 +192,14 @@ pub fn test_insert_and_remove_on_set<
 
 pub fn test_edit_undo_redo_at_generated_indexes<
     K: Clone,
-    C: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K> + IntoIter<K>,
+    C: Keyed<Key = K>
+        + Map<Item = i32>
+        + Get<K>
+        + Insert<K>
+        + StableRemove<K>
+        + Push<K>
+        + IntoIter<K>
+        + ApplyEdit<EC>,
     EC: Clone
         + Default
         + Keyed<Key = K>
@@ -299,7 +306,13 @@ pub fn test_edit_undo_redo_at_generated_indexes<
 pub fn test_edit_undo_redo_at_specified_indexes<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
-    C: Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<Key = K>
+        + Map<Item = V>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + StableRemove<K>
+        + ApplyEdit<EC>,
     EC: Clone
         + Default
         + Keyed<Key = K>
@@ -397,7 +410,13 @@ pub fn test_edit_undo_redo_at_specified_indexes<
 
 pub fn test_edit_undo_redo_on_set<
     K: Clone + FromUsize,
-    C: Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<Key = K>
+        + Map<Item = ()>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + StableRemove<K>
+        + ApplyEdit<EC>,
     EC: Clone
         + Default
         + Keyed<Key = K>

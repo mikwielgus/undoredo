@@ -21,13 +21,16 @@ maintenance = { status = "actively-developed" }
 [features]
 default = ["std"]
 std = []
-stable-vec = ["maplike/stable-vec"]
-thunderdome = ["maplike/thunderdome"]
-rstar = ["maplike/rstar"]
+rstar = ["dep:rstar", "maplike/rstar"]
+stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
+thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
 maplike = "0.5"
+stable-vec = { version = "0.4", optional = true }
+rstar = { version = "0.12", optional = true }
 rstared = { version = "0.4", optional = true }
+thunderdome = { version = "0.6", optional = true }
 
 [dev-dependencies]
 stable-vec = "0.4"

@@ -24,6 +24,7 @@ use rstar::{RTree, RTreeObject};
 ///
 /// Consists of a collection of removed elements and another collection of
 /// inserted elements.
+#[derive(Clone, Debug, Default)]
 pub struct Edit<EC> {
     pub(super) removed: EC,
     pub(super) inserted: EC,
@@ -57,16 +58,10 @@ impl<EC> Edit<EC> {
     }
 }
 
-impl<EC: Default> Default for Edit<EC> {
-    fn default() -> Self {
-        Self {
-            removed: Default::default(),
-            inserted: Default::default(),
-        }
-    }
-}
-
 /// Apply the changes in an edit to a collection.
+///
+/// This can be used to revert a previously recorded edit. The edit has to
+/// be reversed first with [`Edit::reverse()`].
 pub trait ApplyEdit<EC> {
     /// Apply the changes in an edit to a collection.
     ///

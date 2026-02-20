@@ -7,6 +7,7 @@ use maplike::{Get, Insert, Keyed, Map, Push, Remove, StableRemove};
 use crate::edit::Edit;
 
 /// Records edits applied to a collection so they can be replayed or reverted.
+#[derive(Clone, Debug, Default)]
 pub struct Recorder<C: Keyed + Map, EC: Keyed + Map = C> {
     collection: C,
     edit: Edit<EC>,
@@ -62,16 +63,6 @@ where
     pub fn update<F: FnOnce(Option<C::Item>) -> Option<C::Item>>(&mut self, key: C::Key, f: F) {
         if let Some(value) = f(self.remove(&key)) {
             self.insert(key, value);
-        }
-    }
-}
-
-impl<C: Keyed + Map + Default, EC: Keyed + Map + Default> Default for Recorder<C, EC> {
-    #[inline]
-    fn default() -> Self {
-        Self {
-            collection: Default::default(),
-            edit: Default::default(),
         }
     }
 }

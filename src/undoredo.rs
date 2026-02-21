@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
-use maplike::{Get, Insert, Keyed, Map};
+use maplike::{Get, Insert, KeyedCollection};
 
 use crate::{Edit, Recorder, edit::ApplyEdit};
 
@@ -62,11 +62,13 @@ impl<Cmd, EC> UndoRedo<EC, Cmd> {
     }
 }
 
-impl<Cmd, EC: Keyed + Map + Default> UndoRedo<EC, Cmd> {
+impl<Cmd, EC: KeyedCollection + Default> UndoRedo<EC, Cmd> {
     /// Make and record changes to the recorded collection from within a
     /// closure, automatically committing them once closure finishes.
     pub fn edit<
-        C: Keyed<Key = EC::Key> + Map<Item = EC::Item> + Get<C::Key> + Insert<C::Key>,
+        K,
+        V,
+        C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
         F: FnOnce(&mut Recorder<C, EC>) -> Cmd,
     >(
         &mut self,
@@ -74,8 +76,9 @@ impl<Cmd, EC: Keyed + Map + Default> UndoRedo<EC, Cmd> {
         f: F,
     ) -> C
     where
-        C::Key: Clone,
-        C::Item: Clone,
+        EC: KeyedCollection<Key = K, Value = V>,
+        K: Clone,
+        V: Clone,
     {
         let mut recorder = Recorder::<C, EC>::new(collection);
         let cmd = f(&mut recorder);

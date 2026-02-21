@@ -22,21 +22,22 @@ maintenance = { status = "actively-developed" }
 default = ["std"]
 std = []
 rstar = ["dep:rstar", "maplike/rstar"]
+rstared = ["dep:rstared", "dep:rstar"]
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
-maplike = "0.5"
+maplike = "0.7"
 stable-vec = { version = "0.4", optional = true }
 rstar = { version = "0.12", optional = true }
-rstared = { version = "0.4", optional = true }
+rstared = { version = "0.7", optional = true }
 thunderdome = { version = "0.6", optional = true }
 
 [dev-dependencies]
 stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
-rstared = "0.4"
+rstared = "0.7"
 
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]
@@ -64,4 +65,9 @@ doc-scrape-examples = true
 [[example]]
 name = "rstar"
 required-features = ["rstar"]
+doc-scrape-examples = true
+
+[[example]]
+name = "rstared"
+required-features = ["rstared"]
 doc-scrape-examples = true

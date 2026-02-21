@@ -7,8 +7,14 @@
 use std::collections::BTreeMap;
 
 use undoredo::{
-    ApplyEdit, Edit, Get, Insert, IntoIter, Keyed, Map, Push, Recorder, StableRemove, UndoRedo,
+    ApplyEdit, Edit, Get, Insert, IntoIter, KeyedCollection, Push, Recorder, StableRemove, UndoRedo,
 };
+
+pub(crate) trait Keyed<K>: KeyedCollection<Key = K> {}
+impl<T: KeyedCollection<Key = K>, K> Keyed<K> for T {}
+
+pub(crate) trait Map<V>: KeyedCollection<Value = V> {}
+impl<T: KeyedCollection<Value = V>, V> Map<V> for T {}
 
 pub trait FromUsize {
     fn from_usize(u: usize) -> Self;
@@ -28,8 +34,8 @@ impl FromUsize for usize {
 
 pub fn test_apply_edit_at_generated_indexes<
     K: Ord + Clone,
-    C: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K>,
-    EC: Clone + Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K>,
+    EC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -58,8 +64,8 @@ pub fn test_apply_edit_at_generated_indexes<
 pub fn test_apply_edit_at_specified_indexes<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
-    C: Keyed<Key = K> + Map<Item = V> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Clone + Keyed<Key = K> + Map<Item = V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<K> + Map<V> + Insert<K> + StableRemove<K> + Get<K>,
+    EC: Clone + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -88,8 +94,8 @@ pub fn test_apply_edit_at_specified_indexes<
 
 pub fn test_apply_edit_on_set<
     K: Clone + FromUsize + Ord,
-    C: Keyed<Key = K> + Map<Item = ()> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Clone + Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<K> + Map<()> + Insert<K> + StableRemove<K> + Get<K>,
+    EC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -115,8 +121,8 @@ pub fn test_apply_edit_on_set<
 
 pub fn test_insert_and_remove_at_generated_indexes<
     K: Clone,
-    C: Keyed<Key = K> + Map<Item = i32> + Insert<K> + StableRemove<K> + Push<K> + Get<K>,
-    EC: Keyed<Key = K> + Map<Item = i32> + Get<K> + Insert<K> + StableRemove<K>,
+    C: Keyed<K> + Map<i32> + Insert<K> + StableRemove<K> + Push<K> + Get<K>,
+    EC: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -142,8 +148,8 @@ pub fn test_insert_and_remove_at_generated_indexes<
 }
 
 pub fn test_insert_and_remove_at_specified_indexes<
-    C: Keyed<Key = usize> + Map<Item = i32> + Insert<usize> + StableRemove<usize> + Get<usize>,
-    EC: Keyed<Key = usize> + Map<Item = i32> + Get<usize> + Insert<usize> + StableRemove<usize>,
+    C: Keyed<usize> + Map<i32> + Insert<usize> + StableRemove<usize> + Get<usize>,
+    EC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + StableRemove<usize>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -167,8 +173,8 @@ pub fn test_insert_and_remove_at_specified_indexes<
 
 pub fn test_insert_and_remove_on_set<
     K: Clone + FromUsize,
-    C: Keyed<Key = K> + Map<Item = ()> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Keyed<Key = K> + Map<Item = ()> + Get<K> + Insert<K> + StableRemove<K>,
+    C: Keyed<K> + Map<()> + Insert<K> + StableRemove<K> + Get<K>,
+    EC: Keyed<K> + Map<()> + Get<K> + Insert<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
 ) {
@@ -192,22 +198,15 @@ pub fn test_insert_and_remove_on_set<
 
 pub fn test_edit_undo_redo_at_generated_indexes<
     K: Clone,
-    C: Keyed<Key = K>
-        + Map<Item = i32>
+    C: Keyed<K>
+        + Map<i32>
         + Get<K>
         + Insert<K>
         + StableRemove<K>
         + Push<K>
         + IntoIter<K>
         + ApplyEdit<EC>,
-    EC: Clone
-        + Default
-        + Keyed<Key = K>
-        + Map<Item = i32>
-        + Get<K>
-        + Insert<K>
-        + IntoIter<K>
-        + StableRemove<K>,
+    EC: Clone + Default + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {
@@ -306,21 +305,8 @@ pub fn test_edit_undo_redo_at_generated_indexes<
 pub fn test_edit_undo_redo_at_specified_indexes<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
-    C: Keyed<Key = K>
-        + Map<Item = V>
-        + Get<K>
-        + Insert<K>
-        + IntoIter<K>
-        + StableRemove<K>
-        + ApplyEdit<EC>,
-    EC: Clone
-        + Default
-        + Keyed<Key = K>
-        + Map<Item = V>
-        + Get<K>
-        + Insert<K>
-        + IntoIter<K>
-        + StableRemove<K>,
+    C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
+    EC: Clone + Default + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {
@@ -410,21 +396,8 @@ pub fn test_edit_undo_redo_at_specified_indexes<
 
 pub fn test_edit_undo_redo_on_set<
     K: Clone + FromUsize,
-    C: Keyed<Key = K>
-        + Map<Item = ()>
-        + Get<K>
-        + Insert<K>
-        + IntoIter<K>
-        + StableRemove<K>
-        + ApplyEdit<EC>,
-    EC: Clone
-        + Default
-        + Keyed<Key = K>
-        + Map<Item = ()>
-        + Get<K>
-        + Insert<K>
-        + IntoIter<K>
-        + StableRemove<K>,
+    C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
+    EC: Clone + Default + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {

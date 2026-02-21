@@ -46,6 +46,11 @@ impl<EC> Edit<EC> {
         Self { removed, inserted }
     }
 
+    /// Consume the edit and return removed and inserted collections.
+    pub fn dissolve(self) -> (EC, EC) {
+        (self.removed, self.inserted)
+    }
+
     /// Reverse the edit.
     ///
     /// This is done by swapping the collections of removed and inserted

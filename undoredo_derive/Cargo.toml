@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2025 undoredo contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
+name = "undoredo_derive"
+version = "0.8.1"
+authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
+description = "Derive macros for undoredo."
+repository = "https://codeberg.org/topola/undoredo"
+documentation = "https://docs.rs/undoredo"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["undo", "redo", "no_std"]
+categories = ["data-structures", "gui", "no-std", "rust-patterns"]
+edition = "2024"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "2", features = ["full"] }

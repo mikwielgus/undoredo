@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![cfg(feature = "derive")]
+
 use std::collections::{BTreeMap, BTreeSet};
 
 use undoredo::{ApplyEdit, Edit};

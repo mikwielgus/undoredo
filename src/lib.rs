@@ -24,5 +24,5 @@ pub use crate::recorder::Recorder;
 pub use crate::undoredo::UndoRedo;
 pub use maplike::{Get, Insert, IntoIter, KeyedCollection, Map, Push, Remove, StableRemove};
 
-#[cfg(feature = "undoredo_derive")]
+#[cfg(feature = "derive")]
 pub use undoredo_derive::ApplyEdit;

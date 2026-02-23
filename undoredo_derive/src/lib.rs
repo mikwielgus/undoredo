@@ -27,6 +27,9 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
     };
 
     let where_clause = generics.make_where_clause();
+    where_clause.predicates.push(syn::parse_quote! {
+        ::undoredo::Edit<Self>: ::core::clone::Clone
+    });
 
     let mut apply_stmts = Vec::new();
 

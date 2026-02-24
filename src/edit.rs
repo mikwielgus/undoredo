@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::{
+    collections::{BTreeMap, BTreeSet},
+    vec::Vec,
+};
 use maplike::{Insert, IntoIter, KeyedCollection, StableRemove};
 
 #[cfg(feature = "std")]
@@ -75,7 +78,7 @@ pub trait ApplyEdit<EC> {
     fn apply_edit(&mut self, edit: &Edit<EC>);
 }
 
-fn apply_edit<K, C, EC>(collection: &mut C, edit: &Edit<EC>)
+fn apply_edit_on_map<K, C, EC>(collection: &mut C, edit: &Edit<EC>)
 where
     C: KeyedCollection<Key = K> + Insert<K> + StableRemove<K>,
     EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = C::Value>,
@@ -89,11 +92,41 @@ where
     }
 }
 
+impl<V, EC: Clone + IntoIter<usize, Value = V>> ApplyEdit<EC> for Vec<V>
+where
+    EC::IntoIter: DoubleEndedIterator,
+{
+    fn apply_edit(&mut self, edit: &Edit<EC>) {
+        // This implementation is different than the others because stable
+        // removal is impossible on `Vec`.
+
+        // We reverse the order of removeds to have removals become
+        // corresponding pops of all pushes in their reverse order. Otherwise,
+        // the no-op branch would get triggered.
+        for (removed_index, _removed_value) in edit.removed.clone().into_iter().rev() {
+            if removed_index == self.len() - 1 {
+                self.pop();
+            } else {
+                // No-op. The value will just get overridden by the subsequent
+                // insertion.
+            }
+        }
+
+        for (inserted_index, inserted_value) in edit.inserted.clone().into_iter() {
+            if inserted_index == self.len() {
+                self.push(inserted_value);
+            } else {
+                self[inserted_index] = inserted_value;
+            }
+        }
+    }
+}
+
 impl<K: Ord, V, EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>> ApplyEdit<EC>
     for BTreeMap<K, V>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -101,7 +134,7 @@ impl<K: Ord, EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()>> App
     for BTreeSet<K>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -110,7 +143,7 @@ impl<K: Eq + Hash, V, EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value =
     for HashMap<K, V>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -119,7 +152,7 @@ impl<K: Eq + Hash, EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()
     for HashSet<K>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -131,7 +164,7 @@ impl<
 > ApplyEdit<EC> for StableVecFacade<V, C>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -140,7 +173,7 @@ impl<V, EC: Clone + IntoIter<Index> + KeyedCollection<Key = Index, Value = V>> A
     for Arena<V>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -149,7 +182,7 @@ impl<K: RTreeObject + PartialEq, EC: Clone + IntoIter<K> + KeyedCollection<Key =
     ApplyEdit<EC> for RTree<K>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }
 
@@ -162,6 +195,6 @@ where
     Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + StableRemove<C::Key>,
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
-        apply_edit(self, edit);
+        apply_edit_on_map(self, edit);
     }
 }

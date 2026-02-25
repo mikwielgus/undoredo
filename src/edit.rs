@@ -8,7 +8,7 @@ use alloc::{
 };
 #[cfg(feature = "rstared")]
 use maplike::Get;
-use maplike::{Insert, IntoIter, KeyedCollection, StableRemove};
+use maplike::{Insert, IntoIter, KeyedCollection, Remove};
 
 #[cfg(feature = "std")]
 use std::{
@@ -85,7 +85,7 @@ pub trait ApplyEdit<EC> {
 
 fn apply_edit_on_map<K, C, EC>(collection: &mut C, edit: &Edit<EC>)
 where
-    C: KeyedCollection<Key = K> + Insert<K> + StableRemove<K>,
+    C: KeyedCollection<Key = K> + Insert<K> + Remove<K>,
     EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = C::Value>,
 {
     for (removed_key, _removed_value) in edit.removed.clone().into_iter() {
@@ -195,7 +195,7 @@ impl<K: RTreeObject + PartialEq, EC: Clone + IntoIter<K> + KeyedCollection<Key =
 impl<
     K: Clone + PartialEq,
     V: Clone + PartialEq + RTreeObject,
-    C: Get<K> + KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
+    C: Get<K> + KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>,
 > ApplyEdit<EC> for RTreed<C>
 {

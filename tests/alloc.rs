@@ -9,3 +9,6 @@ mod btreemap;
 
 #[path = "alloc/btreeset.rs"]
 mod btreeset;
+
+#[path = "alloc/vec.rs"]
+mod vec;

@@ -52,8 +52,8 @@ impl<C: KeyedCollection, EC: KeyedCollection> Recorder<C, EC> {
 
 impl<K, V, C, EC> Recorder<C, EC>
 where
-    C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + StableRemove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + StableRemove<K>,
+    C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -132,8 +132,8 @@ where
 
 impl<K, V, C, EC> Remove<K> for Recorder<C, EC>
 where
-    C: KeyedCollection<Key = K, Value = V> + StableRemove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
+    C: KeyedCollection<Key = K, Value = V> + Remove<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -154,8 +154,8 @@ where
 
 impl<K, V, C, EC> Recorder<C, EC>
 where
-    C: KeyedCollection<Key = K, Value = V> + StableRemove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
+    C: KeyedCollection<Key = K, Value = V> + Remove<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -210,7 +210,7 @@ impl<
     EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
 > ApplyEdit<EC> for Recorder<C, REC>
 where
-    Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + StableRemove<C::Key>,
+    Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         self.collection.apply_edit(edit);

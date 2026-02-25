@@ -97,10 +97,7 @@ where
     }
 }
 
-impl<V, EC: Clone + IntoIter<usize, Value = V>> ApplyEdit<EC> for Vec<V>
-where
-    EC::IntoIter: DoubleEndedIterator,
-{
+impl<V: Clone, EC: Clone + IntoIter<usize, Value = V>> ApplyEdit<EC> for Vec<V> {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         // This implementation is different than the others because stable
         // removal is impossible on `Vec`.
@@ -108,7 +105,7 @@ where
         // We reverse the order of removeds to have removals become
         // corresponding pops of all pushes in their reverse order. Otherwise,
         // the no-op branch would get triggered.
-        for (removed_index, _removed_value) in edit.removed.clone().into_iter().rev() {
+        for (removed_index, _removed_value) in edit.removed.clone().into_iter() {
             if removed_index == self.len() - 1 {
                 self.pop();
             } else {
@@ -121,7 +118,7 @@ where
             if inserted_index == self.len() {
                 self.push(inserted_value);
             } else {
-                self[inserted_index] = inserted_value;
+                Insert::insert(self, inserted_index, inserted_value);
             }
         }
     }

@@ -220,7 +220,7 @@ where
 impl<K, V, C, EC> Recorder<C, EC>
 where
     C: KeyedCollection<Key = K, Value = V> + Len + Pop,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -229,9 +229,12 @@ where
     #[inline]
     pub fn pop(&mut self) -> Option<V> {
         let value = self.collection.pop()?;
-        self.edit
-            .removed
-            .insert(self.collection.len(), value.clone());
+
+        if self.edit.inserted.remove(&self.collection.len()).is_none() {
+            self.edit
+                .removed
+                .insert(self.collection.len(), value.clone());
+        }
 
         Some(value)
     }

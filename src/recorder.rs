@@ -207,7 +207,7 @@ where
 impl<K, V, C, EC> Pop for Recorder<C, EC>
 where
     C: KeyedCollection<Key = K, Value = V> + Len + Pop,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Get, Insert, IntoIter, KeyedCollection, Push, Remove, StableRemove};
+use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, StableRemove};
 
 use crate::{ApplyEdit, edit::Edit};
 
@@ -201,6 +201,39 @@ where
         self.edit.inserted.insert(key.clone(), value);
 
         key
+    }
+}
+
+impl<K, V, C, EC> Pop for Recorder<C, EC>
+where
+    C: KeyedCollection<Key = K, Value = V> + Len + Pop,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn pop(&mut self) -> Option<V> {
+        self.pop()
+    }
+}
+
+impl<K, V, C, EC> Recorder<C, EC>
+where
+    C: KeyedCollection<Key = K, Value = V> + Len + Pop,
+    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Insert a value into the collection without specifying a key, returning
+    /// the key that was automatically generated.
+    #[inline]
+    pub fn pop(&mut self) -> Option<V> {
+        let value = self.collection.pop()?;
+        self.edit
+            .removed
+            .insert(self.collection.len(), value.clone());
+
+        Some(value)
     }
 }
 

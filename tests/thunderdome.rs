@@ -23,6 +23,6 @@ fn test_insert_and_remove_at_generated_indices() {
 }
 
 #[test]
-fn test_edit_undo_redo_at_generated_indices() {
-    common::test_edit_undo_redo_at_generated_indices::<Index, Arena<i32>, Arena<i32>>(Arena::new());
+fn test_undo_redo_at_generated_indices() {
+    common::test_undo_redo_at_generated_indices::<Index, Arena<i32>, Arena<i32>>(Arena::new());
 }

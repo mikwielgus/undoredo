@@ -24,8 +24,8 @@ fn test_insert_and_remove_at_specified_indices() {
 }
 
 #[test]
-fn test_edit_undo_redo_at_specified_indices() {
-    common::test_edit_undo_redo_at_specified_indices::<
+fn test_undo_redo_at_specified_indices() {
+    common::test_undo_redo_at_specified_indices::<
         usize,
         i32,
         HashMap<usize, i32>,

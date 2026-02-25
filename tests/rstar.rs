@@ -29,8 +29,8 @@ fn test_insert_and_remove_on_set() {
 }
 
 #[test]
-fn test_edit_undo_redo_on_set() {
-    common::test_edit_undo_redo_on_set::<(i32, i32), RTree<(i32, i32)>, RTree<(i32, i32)>>(
+fn test_undo_redo_on_set() {
+    common::test_undo_redo_on_set::<(i32, i32), RTree<(i32, i32)>, RTree<(i32, i32)>>(
         RTree::new(),
     );
 }

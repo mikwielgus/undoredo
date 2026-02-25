@@ -202,7 +202,7 @@ pub fn test_insert_and_remove_on_set<
     assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
 }
 
-pub fn test_edit_undo_redo_at_generated_indices<
+pub fn test_undo_redo_at_generated_indices<
     K: Clone,
     C: Keyed<K>
         + Map<i32>
@@ -308,7 +308,7 @@ pub fn test_edit_undo_redo_at_generated_indices<
     assert_eq!(collection.get(&indices[5]), Some(&50));
 }
 
-pub fn test_edit_undo_redo_at_specified_indices<
+pub fn test_undo_redo_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
     C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
@@ -400,7 +400,7 @@ pub fn test_edit_undo_redo_at_specified_indices<
     assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 }
 
-pub fn test_edit_undo_redo_on_set<
+pub fn test_undo_redo_on_set<
     K: Clone + FromUsize,
     C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
     EC: Clone + Default + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,

@@ -5,7 +5,7 @@
 #[path = "../common/mod.rs"]
 mod common;
 
-use std::collections::BTreeSet;
+use alloc::collections::BTreeSet;
 use undoredo::Recorder;
 
 #[test]
@@ -24,4 +24,3 @@ fn test_insert_and_remove_on_set() {
 fn test_edit_undo_redo_on_set() {
     common::test_edit_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSet<i32>>(BTreeSet::new());
 }
-

@@ -1,8 +1,8 @@
-#![allow(dead_code)]
-
 // SPDX-FileCopyrightText: 2025 undoredo contributors
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
+
+#![allow(dead_code)]
 
 use std::collections::BTreeMap;
 
@@ -49,7 +49,7 @@ pub fn test_apply_edit_at_generated_indexes<
 
     let edit = Edit::with_removed_inserted(
         BTreeMap::from([(second.clone(), 20)]),
-        BTreeMap::from([(third.clone(), 33), (sixth.clone(), 60)]),
+        BTreeMap::from([(third.clone(), 33), (sixth.clone(), 66)]),
     );
     recorder.apply_edit(&edit);
 
@@ -58,7 +58,7 @@ pub fn test_apply_edit_at_generated_indexes<
     assert_eq!(recorder.get(&third), Some(&33));
     assert_eq!(recorder.get(&fourth), Some(&40));
     assert_eq!(recorder.get(&fifth), Some(&50));
-    assert_eq!(recorder.get(&sixth), Some(&60));
+    assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
 pub fn test_apply_edit_at_specified_indexes<
@@ -79,7 +79,7 @@ pub fn test_apply_edit_at_specified_indexes<
         BTreeMap::from([(K::from_usize(2), V::from_usize(20))]),
         BTreeMap::from([
             (K::from_usize(3), V::from_usize(33)),
-            (K::from_usize(6), V::from_usize(60)),
+            (K::from_usize(6), V::from_usize(66)),
         ]),
     );
     recorder.apply_edit(&edit);
@@ -89,7 +89,7 @@ pub fn test_apply_edit_at_specified_indexes<
     assert_eq!(recorder.get(&K::from_usize(3)), Some(&V::from_usize(33)));
     assert_eq!(recorder.get(&K::from_usize(4)), Some(&V::from_usize(40)));
     assert_eq!(recorder.get(&K::from_usize(5)), Some(&V::from_usize(50)));
-    assert_eq!(recorder.get(&K::from_usize(6)), Some(&V::from_usize(60)));
+    assert_eq!(recorder.get(&K::from_usize(6)), Some(&V::from_usize(66)));
 }
 
 pub fn test_apply_edit_on_set<
@@ -137,14 +137,14 @@ pub fn test_insert_and_remove_at_generated_indexes<
     recorder.remove(&second);
     recorder.insert(first.clone(), 11);
     recorder.remove(&fourth);
-    recorder.insert(sixth.clone(), 60);
+    recorder.insert(sixth.clone(), 66);
 
     assert_eq!(recorder.get(&first), Some(&11));
     assert_eq!(recorder.get(&second), None);
     assert_eq!(recorder.get(&third), Some(&30));
     assert_eq!(recorder.get(&fourth), None);
     assert_eq!(recorder.get(&fifth), Some(&50));
-    assert_eq!(recorder.get(&sixth), Some(&60));
+    assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
 pub fn test_insert_and_remove_at_specified_indexes<

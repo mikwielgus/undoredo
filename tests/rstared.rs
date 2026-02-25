@@ -32,5 +32,5 @@ fn test_apply_edit_on_set() {
         RTreed<HashMap<i32, Rectangle<(i32, i32)>>>,
         HashMap<i32, Rectangle<(i32, i32)>>,
     >::new(RTreed::new(rect_hashmap));
-    common::test_apply_edit_at_specified_indexes(recorder);
+    common::test_apply_edit_at_specified_indices(recorder);
 }

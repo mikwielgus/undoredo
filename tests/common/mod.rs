@@ -32,7 +32,7 @@ impl FromUsize for usize {
     }
 }
 
-pub fn test_apply_edit_at_generated_indexes<
+pub fn test_apply_edit_at_generated_indices<
     K: Ord + Clone,
     C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K>,
     EC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
@@ -63,7 +63,7 @@ pub fn test_apply_edit_at_generated_indexes<
     assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
-pub fn test_apply_edit_at_specified_indexes<
+pub fn test_apply_edit_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     C: Keyed<K> + Map<V> + Insert<K> + StableRemove<K> + Get<K>,
@@ -125,7 +125,7 @@ pub fn test_apply_edit_on_set<
     assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
 }
 
-pub fn test_insert_and_remove_at_generated_indexes<
+pub fn test_insert_and_remove_at_generated_indices<
     K: Clone,
     C: Keyed<K> + Map<i32> + Insert<K> + StableRemove<K> + Push<K> + Get<K>,
     EC: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K>,
@@ -153,7 +153,7 @@ pub fn test_insert_and_remove_at_generated_indexes<
     assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
-pub fn test_insert_and_remove_at_specified_indexes<
+pub fn test_insert_and_remove_at_specified_indices<
     C: Keyed<usize> + Map<i32> + Insert<usize> + StableRemove<usize> + Get<usize>,
     EC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + StableRemove<usize>,
 >(
@@ -202,7 +202,7 @@ pub fn test_insert_and_remove_on_set<
     assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
 }
 
-pub fn test_edit_undo_redo_at_generated_indexes<
+pub fn test_edit_undo_redo_at_generated_indices<
     K: Clone,
     C: Keyed<K>
         + Map<i32>
@@ -220,69 +220,69 @@ pub fn test_edit_undo_redo_at_generated_indexes<
     assert_eq!(undoredo.undo(&mut collection), None);
     assert_eq!(undoredo.redo(&mut collection), None);
 
-    let mut indexes = Vec::new();
+    let mut indices = Vec::new();
 
     let mut collection = undoredo.edit(collection, |recorder| {
-        indexes.push(recorder.push(10));
-        // Repeat the same index to start indexing from 1 like in the test with specified indexes.
-        indexes.push(indexes[0].clone());
+        indices.push(recorder.push(10));
+        // Repeat the same index to start indexing from 1 like in the test with specified indices.
+        indices.push(indices[0].clone());
 
-        indexes.push(recorder.push(20));
-        indexes.push(recorder.push(30));
-        indexes.push(recorder.push(40));
-        indexes.push(recorder.push(50));
+        indices.push(recorder.push(20));
+        indices.push(recorder.push(30));
+        indices.push(recorder.push(40));
+        indices.push(recorder.push(50));
 
-        indexes.push(recorder.push(60));
-        recorder.remove(&indexes[6]);
+        indices.push(recorder.push(60));
+        recorder.remove(&indices[6]);
     });
 
     assert_eq!(undoredo.redo(&mut collection), None);
 
-    assert_eq!(collection.get(&indexes[1]), Some(&10));
-    assert_eq!(collection.get(&indexes[2]), Some(&20));
-    assert_eq!(collection.get(&indexes[3]), Some(&30));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&10));
+    assert_eq!(collection.get(&indices[2]), Some(&20));
+    assert_eq!(collection.get(&indices[3]), Some(&30));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 
     let mut collection = undoredo.edit(collection, |recorder| {
-        recorder.remove(&indexes[2]);
-        recorder.insert(indexes[1].clone(), 11);
-        recorder.insert(indexes[3].clone(), 33);
+        recorder.remove(&indices[2]);
+        recorder.insert(indices[1].clone(), 11);
+        recorder.insert(indices[3].clone(), 33);
     });
 
-    assert_eq!(collection.get(&indexes[1]), Some(&11));
-    assert_eq!(collection.get(&indexes[2]), None);
-    assert_eq!(collection.get(&indexes[3]), Some(&33));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&11));
+    assert_eq!(collection.get(&indices[2]), None);
+    assert_eq!(collection.get(&indices[3]), Some(&33));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 
     assert!(undoredo.undo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&indexes[1]), Some(&10));
-    assert_eq!(collection.get(&indexes[2]), Some(&20));
-    assert_eq!(collection.get(&indexes[3]), Some(&30));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&10));
+    assert_eq!(collection.get(&indices[2]), Some(&20));
+    assert_eq!(collection.get(&indices[3]), Some(&30));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&indexes[1]), Some(&11));
-    assert_eq!(collection.get(&indexes[2]), None);
-    assert_eq!(collection.get(&indexes[3]), Some(&33));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&11));
+    assert_eq!(collection.get(&indices[2]), None);
+    assert_eq!(collection.get(&indices[3]), Some(&33));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 
     let mut collection = undoredo.edit(collection, |recorder| {
-        recorder.remove(&indexes[3]);
-        recorder.insert(indexes[6].clone(), 60);
+        recorder.remove(&indices[3]);
+        recorder.insert(indices[6].clone(), 60);
     });
 
-    assert_eq!(collection.get(&indexes[1]), Some(&11));
-    assert_eq!(collection.get(&indexes[2]), None);
-    assert_eq!(collection.get(&indexes[3]), None);
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
-    assert_eq!(collection.get(&indexes[6]), Some(&60));
+    assert_eq!(collection.get(&indices[1]), Some(&11));
+    assert_eq!(collection.get(&indices[2]), None);
+    assert_eq!(collection.get(&indices[3]), None);
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
+    assert_eq!(collection.get(&indices[6]), Some(&60));
 
     assert_eq!(undoredo.redo(&mut collection), None);
 
@@ -293,22 +293,22 @@ pub fn test_edit_undo_redo_at_generated_indexes<
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&indexes[1]), Some(&10));
-    assert_eq!(collection.get(&indexes[2]), Some(&20));
-    assert_eq!(collection.get(&indexes[3]), Some(&30));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&10));
+    assert_eq!(collection.get(&indices[2]), Some(&20));
+    assert_eq!(collection.get(&indices[3]), Some(&30));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 
     assert!(undoredo.redo(&mut collection).is_some());
 
-    assert_eq!(collection.get(&indexes[1]), Some(&11));
-    assert_eq!(collection.get(&indexes[2]), None);
-    assert_eq!(collection.get(&indexes[3]), Some(&33));
-    assert_eq!(collection.get(&indexes[4]), Some(&40));
-    assert_eq!(collection.get(&indexes[5]), Some(&50));
+    assert_eq!(collection.get(&indices[1]), Some(&11));
+    assert_eq!(collection.get(&indices[2]), None);
+    assert_eq!(collection.get(&indices[3]), Some(&33));
+    assert_eq!(collection.get(&indices[4]), Some(&40));
+    assert_eq!(collection.get(&indices[5]), Some(&50));
 }
 
-pub fn test_edit_undo_redo_at_specified_indexes<
+pub fn test_edit_undo_redo_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
     C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,

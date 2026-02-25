@@ -9,20 +9,20 @@ use alloc::collections::BTreeMap;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_at_specified_indexes() {
+fn test_apply_edit_at_specified_indices() {
     let recorder = Recorder::<BTreeMap<usize, i32>>::new(BTreeMap::new());
-    common::test_apply_edit_at_specified_indexes(recorder);
+    common::test_apply_edit_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_insert_and_remove_at_specified_indexes() {
+fn test_insert_and_remove_at_specified_indices() {
     let recorder = Recorder::<BTreeMap<usize, i32>>::new(BTreeMap::new());
-    common::test_insert_and_remove_at_specified_indexes(recorder);
+    common::test_insert_and_remove_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_edit_undo_redo_at_specified_indexes() {
-    common::test_edit_undo_redo_at_specified_indexes::<
+fn test_edit_undo_redo_at_specified_indices() {
+    common::test_edit_undo_redo_at_specified_indices::<
         usize,
         i32,
         BTreeMap<usize, i32>,

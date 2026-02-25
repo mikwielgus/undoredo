@@ -11,18 +11,18 @@ use thunderdome::{Arena, Index};
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_at_generated_indexes() {
+fn test_apply_edit_at_generated_indices() {
     let recorder = Recorder::<Arena<i32>>::new(Arena::new());
-    common::test_apply_edit_at_generated_indexes::<Index, _, _>(recorder);
+    common::test_apply_edit_at_generated_indices::<Index, _, _>(recorder);
 }
 
 #[test]
-fn test_insert_and_remove_at_generated_indexes() {
+fn test_insert_and_remove_at_generated_indices() {
     let recorder = Recorder::<Arena<i32>>::new(Arena::new());
-    common::test_insert_and_remove_at_generated_indexes::<Index, _, _>(recorder);
+    common::test_insert_and_remove_at_generated_indices::<Index, _, _>(recorder);
 }
 
 #[test]
-fn test_edit_undo_redo_at_generated_indexes() {
-    common::test_edit_undo_redo_at_generated_indexes::<Index, Arena<i32>, Arena<i32>>(Arena::new());
+fn test_edit_undo_redo_at_generated_indices() {
+    common::test_edit_undo_redo_at_generated_indices::<Index, Arena<i32>, Arena<i32>>(Arena::new());
 }

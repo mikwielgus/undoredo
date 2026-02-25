@@ -11,39 +11,39 @@ use stable_vec::StableVec;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_at_generated_indexes() {
+fn test_apply_edit_at_generated_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_edit_at_generated_indexes::<usize, _, _>(recorder);
+    common::test_apply_edit_at_generated_indices::<usize, _, _>(recorder);
 }
 
 #[test]
-fn test_apply_edit_at_specified_indexes() {
+fn test_apply_edit_at_specified_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_edit_at_specified_indexes(recorder);
+    common::test_apply_edit_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_insert_and_remove_at_generated_indexes() {
+fn test_insert_and_remove_at_generated_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_insert_and_remove_at_generated_indexes::<usize, _, _>(recorder);
+    common::test_insert_and_remove_at_generated_indices::<usize, _, _>(recorder);
 }
 
 #[test]
-fn test_insert_and_remove_at_specified_indexes() {
+fn test_insert_and_remove_at_specified_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_insert_and_remove_at_specified_indexes(recorder);
+    common::test_insert_and_remove_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_edit_undo_redo_at_generated_indexes() {
-    common::test_edit_undo_redo_at_generated_indexes::<usize, StableVec<i32>, StableVec<i32>>(
+fn test_edit_undo_redo_at_generated_indices() {
+    common::test_edit_undo_redo_at_generated_indices::<usize, StableVec<i32>, StableVec<i32>>(
         StableVec::new(),
     );
 }
 
 #[test]
-fn test_edit_undo_redo_at_specified_indexes() {
-    common::test_edit_undo_redo_at_specified_indexes::<usize, i32, StableVec<i32>, StableVec<i32>>(
+fn test_edit_undo_redo_at_specified_indices() {
+    common::test_edit_undo_redo_at_specified_indices::<usize, i32, StableVec<i32>, StableVec<i32>>(
         StableVec::new(),
     );
 }

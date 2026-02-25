@@ -6,6 +6,8 @@ use alloc::{
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
 };
+#[cfg(feature = "rstared")]
+use maplike::Get;
 use maplike::{Insert, IntoIter, KeyedCollection, StableRemove};
 
 #[cfg(feature = "std")]
@@ -22,6 +24,9 @@ use thunderdome::{Arena, Index};
 
 #[cfg(feature = "rstar")]
 use rstar::{RTree, RTreeObject};
+
+#[cfg(feature = "rstared")]
+use rstared::RTreed;
 
 /// A reversible set of changes to a collection.
 ///
@@ -186,13 +191,13 @@ impl<K: RTreeObject + PartialEq, EC: Clone + IntoIter<K> + KeyedCollection<Key =
     }
 }
 
+#[cfg(feature = "rstared")]
 impl<
-    C: KeyedCollection,
-    REC: KeyedCollection,
-    EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
-> ApplyEdit<EC> for crate::recorder::Recorder<C, REC>
-where
-    Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + StableRemove<C::Key>,
+    K: Clone + PartialEq,
+    V: Clone + PartialEq + RTreeObject,
+    C: Get<K> + KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
+    EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>,
+> ApplyEdit<EC> for RTreed<C>
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit_on_map(self, edit);

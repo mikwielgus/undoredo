@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Get, Insert, KeyedCollection, Push, Remove, StableRemove};
+use maplike::{Get, Insert, IntoIter, KeyedCollection, Push, Remove, StableRemove};
 
-use crate::edit::Edit;
+use crate::{ApplyEdit, edit::Edit};
 
 /// Records edits applied to a collection so they can be replayed or reverted.
 #[derive(Clone, Debug, Default)]
@@ -201,5 +201,18 @@ where
         self.edit.inserted.insert(key.clone(), value);
 
         key
+    }
+}
+
+impl<
+    C: KeyedCollection + ApplyEdit<EC>,
+    REC: KeyedCollection,
+    EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
+> ApplyEdit<EC> for Recorder<C, REC>
+where
+    Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + StableRemove<C::Key>,
+{
+    fn apply_edit(&mut self, edit: &Edit<EC>) {
+        self.collection.apply_edit(edit);
     }
 }

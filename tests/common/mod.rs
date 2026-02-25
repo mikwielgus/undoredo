@@ -38,7 +38,9 @@ pub fn test_apply_edit_at_generated_indexes<
     EC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
-) {
+) where
+    C: ApplyEdit<BTreeMap<K, i32>>,
+{
     let first = recorder.push(10);
     let second = recorder.push(20);
     let third = recorder.push(30);
@@ -68,7 +70,9 @@ pub fn test_apply_edit_at_specified_indexes<
     EC: Clone + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
-) {
+) where
+    C: ApplyEdit<BTreeMap<K, V>>,
+{
     recorder.insert(K::from_usize(1), V::from_usize(10));
     recorder.insert(K::from_usize(2), V::from_usize(20));
     recorder.insert(K::from_usize(3), V::from_usize(30));
@@ -98,7 +102,9 @@ pub fn test_apply_edit_on_set<
     EC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut recorder: Recorder<C, EC>,
-) {
+) where
+    C: ApplyEdit<BTreeMap<K, ()>>,
+{
     recorder.insert(K::from_usize(10), ());
     recorder.insert(K::from_usize(20), ());
     recorder.insert(K::from_usize(30), ());

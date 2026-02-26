@@ -13,6 +13,13 @@ pub struct Recorder<C: KeyedCollection, EC: KeyedCollection = C> {
     edit: Edit<EC>,
 }
 
+impl<C: KeyedCollection, EC: KeyedCollection> AsRef<C> for Recorder<C, EC> {
+    #[inline]
+    fn as_ref(&self) -> &C {
+        &self.collection
+    }
+}
+
 impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
     /// Create a new recorder recording changes to an owned collection.
     #[inline]

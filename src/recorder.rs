@@ -26,13 +26,6 @@ impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
     pub fn new(collection: C) -> Self {
         Self::with_edit(collection, Default::default())
     }
-
-    /// Flush the recorder, returning the recorded edit and replacing it with a
-    /// new empty one.
-    #[inline]
-    pub fn flush_edit(&mut self) -> Edit<EC> {
-        core::mem::replace(&mut self.edit, Edit::new())
-    }
 }
 
 impl<C: KeyedCollection, EC: KeyedCollection> Recorder<C, EC> {
@@ -283,6 +276,17 @@ where
     }
 }
 
+impl<C, EC> Len for Recorder<C, EC>
+where
+    C: Len,
+    EC: KeyedCollection,
+{
+    #[inline]
+    fn len(&self) -> C::Key {
+        self.len()
+    }
+}
+
 impl<C, EC> Recorder<C, EC>
 where
     C: Len,
@@ -295,14 +299,16 @@ where
     }
 }
 
-impl<C, EC> Len for Recorder<C, EC>
+impl<K, C, EC> IntoIter<K> for Recorder<C, EC>
 where
-    C: Len,
+    C: IntoIter<K>,
     EC: KeyedCollection,
 {
+    type IntoIter = C::IntoIter;
+
     #[inline]
-    fn len(&self) -> C::Key {
-        self.len()
+    fn into_iter(self) -> C::IntoIter {
+        self.collection.into_iter()
     }
 }
 
@@ -320,19 +326,6 @@ where
     }
 }*/
 
-impl<K, C, EC> IntoIter<K> for Recorder<C, EC>
-where
-    C: IntoIter<K>,
-    EC: KeyedCollection,
-{
-    type IntoIter = C::IntoIter;
-
-    #[inline]
-    fn into_iter(self) -> C::IntoIter {
-        self.collection.into_iter()
-    }
-}
-
 impl<
     C: KeyedCollection + ApplyEdit<EC>,
     REC: KeyedCollection,
@@ -341,7 +334,48 @@ impl<
 where
     Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
 {
+    #[inline]
     fn apply_edit(&mut self, edit: &Edit<EC>) {
+        self.collection.apply_edit(edit)
+    }
+}
+
+// This won't compile because K is unconstrained type parameter.
+//
+/*impl<
+    C: KeyedCollection + ApplyEdit<EC>,
+    REC: KeyedCollection,
+    EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
+> Recorder<C, REC>
+where
+    Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
+{
+    #[inline]
+    pub fn apply_edit(&mut self, edit: &Edit<EC>) {
         self.collection.apply_edit(edit);
+    }
+}*/
+
+/// Flush the recorder, returning the recorded edit and replacing it with a
+/// new empty one.
+pub trait FlushEdit<EC> {
+    /// Flush the recorder, returning the recorded edit and replacing it with a
+    /// new empty one.
+    fn flush_edit(&mut self) -> Edit<EC>;
+}
+
+impl<C: KeyedCollection, EC: KeyedCollection + Default> FlushEdit<EC> for Recorder<C, EC> {
+    #[inline]
+    fn flush_edit(&mut self) -> Edit<EC> {
+        self.flush_edit()
+    }
+}
+
+impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
+    /// Flush the recorder, returning the recorded edit and replacing it with a
+    /// new empty one.
+    #[inline]
+    pub fn flush_edit(&mut self) -> Edit<EC> {
+        core::mem::replace(&mut self.edit, Edit::new())
     }
 }

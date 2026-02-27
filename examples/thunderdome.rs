@@ -10,16 +10,16 @@ fn main() {
     let mut undoredo: UndoRedo<Arena<char>> = UndoRedo::new();
 
     recorder.push('A');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     recorder.push('B');
     recorder.push('B');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     let key = recorder.push('X');
     recorder.remove(&key);
     recorder.push('C');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B', 'C']);

@@ -10,13 +10,13 @@ fn main() {
     let mut undoredo: UndoRedo<RTree<(i32, i32)>> = UndoRedo::new();
 
     recorder.insert((1, 1), ());
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     recorder.insert((2, 2), ());
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     recorder.insert((3, 3), ());
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     assert_eq!(
         recorder.collection().iter().collect::<Vec<_>>(),

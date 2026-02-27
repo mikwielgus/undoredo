@@ -10,16 +10,16 @@ fn main() {
     let mut undoredo: UndoRedo<StableVec<char>> = UndoRedo::new();
 
     recorder.push('A');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     recorder.push('B');
     recorder.push('B');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     let key = recorder.push('X');
     recorder.remove(&key);
     recorder.push('C');
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     assert!(
         recorder

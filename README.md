@@ -77,7 +77,7 @@ fn main() {
 
     // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
-    undoredo.commit(recorder.flush());
+    undoredo.commit(recorder.flush_edit());
 
     // The pushed elements are now present in the collection.
     assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
@@ -135,7 +135,7 @@ fn main() {
 
     // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
     // with the recorded edit.
-    undoredo.cmd_commit(Command::PushChar, recorder.flush());
+    undoredo.cmd_commit(Command::PushChar, recorder.flush_edit());
 
     // `Command::PushChar` is now the top element of the stack of done cmd-edits.
     assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChar);

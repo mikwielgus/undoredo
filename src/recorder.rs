@@ -30,7 +30,7 @@ impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
     /// Flush the recorder, returning the recorded edit and replacing it with a
     /// new empty one.
     #[inline]
-    pub fn flush(&mut self) -> Edit<EC> {
+    pub fn flush_edit(&mut self) -> Edit<EC> {
         core::mem::replace(&mut self.edit, Edit::new())
     }
 }

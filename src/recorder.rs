@@ -371,6 +371,14 @@ impl<C: KeyedCollection, EC: KeyedCollection + Default> FlushEdit<EC> for Record
     }
 }
 
+impl<C: KeyedCollection + Default> FlushEdit<Recorder<C>> for Recorder<C> {
+    #[inline]
+    fn flush_edit(&mut self) -> Edit<Recorder<C>> {
+        let (removed, inserted) = <Recorder<C> as FlushEdit<C>>::flush_edit(self).dissolve();
+        Edit::with_removed_inserted(Recorder::new(removed), Recorder::new(inserted))
+    }
+}
+
 impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
     /// Flush the recorder, returning the recorded edit and replacing it with a
     /// new empty one.

@@ -80,7 +80,7 @@ impl<C: KeyedCollection, EC: KeyedCollection> KeyedCollection for Recorder<C, EC
 
 impl<K, C, EC> Get<K> for Recorder<C, EC>
 where
-    C: KeyedCollection<Key = K> + Get<K>,
+    C: Get<K, Key = K>,
     EC: KeyedCollection,
 {
     #[inline]
@@ -91,7 +91,7 @@ where
 
 impl<K, C, EC> Recorder<C, EC>
 where
-    C: KeyedCollection<Key = K> + Get<K>,
+    C: Get<K, Key = K>,
     EC: KeyedCollection,
 {
     /// Returns a reference to the value corresponding to the key.
@@ -280,6 +280,56 @@ where
         }
 
         Some(value)
+    }
+}
+
+impl<C, EC> Recorder<C, EC>
+where
+    C: Len,
+    EC: KeyedCollection,
+{
+    /// Returns the length of the collection.
+    #[inline]
+    fn len(&self) -> C::Key {
+        self.collection.len()
+    }
+}
+
+impl<C, EC> Len for Recorder<C, EC>
+where
+    C: Len,
+    EC: KeyedCollection,
+{
+    #[inline]
+    fn len(&self) -> C::Key {
+        self.len()
+    }
+}
+
+// This won't compile because K is unconstrained type parameter.
+//
+// XXX: Remove `K` parameter from `IntoIter<K>`?
+/*impl<K, C, EC> Recorder<C, EC>
+where
+    C: IntoIter<K>,
+    EC: KeyedCollection,
+{
+    #[inline]
+    pub fn into_iter(self) -> C::IntoIter {
+        self.into_iter()
+    }
+}*/
+
+impl<K, C, EC> IntoIter<K> for Recorder<C, EC>
+where
+    C: IntoIter<K>,
+    EC: KeyedCollection,
+{
+    type IntoIter = C::IntoIter;
+
+    #[inline]
+    fn into_iter(self) -> C::IntoIter {
+        self.collection.into_iter()
     }
 }
 

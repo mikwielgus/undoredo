@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use core::marker::PhantomData;
+
 use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove};
 
 use crate::{ApplyEdit, edit::Edit};
@@ -385,5 +387,13 @@ impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
     #[inline]
     pub fn flush_edit(&mut self) -> Edit<EC> {
         core::mem::replace(&mut self.edit, Edit::new())
+    }
+}
+
+impl<V, EC: Default> FlushEdit<EC> for PhantomData<V> {
+    #[inline]
+    fn flush_edit(&mut self) -> Edit<EC> {
+        // Nothing happens, obviously.
+        Edit::default()
     }
 }

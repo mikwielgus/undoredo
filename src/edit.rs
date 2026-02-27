@@ -10,6 +10,7 @@ use alloc::{
 use maplike::Get;
 use maplike::{Insert, IntoIter, KeyedCollection, Remove};
 
+use core::marker::PhantomData;
 #[cfg(feature = "std")]
 use std::{
     collections::{HashMap, HashSet},
@@ -137,6 +138,12 @@ impl<K: Ord, EC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()>> App
 {
     fn apply_edit(&mut self, edit: &Edit<EC>) {
         apply_edit_on_map(self, edit);
+    }
+}
+
+impl<V, EC> ApplyEdit<EC> for PhantomData<V> {
+    fn apply_edit(&mut self, _edit: &Edit<EC>) {
+        // Nothing happens, obviously.
     }
 }
 

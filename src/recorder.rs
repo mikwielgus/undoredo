@@ -373,11 +373,29 @@ impl<C: KeyedCollection, EC: KeyedCollection + Default> FlushEdit<EC> for Record
     }
 }
 
-impl<C: KeyedCollection + Default> FlushEdit<Recorder<C>> for Recorder<C> {
+impl<C, EC> FlushEdit<Recorder<C, EC>> for Recorder<C, EC>
+where
+    C: KeyedCollection + Default + ApplyEdit<EC>,
+    EC: KeyedCollection + Default,
+{
     #[inline]
-    fn flush_edit(&mut self) -> Edit<Recorder<C>> {
-        let (removed, inserted) = <Recorder<C> as FlushEdit<C>>::flush_edit(self).dissolve();
-        Edit::with_removed_inserted(Recorder::new(removed), Recorder::new(inserted))
+    fn flush_edit(&mut self) -> Edit<Recorder<C, EC>> {
+        let (removed, inserted) = <Recorder<C, EC> as FlushEdit<EC>>::flush_edit(self).dissolve();
+
+        // HACK: This is currently the only way to turn EC to C. This may be
+        // improved later.
+        let mut removed_collection = C::default();
+        removed_collection.apply_edit(&Edit::with_removed_inserted(EC::default(), removed));
+
+        // HACK: This is currently the only way to turn EC to C. This may be
+        // improved later.
+        let mut inserted_collection = C::default();
+        inserted_collection.apply_edit(&Edit::with_removed_inserted(EC::default(), inserted));
+
+        Edit::with_removed_inserted(
+            Recorder::new(removed_collection),
+            Recorder::new(inserted_collection),
+        )
     }
 }
 

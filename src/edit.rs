@@ -109,7 +109,7 @@ where
         // We reverse the order of removeds to be descending so that we never
         // miss a pop.
         for (removed_index, _removed_value) in edit.removed.clone().into_iter().rev() {
-            if removed_index == self.len() - 1 {
+            if removed_index + 1 == self.len() {
                 self.pop();
             } else {
                 // No-op. The value will just get overridden by the subsequent

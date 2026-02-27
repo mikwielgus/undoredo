@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, StableRemove};
+use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove};
 
 use crate::{ApplyEdit, edit::Edit};
 
@@ -98,6 +98,42 @@ where
     #[inline]
     pub fn get(&self, key: &K) -> Option<&C::Value> {
         self.collection.get(key)
+    }
+}
+
+impl<K, V, C, EC> Set<K> for Recorder<C, EC>
+where
+    C: KeyedCollection<Key = K, Value = V> + Get<K> + Set<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn set(&mut self, key: K, value: Self::Value) {
+        self.set(key, value);
+    }
+}
+
+impl<K, V, C, EC> Recorder<C, EC>
+where
+    C: KeyedCollection<Key = K, Value = V> + Get<K> + Set<K>,
+    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Set the value of an already existing element under a key.
+    #[inline]
+    pub fn set(&mut self, key: K, value: V) {
+        if self.edit.inserted.get(&key).is_none() {
+            if let Some(value_to_remove) = self.collection.get(&key) {
+                self.edit
+                    .removed
+                    .insert(key.clone(), value_to_remove.clone());
+            }
+        }
+
+        self.edit.inserted.insert(key.clone(), value.clone());
+        self.collection.set(key, value);
     }
 }
 

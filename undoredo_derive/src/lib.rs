@@ -27,14 +27,12 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
         }
     };
 
-    // We use this function instead of `.to_token_stream()` because we need the
-    // parameter declaration form, and the latter returns the type-argument use
-    // form, which is different.
-    let edit_ty_generics_tokens = generics_tokens(&generics);
+    let generics_for_edit = generics.clone();
+    let (_, edit_ty_generics, _) = generics_for_edit.split_for_impl();
 
     let where_clause = generics.make_where_clause();
     where_clause.predicates.push(syn::parse_quote! {
-        ::undoredo::Edit<#edit_name #edit_ty_generics_tokens>: ::core::clone::Clone
+        ::undoredo::Edit<#edit_name #edit_ty_generics>: ::core::clone::Clone
     });
 
     let mut apply_stmts = Vec::new();
@@ -296,28 +294,6 @@ fn composite_edit_ident(name: &syn::Ident) -> syn::Ident {
         &format!("{}CompositeEdit", name),
         proc_macro2::Span::call_site(),
     )
-}
-fn generics_tokens(generics: &syn::Generics) -> proc_macro2::TokenStream {
-    let args = generics.params.iter().map(|param| match param {
-        syn::GenericParam::Lifetime(param) => {
-            let lifetime = &param.lifetime;
-            quote! { #lifetime }
-        }
-        syn::GenericParam::Type(param) => {
-            let ident = &param.ident;
-            quote! { #ident }
-        }
-        syn::GenericParam::Const(param) => {
-            let ident = &param.ident;
-            quote! { #ident }
-        }
-    });
-
-    if generics.params.is_empty() {
-        quote! {}
-    } else {
-        quote! { <#(#args),*> }
-    }
 }
 
 fn recorder_type_to_edit_collection_type(field_ty: Type) -> Type {

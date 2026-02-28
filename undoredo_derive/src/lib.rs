@@ -4,7 +4,7 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, parse_macro_input};
+use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type, parse_macro_input};
 
 #[proc_macro_derive(ApplyEdit)]
 pub fn derive_apply_edit(input: TokenStream) -> TokenStream {
@@ -211,5 +211,100 @@ fn push_field_flush_parts(
     } else {
         removed_fields.push(quote! { #removed_ident });
         inserted_fields.push(quote! { #inserted_ident });
+    }
+}
+
+#[proc_macro_derive(CompositeEdit)]
+pub fn derive_composite_edit(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    expand_composite_edit(input).unwrap_or_else(|err| err.to_compile_error().into())
+}
+
+fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
+    let name = input.ident;
+    let vis = input.vis;
+    let generics = input.generics;
+    let edit_name = syn::Ident::new(
+        &format!("{}CompositeEdit", name),
+        proc_macro2::Span::call_site(),
+    );
+
+    let data_struct = match input.data {
+        Data::Struct(data) => data,
+        _ => {
+            return Err(syn::Error::new(
+                proc_macro2::Span::call_site(),
+                "CompositeEdit can only be derived for structs",
+            ));
+        }
+    };
+
+    let fields = match data_struct.fields {
+        Fields::Named(named) => {
+            let mapped = named
+                .named
+                .into_iter()
+                .map(|mut field| {
+                    field.ty = map_recorder_field_type(field.ty);
+                    field
+                })
+                .collect();
+            Fields::Named(syn::FieldsNamed {
+                brace_token: named.brace_token,
+                named: mapped,
+            })
+        }
+        Fields::Unnamed(unnamed) => {
+            let mapped = unnamed
+                .unnamed
+                .into_iter()
+                .map(|mut field| {
+                    field.ty = map_recorder_field_type(field.ty);
+                    field
+                })
+                .collect();
+            Fields::Unnamed(syn::FieldsUnnamed {
+                paren_token: unnamed.paren_token,
+                unnamed: mapped,
+            })
+        }
+        Fields::Unit => Fields::Unit,
+    };
+
+    Ok(quote! {
+        #vis struct #edit_name #generics #fields
+    }
+    .into())
+}
+
+fn map_recorder_field_type(field_ty: Type) -> Type {
+    match field_ty {
+        Type::Path(mut ty_path) => {
+            if let Some(last_segment) = ty_path.path.segments.last_mut() {
+                if last_segment.ident == "Recorder" {
+                    if let PathArguments::AngleBracketed(args) = &mut last_segment.arguments {
+                        let type_args = args
+                            .args
+                            .iter()
+                            .filter_map(|arg| match arg {
+                                GenericArgument::Type(ty) => Some(ty.clone()),
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>();
+
+                        if type_args.len() >= 2 {
+                            return type_args[1].clone();
+                        }
+
+                        if let Some(collection_ty) = type_args.first() {
+                            return collection_ty.clone();
+                        }
+                    }
+                }
+            }
+
+            Type::Path(ty_path)
+        }
+        other => other,
     }
 }

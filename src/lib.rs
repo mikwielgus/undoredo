@@ -24,4 +24,4 @@ pub use crate::undoredo::UndoRedo;
 pub use maplike::{Get, Insert, IntoIter, KeyedCollection, Map, Push, Remove, StableRemove};
 
 #[cfg(feature = "derive")]
-pub use undoredo_derive::{ApplyEdit, FlushEdit};
+pub use undoredo_derive::{ApplyEdit, CompositeEdit, FlushEdit};

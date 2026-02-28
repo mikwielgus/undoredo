@@ -8,7 +8,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use undoredo::{FlushEdit, Recorder};
 
-#[derive(undoredo::FlushEdit)]
+#[derive(undoredo::FlushEdit, undoredo::CompositeEdit)]
 struct FlatStruct {
     map: Recorder<BTreeMap<i32, i32>>,
     set: Recorder<BTreeSet<i32>>,
@@ -38,14 +38,8 @@ fn test_derive_flush_edit_flat_struct() {
     let edit = flat_struct.flush_edit();
     let (removed, inserted) = edit.dissolve();
 
-    assert_eq!(
-        removed.map.collection(),
-        &BTreeMap::from([(2, 20), (3, 30)])
-    );
-    assert_eq!(
-        inserted.map.collection(),
-        &BTreeMap::from([(3, 30), (6, 60)])
-    );
-    assert_eq!(removed.set.collection(), &BTreeSet::from([20, 30]));
-    assert_eq!(inserted.set.collection(), &BTreeSet::from([30, 60]));
+    assert_eq!(removed.map, BTreeMap::from([(2, 20), (3, 30)]));
+    assert_eq!(inserted.map, BTreeMap::from([(3, 30), (6, 60)]));
+    assert_eq!(removed.set, BTreeSet::from([20, 30]));
+    assert_eq!(inserted.set, BTreeSet::from([30, 60]));
 }

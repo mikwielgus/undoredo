@@ -15,6 +15,7 @@ pub fn derive_apply_edit(input: TokenStream) -> TokenStream {
 fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident;
     let mut generics = input.generics;
+    let edit_name = composite_edit_ident(&name);
 
     let fields = match input.data {
         Data::Struct(data) => data.fields,
@@ -26,9 +27,14 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
         }
     };
 
+    // We use this function instead of `.to_token_stream()` because we need the
+    // parameter declaration form, and the latter returns the type-argument use
+    // form, which is different.
+    let edit_ty_generics_tokens = generics_tokens(&generics);
+
     let where_clause = generics.make_where_clause();
     where_clause.predicates.push(syn::parse_quote! {
-        ::undoredo::Edit<Self>: ::core::clone::Clone
+        ::undoredo::Edit<#edit_name #edit_ty_generics_tokens>: ::core::clone::Clone
     });
 
     let mut apply_stmts = Vec::new();
@@ -39,7 +45,8 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 push_field_apply_stmt(
                     where_clause,
                     &mut apply_stmts,
-                    field.ty,
+                    field.ty.clone(),
+                    recorder_type_to_edit_collection_type(field.ty),
                     syn::Member::Named(field.ident.expect("named field must have ident")),
                 );
             }
@@ -49,7 +56,8 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 push_field_apply_stmt(
                     where_clause,
                     &mut apply_stmts,
-                    field.ty,
+                    field.ty.clone(),
+                    recorder_type_to_edit_collection_type(field.ty),
                     syn::Member::Unnamed(syn::Index::from(idx)),
                 );
             }
@@ -59,10 +67,10 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let output = quote! {
-        impl #impl_generics ::undoredo::ApplyEdit<#name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::ApplyEdit<#edit_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn apply_edit(&mut self, edit: &::undoredo::Edit<#name #ty_generics>) {
+            fn apply_edit(&mut self, edit: &::undoredo::Edit<#edit_name #ty_generics>) {
                 #[allow(unused_variables)]
                 let (removed, inserted) = edit.clone().dissolve();
                 #(#apply_stmts)*
@@ -77,10 +85,11 @@ fn push_field_apply_stmt(
     where_clause: &mut syn::WhereClause,
     apply_stmts: &mut Vec<proc_macro2::TokenStream>,
     field_ty: syn::Type,
+    edit_field_ty: syn::Type,
     field_member: syn::Member,
 ) {
     where_clause.predicates.push(syn::parse_quote! {
-        #field_ty: ::undoredo::ApplyEdit<#field_ty> + ::core::clone::Clone
+        #field_ty: ::undoredo::ApplyEdit<#edit_field_ty> + ::core::clone::Clone
     });
     apply_stmts.push(quote! {
         {
@@ -102,6 +111,7 @@ pub fn derive_flush_edit(input: TokenStream) -> TokenStream {
 fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident;
     let mut generics = input.generics;
+    let edit_name = composite_edit_ident(&name);
 
     let fields = match input.data {
         Data::Struct(data) => data.fields,
@@ -128,7 +138,8 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     &mut bindings,
                     &mut removed_fields,
                     &mut inserted_fields,
-                    field.ty,
+                    field.ty.clone(),
+                    recorder_type_to_edit_collection_type(field.ty),
                     syn::Member::Named(field_ident.clone()),
                     Some(field_ident.clone()),
                     syn::Ident::new(
@@ -143,8 +154,8 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             }
 
             (
-                quote! { #name { #(#removed_fields),* } },
-                quote! { #name { #(#inserted_fields),* } },
+                quote! { #edit_name { #(#removed_fields),* } },
+                quote! { #edit_name { #(#inserted_fields),* } },
             )
         }
         Fields::Unnamed(unnamed) => {
@@ -154,7 +165,8 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     &mut bindings,
                     &mut removed_fields,
                     &mut inserted_fields,
-                    field.ty,
+                    field.ty.clone(),
+                    recorder_type_to_edit_collection_type(field.ty),
                     syn::Member::Unnamed(syn::Index::from(idx)),
                     None,
                     syn::Ident::new(&format!("removed_{}", idx), proc_macro2::Span::call_site()),
@@ -163,19 +175,19 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             }
 
             (
-                quote! { #name ( #(#removed_fields),* ) },
-                quote! { #name ( #(#inserted_fields),* ) },
+                quote! { #edit_name ( #(#removed_fields),* ) },
+                quote! { #edit_name ( #(#inserted_fields),* ) },
             )
         }
-        Fields::Unit => (quote! { #name }, quote! { #name }),
+        Fields::Unit => (quote! { #edit_name }, quote! { #edit_name }),
     };
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let output = quote! {
-        impl #impl_generics ::undoredo::FlushEdit<#name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::FlushEdit<#edit_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn flush_edit(&mut self) -> ::undoredo::Edit<#name #ty_generics> {
+            fn flush_edit(&mut self) -> ::undoredo::Edit<#edit_name #ty_generics> {
                 #(#bindings)*
                 ::undoredo::Edit::with_removed_inserted(#removed_ctor, #inserted_ctor)
             }
@@ -191,13 +203,14 @@ fn push_field_flush_parts(
     removed_fields: &mut Vec<proc_macro2::TokenStream>,
     inserted_fields: &mut Vec<proc_macro2::TokenStream>,
     field_ty: syn::Type,
+    edit_field_ty: syn::Type,
     field_member: syn::Member,
     ctor_field_ident: Option<syn::Ident>,
     removed_ident: syn::Ident,
     inserted_ident: syn::Ident,
 ) {
     where_clause.predicates.push(syn::parse_quote! {
-        #field_ty: ::undoredo::FlushEdit<#field_ty>
+        #field_ty: ::undoredo::FlushEdit<#edit_field_ty>
     });
 
     bindings.push(quote! {
@@ -245,7 +258,7 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 .named
                 .into_iter()
                 .map(|mut field| {
-                    field.ty = map_recorder_field_type(field.ty);
+                    field.ty = recorder_type_to_edit_collection_type(field.ty);
                     field
                 })
                 .collect();
@@ -259,7 +272,7 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 .unnamed
                 .into_iter()
                 .map(|mut field| {
-                    field.ty = map_recorder_field_type(field.ty);
+                    field.ty = recorder_type_to_edit_collection_type(field.ty);
                     field
                 })
                 .collect();
@@ -272,12 +285,42 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
     };
 
     Ok(quote! {
+        #[derive(Clone)]
         #vis struct #edit_name #generics #fields
     }
     .into())
 }
 
-fn map_recorder_field_type(field_ty: Type) -> Type {
+fn composite_edit_ident(name: &syn::Ident) -> syn::Ident {
+    syn::Ident::new(
+        &format!("{}CompositeEdit", name),
+        proc_macro2::Span::call_site(),
+    )
+}
+fn generics_tokens(generics: &syn::Generics) -> proc_macro2::TokenStream {
+    let args = generics.params.iter().map(|param| match param {
+        syn::GenericParam::Lifetime(param) => {
+            let lifetime = &param.lifetime;
+            quote! { #lifetime }
+        }
+        syn::GenericParam::Type(param) => {
+            let ident = &param.ident;
+            quote! { #ident }
+        }
+        syn::GenericParam::Const(param) => {
+            let ident = &param.ident;
+            quote! { #ident }
+        }
+    });
+
+    if generics.params.is_empty() {
+        quote! {}
+    } else {
+        quote! { <#(#args),*> }
+    }
+}
+
+fn recorder_type_to_edit_collection_type(field_ty: Type) -> Type {
     match field_ty {
         Type::Path(mut ty_path) => {
             if let Some(last_segment) = ty_path.path.segments.last_mut() {

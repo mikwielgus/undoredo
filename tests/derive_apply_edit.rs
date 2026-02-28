@@ -8,7 +8,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use undoredo::{ApplyEdit, Edit};
 
-#[derive(Clone, undoredo::ApplyEdit)]
+#[derive(Clone, undoredo::ApplyEdit, undoredo::CompositeEdit)]
 struct FlatStruct {
     map: BTreeMap<i32, i32>,
     set: BTreeSet<i32>,
@@ -22,11 +22,11 @@ fn test_derive_apply_edit_on_flat_struct() {
     };
 
     let edit = Edit::with_removed_inserted(
-        FlatStruct {
+        FlatStructCompositeEdit {
             map: BTreeMap::from([(2, 20)]),
             set: BTreeSet::from([20]),
         },
-        FlatStruct {
+        FlatStructCompositeEdit {
             map: BTreeMap::from([(3, 33), (6, 60)]),
             set: BTreeSet::from([30, 60]),
         },

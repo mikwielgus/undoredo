@@ -14,14 +14,14 @@ extern crate std;
 // No feature for `alloc` because it would be always enabled anyway.
 extern crate alloc;
 
-mod edit;
+mod delta;
 mod recorder;
 mod undoredo;
 
-pub use crate::edit::{ApplyEdit, Edit};
-pub use crate::recorder::{FlushEdit, Recorder, RecorderEditCollection};
+pub use crate::delta::{ApplyDelta, Delta};
+pub use crate::recorder::{FlushDelta, Recorder, RecorderDeltaCollection};
 pub use crate::undoredo::UndoRedo;
 pub use maplike::{Get, Insert, IntoIter, KeyedCollection, Map, Push, Remove, StableRemove};
 
 #[cfg(feature = "derive")]
-pub use undoredo_derive::{ApplyEdit, CompositeEdit, FlushEdit};
+pub use undoredo_derive::{ApplyDelta, CompositeDelta, FlushDelta};

@@ -12,9 +12,9 @@ use std::collections::HashMap;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_at_specified_indices() {
+fn test_apply_delta_at_specified_indices() {
     let recorder = Recorder::<HashMap<usize, i32>>::new(HashMap::new());
-    common::test_apply_edit_at_specified_indices(recorder);
+    common::test_apply_delta_at_specified_indices(recorder);
 }
 
 #[test]

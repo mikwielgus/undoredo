@@ -11,15 +11,15 @@ use stable_vec::StableVec;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_at_generated_indices() {
+fn test_apply_delta_at_generated_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_edit_at_generated_indices::<usize, _, _>(recorder);
+    common::test_apply_delta_at_generated_indices::<usize, _, _>(recorder);
 }
 
 #[test]
-fn test_apply_edit_at_specified_indices() {
+fn test_apply_delta_at_specified_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_edit_at_specified_indices(recorder);
+    common::test_apply_delta_at_specified_indices(recorder);
 }
 
 #[test]

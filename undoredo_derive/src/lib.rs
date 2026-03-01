@@ -6,33 +6,33 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type, parse_macro_input};
 
-#[proc_macro_derive(ApplyEdit)]
-pub fn derive_apply_edit(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(ApplyDelta)]
+pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    expand_apply_edit(input).unwrap_or_else(|err| err.to_compile_error().into())
+    expand_apply_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
+fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident;
     let mut generics = input.generics;
-    let edit_name = composite_edit_ident(&name);
+    let delta_name = composite_delta_ident(&name);
 
     let fields = match input.data {
         Data::Struct(data) => data.fields,
         _ => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "ApplyEdit can only be derived for structs",
+                "ApplyDelta can only be derived for structs",
             ));
         }
     };
 
-    let generics_for_edit = generics.clone();
-    let (_, edit_ty_generics, _) = generics_for_edit.split_for_impl();
+    let generics_for_delta = generics.clone();
+    let (_, delta_ty_generics, _) = generics_for_delta.split_for_impl();
 
     let where_clause = generics.make_where_clause();
     where_clause.predicates.push(syn::parse_quote! {
-        ::undoredo::Edit<#edit_name #edit_ty_generics>: ::core::clone::Clone
+        ::undoredo::Delta<#delta_name #delta_ty_generics>: ::core::clone::Clone
     });
 
     let mut apply_stmts = Vec::new();
@@ -44,7 +44,7 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     where_clause,
                     &mut apply_stmts,
                     field.ty.clone(),
-                    recorder_type_to_edit_collection_type(field.ty),
+                    recorder_type_to_delta_collection_type(field.ty),
                     syn::Member::Named(field.ident.expect("named field must have ident")),
                 );
             }
@@ -55,7 +55,7 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     where_clause,
                     &mut apply_stmts,
                     field.ty.clone(),
-                    recorder_type_to_edit_collection_type(field.ty),
+                    recorder_type_to_delta_collection_type(field.ty),
                     syn::Member::Unnamed(syn::Index::from(index)),
                 );
             }
@@ -65,12 +65,12 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
     let output = quote! {
-        impl #impl_generics ::undoredo::ApplyEdit<#edit_name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::ApplyDelta<#delta_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn apply_edit(&mut self, edit: &::undoredo::Edit<#edit_name #ty_generics>) {
+            fn apply_delta(&mut self, delta: &::undoredo::Delta<#delta_name #ty_generics>) {
                 #[allow(unused_variables)]
-                let (removed, inserted) = edit.clone().dissolve();
+                let (removed, inserted) = delta.clone().dissolve();
                 #(#apply_stmts)*
             }
         }
@@ -83,40 +83,40 @@ fn push_field_apply_stmt(
     where_clause: &mut syn::WhereClause,
     apply_stmts: &mut Vec<proc_macro2::TokenStream>,
     field_ty: syn::Type,
-    edit_field_ty: syn::Type,
+    delta_field_ty: syn::Type,
     field_member: syn::Member,
 ) {
     where_clause.predicates.push(syn::parse_quote! {
-        #field_ty: ::undoredo::ApplyEdit<#edit_field_ty> + ::core::clone::Clone
+        #field_ty: ::undoredo::ApplyDelta<#delta_field_ty> + ::core::clone::Clone
     });
     apply_stmts.push(quote! {
         {
-            let field_edit = ::undoredo::Edit::with_removed_inserted(
+            let field_delta = ::undoredo::Delta::with_removed_inserted(
                 removed.#field_member,
                 inserted.#field_member,
             );
-            ::undoredo::ApplyEdit::apply_edit(&mut self.#field_member, &field_edit);
+            ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, &field_delta);
         }
     });
 }
 
-#[proc_macro_derive(FlushEdit)]
-pub fn derive_flush_edit(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(FlushDelta)]
+pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    expand_flush_edit(input).unwrap_or_else(|err| err.to_compile_error().into())
+    expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
+fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident;
     let mut generics = input.generics;
-    let edit_name = composite_edit_ident(&name);
+    let delta_name = composite_delta_ident(&name);
 
     let fields = match input.data {
         Data::Struct(data) => data.fields,
         _ => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "FlushEdit can only be derived for structs",
+                "FlushDelta can only be derived for structs",
             ));
         }
     };
@@ -137,7 +137,7 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     &mut removed_fields,
                     &mut inserted_fields,
                     field.ty.clone(),
-                    recorder_type_to_edit_collection_type(field.ty),
+                    recorder_type_to_delta_collection_type(field.ty),
                     syn::Member::Named(field_ident.clone()),
                     Some(field_ident.clone()),
                     syn::Ident::new(
@@ -152,8 +152,8 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             }
 
             (
-                quote! { #edit_name { #(#removed_fields),* } },
-                quote! { #edit_name { #(#inserted_fields),* } },
+                quote! { #delta_name { #(#removed_fields),* } },
+                quote! { #delta_name { #(#inserted_fields),* } },
             )
         }
         Fields::Unnamed(unnamed) => {
@@ -164,7 +164,7 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     &mut removed_fields,
                     &mut inserted_fields,
                     field.ty.clone(),
-                    recorder_type_to_edit_collection_type(field.ty),
+                    recorder_type_to_delta_collection_type(field.ty),
                     syn::Member::Unnamed(syn::Index::from(index)),
                     None,
                     syn::Ident::new(
@@ -179,21 +179,21 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             }
 
             (
-                quote! { #edit_name ( #(#removed_fields),* ) },
-                quote! { #edit_name ( #(#inserted_fields),* ) },
+                quote! { #delta_name ( #(#removed_fields),* ) },
+                quote! { #delta_name ( #(#inserted_fields),* ) },
             )
         }
-        Fields::Unit => (quote! { #edit_name }, quote! { #edit_name }),
+        Fields::Unit => (quote! { #delta_name }, quote! { #delta_name }),
     };
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let output = quote! {
-        impl #impl_generics ::undoredo::FlushEdit<#edit_name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::FlushDelta<#delta_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn flush_edit(&mut self) -> ::undoredo::Edit<#edit_name #ty_generics> {
+            fn flush_delta(&mut self) -> ::undoredo::Delta<#delta_name #ty_generics> {
                 #(#bindings)*
-                ::undoredo::Edit::with_removed_inserted(#removed_ctor, #inserted_ctor)
+                ::undoredo::Delta::with_removed_inserted(#removed_ctor, #inserted_ctor)
             }
         }
     };
@@ -207,19 +207,19 @@ fn push_field_flush_parts(
     removed_fields: &mut Vec<proc_macro2::TokenStream>,
     inserted_fields: &mut Vec<proc_macro2::TokenStream>,
     field_ty: syn::Type,
-    edit_field_ty: syn::Type,
+    delta_field_ty: syn::Type,
     field_member: syn::Member,
     ctor_field_ident: Option<syn::Ident>,
     removed_ident: syn::Ident,
     inserted_ident: syn::Ident,
 ) {
     where_clause.predicates.push(syn::parse_quote! {
-        #field_ty: ::undoredo::FlushEdit<#edit_field_ty>
+        #field_ty: ::undoredo::FlushDelta<#delta_field_ty>
     });
 
     bindings.push(quote! {
         let (#removed_ident, #inserted_ident) =
-            ::undoredo::FlushEdit::flush_edit(&mut self.#field_member).dissolve();
+            ::undoredo::FlushDelta::flush_delta(&mut self.#field_member).dissolve();
     });
 
     if let Some(field_ident) = ctor_field_ident {
@@ -231,18 +231,18 @@ fn push_field_flush_parts(
     }
 }
 
-#[proc_macro_derive(CompositeEdit)]
-pub fn derive_composite_edit(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(CompositeDelta)]
+pub fn derive_composite_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    expand_composite_edit(input).unwrap_or_else(|err| err.to_compile_error().into())
+    expand_composite_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
+fn expand_composite_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident;
     let vis = input.vis;
     let generics = input.generics;
-    let edit_name = syn::Ident::new(
-        &format!("{}CompositeEdit", name),
+    let delta_name = syn::Ident::new(
+        &format!("{}CompositeDelta", name),
         proc_macro2::Span::call_site(),
     );
 
@@ -251,7 +251,7 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
         _ => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "CompositeEdit can only be derived for structs",
+                "CompositeDelta can only be derived for structs",
             ));
         }
     };
@@ -262,7 +262,7 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 .named
                 .into_iter()
                 .map(|mut field| {
-                    field.ty = recorder_type_to_edit_collection_type(field.ty);
+                    field.ty = recorder_type_to_delta_collection_type(field.ty);
                     field
                 })
                 .collect();
@@ -276,7 +276,7 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                 .unnamed
                 .into_iter()
                 .map(|mut field| {
-                    field.ty = recorder_type_to_edit_collection_type(field.ty);
+                    field.ty = recorder_type_to_delta_collection_type(field.ty);
                     field
                 })
                 .collect();
@@ -290,19 +290,19 @@ fn expand_composite_edit(input: DeriveInput) -> syn::Result<TokenStream> {
 
     Ok(quote! {
         #[derive(Clone)]
-        #vis struct #edit_name #generics #fields
+        #vis struct #delta_name #generics #fields
     }
     .into())
 }
 
-fn composite_edit_ident(name: &syn::Ident) -> syn::Ident {
+fn composite_delta_ident(name: &syn::Ident) -> syn::Ident {
     syn::Ident::new(
-        &format!("{}CompositeEdit", name),
+        &format!("{}CompositeDelta", name),
         proc_macro2::Span::call_site(),
     )
 }
 
-fn recorder_type_to_edit_collection_type(field_ty: Type) -> Type {
+fn recorder_type_to_delta_collection_type(field_ty: Type) -> Type {
     match field_ty {
         Type::Path(mut ty_path) => {
             if let Some(last_segment) = ty_path.path.segments.last_mut() {
@@ -323,7 +323,7 @@ fn recorder_type_to_edit_collection_type(field_ty: Type) -> Type {
 
                         if let Some(collection_ty) = type_args.first() {
                             return syn::parse_quote! {
-                                <::undoredo::Recorder<#collection_ty> as ::undoredo::RecorderEditCollection>::EditCollection
+                                <::undoredo::Recorder<#collection_ty> as ::undoredo::RecorderDeltaCollection>::DeltaCollection
                             };
                         }
                     }

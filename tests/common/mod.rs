@@ -7,7 +7,7 @@
 use std::collections::BTreeMap;
 
 use undoredo::{
-    ApplyEdit, Edit, Get, Insert, IntoIter, KeyedCollection, Push, Recorder, StableRemove, UndoRedo,
+    ApplyDelta, Delta, Get, Insert, IntoIter, KeyedCollection, Push, Recorder, StableRemove, UndoRedo,
 };
 
 pub(crate) trait Keyed<K>: KeyedCollection<Key = K> {}
@@ -32,14 +32,14 @@ impl FromUsize for usize {
     }
 }
 
-pub fn test_apply_edit_at_generated_indices<
+pub fn test_apply_delta_at_generated_indices<
     K: Ord + Clone,
     C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K> + Push<K>,
-    EC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    DC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyEdit<BTreeMap<K, i32>>,
+    C: ApplyDelta<BTreeMap<K, i32>>,
 {
     let first = recorder.push(10);
     let second = recorder.push(20);
@@ -49,11 +49,11 @@ pub fn test_apply_edit_at_generated_indices<
     let sixth = recorder.push(60);
     recorder.remove(&sixth);
 
-    let edit = Edit::with_removed_inserted(
+    let delta = Delta::with_removed_inserted(
         BTreeMap::from([(second.clone(), 20)]),
         BTreeMap::from([(third.clone(), 33), (sixth.clone(), 66)]),
     );
-    recorder.apply_edit(&edit);
+    recorder.apply_delta(&delta);
 
     assert_eq!(recorder.get(&first), Some(&10));
     assert_eq!(recorder.get(&second), None);
@@ -63,15 +63,15 @@ pub fn test_apply_edit_at_generated_indices<
     assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
-pub fn test_apply_edit_at_specified_indices<
+pub fn test_apply_delta_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     C: Keyed<K> + Map<V> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Clone + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    DC: Clone + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyEdit<BTreeMap<K, V>>,
+    C: ApplyDelta<BTreeMap<K, V>>,
 {
     recorder.insert(K::from_usize(1), V::from_usize(10));
     recorder.insert(K::from_usize(2), V::from_usize(20));
@@ -79,14 +79,14 @@ pub fn test_apply_edit_at_specified_indices<
     recorder.insert(K::from_usize(4), V::from_usize(40));
     recorder.insert(K::from_usize(5), V::from_usize(50));
 
-    let edit = Edit::with_removed_inserted(
+    let delta = Delta::with_removed_inserted(
         BTreeMap::from([(K::from_usize(2), V::from_usize(20))]),
         BTreeMap::from([
             (K::from_usize(3), V::from_usize(33)),
             (K::from_usize(6), V::from_usize(66)),
         ]),
     );
-    recorder.apply_edit(&edit);
+    recorder.apply_delta(&delta);
 
     assert_eq!(recorder.get(&K::from_usize(1)), Some(&V::from_usize(10)));
     assert_eq!(recorder.get(&K::from_usize(2)), None);
@@ -96,14 +96,14 @@ pub fn test_apply_edit_at_specified_indices<
     assert_eq!(recorder.get(&K::from_usize(6)), Some(&V::from_usize(66)));
 }
 
-pub fn test_apply_edit_on_set<
+pub fn test_apply_delta_on_set<
     K: Clone + FromUsize + Ord,
     C: Keyed<K> + Map<()> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    DC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyEdit<BTreeMap<K, ()>>,
+    C: ApplyDelta<BTreeMap<K, ()>>,
 {
     recorder.insert(K::from_usize(10), ());
     recorder.insert(K::from_usize(20), ());
@@ -111,11 +111,11 @@ pub fn test_apply_edit_on_set<
     recorder.insert(K::from_usize(40), ());
     recorder.insert(K::from_usize(50), ());
 
-    let edit = Edit::with_removed_inserted(
+    let delta = Delta::with_removed_inserted(
         BTreeMap::from([(K::from_usize(20), ())]),
         BTreeMap::from([(K::from_usize(30), ()), (K::from_usize(60), ())]),
     );
-    recorder.apply_edit(&edit);
+    recorder.apply_delta(&delta);
 
     assert_eq!(recorder.get(&K::from_usize(10)), Some(&()));
     assert_eq!(recorder.get(&K::from_usize(20)), None);
@@ -128,9 +128,9 @@ pub fn test_apply_edit_on_set<
 pub fn test_insert_and_remove_at_generated_indices<
     K: Clone,
     C: Keyed<K> + Map<i32> + Insert<K> + StableRemove<K> + Push<K> + Get<K>,
-    EC: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K>,
+    DC: Keyed<K> + Map<i32> + Get<K> + Insert<K> + StableRemove<K>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) {
     let first = recorder.push(10);
     let second = recorder.push(20);
@@ -155,9 +155,9 @@ pub fn test_insert_and_remove_at_generated_indices<
 
 pub fn test_insert_and_remove_at_specified_indices<
     C: Keyed<usize> + Map<i32> + Insert<usize> + StableRemove<usize> + Get<usize>,
-    EC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + StableRemove<usize>,
+    DC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + StableRemove<usize>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) {
     recorder.insert(1, 10);
     recorder.insert(2, 20);
@@ -180,9 +180,9 @@ pub fn test_insert_and_remove_at_specified_indices<
 pub fn test_insert_and_remove_on_set<
     K: Clone + FromUsize,
     C: Keyed<K> + Map<()> + Insert<K> + StableRemove<K> + Get<K>,
-    EC: Keyed<K> + Map<()> + Get<K> + Insert<K> + StableRemove<K>,
+    DC: Keyed<K> + Map<()> + Get<K> + Insert<K> + StableRemove<K>,
 >(
-    mut recorder: Recorder<C, EC>,
+    mut recorder: Recorder<C, DC>,
 ) {
     recorder.insert(K::from_usize(10), ());
     recorder.insert(K::from_usize(20), ());
@@ -211,18 +211,18 @@ pub fn test_undo_redo_at_generated_indices<
         + StableRemove<K>
         + Push<K>
         + IntoIter<K>
-        + ApplyEdit<EC>,
-    EC: Clone + Default + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+        + ApplyDelta<DC>,
+    DC: Clone + Default + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {
-    let mut undoredo: UndoRedo<EC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut collection), None);
     assert_eq!(undoredo.redo(&mut collection), None);
 
     let mut indices = Vec::new();
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         indices.push(recorder.push(10));
         // Repeat the same index to start indexing from 1 like in the test with specified indices.
         indices.push(indices[0].clone());
@@ -244,7 +244,7 @@ pub fn test_undo_redo_at_generated_indices<
     assert_eq!(collection.get(&indices[4]), Some(&40));
     assert_eq!(collection.get(&indices[5]), Some(&50));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&indices[2]);
         recorder.insert(indices[1].clone(), 11);
         recorder.insert(indices[3].clone(), 33);
@@ -272,7 +272,7 @@ pub fn test_undo_redo_at_generated_indices<
     assert_eq!(collection.get(&indices[4]), Some(&40));
     assert_eq!(collection.get(&indices[5]), Some(&50));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&indices[3]);
         recorder.insert(indices[6].clone(), 60);
     });
@@ -311,16 +311,16 @@ pub fn test_undo_redo_at_generated_indices<
 pub fn test_undo_redo_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
-    C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
-    EC: Clone + Default + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyDelta<DC>,
+    DC: Clone + Default + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {
-    let mut undoredo: UndoRedo<EC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut collection), None);
     assert_eq!(undoredo.redo(&mut collection), None);
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.insert(K::from_usize(1), V::from_usize(10));
         recorder.insert(K::from_usize(2), V::from_usize(20));
         recorder.insert(K::from_usize(3), V::from_usize(30));
@@ -336,7 +336,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
     assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&K::from_usize(2));
         recorder.insert(K::from_usize(1), V::from_usize(11));
         recorder.insert(K::from_usize(3), V::from_usize(33));
@@ -364,7 +364,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(collection.get(&K::from_usize(4)), Some(&V::from_usize(40)));
     assert_eq!(collection.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&K::from_usize(3));
         recorder.insert(K::from_usize(6), V::from_usize(60));
     });
@@ -402,16 +402,16 @@ pub fn test_undo_redo_at_specified_indices<
 
 pub fn test_undo_redo_on_set<
     K: Clone + FromUsize,
-    C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyEdit<EC>,
-    EC: Clone + Default + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
+    C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K> + ApplyDelta<DC>,
+    DC: Clone + Default + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + StableRemove<K>,
 >(
     mut collection: C,
 ) {
-    let mut undoredo: UndoRedo<EC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut collection), None);
     assert_eq!(undoredo.redo(&mut collection), None);
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.insert(K::from_usize(10), ());
         recorder.insert(K::from_usize(20), ());
         recorder.insert(K::from_usize(30), ());
@@ -427,7 +427,7 @@ pub fn test_undo_redo_on_set<
     assert_eq!(collection.get(&K::from_usize(40)), Some(&()));
     assert_eq!(collection.get(&K::from_usize(50)), Some(&()));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&K::from_usize(20));
     });
 
@@ -453,7 +453,7 @@ pub fn test_undo_redo_on_set<
     assert_eq!(collection.get(&K::from_usize(40)), Some(&()));
     assert_eq!(collection.get(&K::from_usize(50)), Some(&()));
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.remove(&K::from_usize(30));
         recorder.insert(K::from_usize(60), ());
     });

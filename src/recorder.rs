@@ -7,50 +7,50 @@ use core::marker::PhantomData;
 
 use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove};
 
-use crate::{ApplyEdit, edit::Edit};
+use crate::{ApplyDelta, delta::Delta};
 
-/// Records edits applied to a collection so that they can be replayed or
+/// Records deltas applied to a collection so that they can be replayed or
 /// reverted.
 #[derive(Clone, Debug, Default)]
 pub struct Recorder<
     C: KeyedCollection,
-    EC: KeyedCollection = BTreeMap<<C as KeyedCollection>::Key, <C as KeyedCollection>::Value>,
+    DC: KeyedCollection = BTreeMap<<C as KeyedCollection>::Key, <C as KeyedCollection>::Value>,
 > {
     collection: C,
-    edit: Edit<EC>,
+    delta: Delta<DC>,
 }
 
-/// Access the type of the edit collection carried by a recorder.
-pub trait RecorderEditCollection {
-    /// The collection type used to store recorder edits.
-    type EditCollection: KeyedCollection;
+/// Access the type of the delta collection carried by a recorder.
+pub trait RecorderDeltaCollection {
+    /// The collection type used to store recorder deltas.
+    type DeltaCollection: KeyedCollection;
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection> RecorderEditCollection for Recorder<C, EC> {
-    type EditCollection = EC;
+impl<C: KeyedCollection, DC: KeyedCollection> RecorderDeltaCollection for Recorder<C, DC> {
+    type DeltaCollection = DC;
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection> AsRef<C> for Recorder<C, EC> {
+impl<C: KeyedCollection, DC: KeyedCollection> AsRef<C> for Recorder<C, DC> {
     #[inline]
     fn as_ref(&self) -> &C {
         &self.collection
     }
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
+impl<C: KeyedCollection, DC: KeyedCollection + Default> Recorder<C, DC> {
     /// Create a new recorder recording changes to an owned collection.
     #[inline]
     pub fn new(collection: C) -> Self {
-        Self::with_edit(collection, Default::default())
+        Self::with_delta(collection, Default::default())
     }
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection> Recorder<C, EC> {
+impl<C: KeyedCollection, DC: KeyedCollection> Recorder<C, DC> {
     /// Create a new recorder recording changes to an owned collection, storing
-    /// them in an already existing edit.
+    /// them in an already existing delta.
     #[inline]
-    pub fn with_edit(collection: C, edit: Edit<EC>) -> Self {
-        Self { collection, edit }
+    pub fn with_delta(collection: C, delta: Delta<DC>) -> Self {
+        Self { collection, delta }
     }
 
     /// Returns a reference to the recorded collection.
@@ -60,17 +60,17 @@ impl<C: KeyedCollection, EC: KeyedCollection> Recorder<C, EC> {
     }
 
     /// Dissolve the recorder, returning and ceding ownership of its recorded
-    /// collection and edit.
+    /// collection and delta.
     #[inline]
-    pub fn dissolve(self) -> (C, Edit<EC>) {
-        (self.collection, self.edit)
+    pub fn dissolve(self) -> (C, Delta<DC>) {
+        (self.collection, self.delta)
     }
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -83,15 +83,15 @@ where
     }
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection> KeyedCollection for Recorder<C, EC> {
+impl<C: KeyedCollection, DC: KeyedCollection> KeyedCollection for Recorder<C, DC> {
     type Key = C::Key;
     type Value = C::Value;
 }
 
-impl<K, C, EC> Get<K> for Recorder<C, EC>
+impl<K, C, DC> Get<K> for Recorder<C, DC>
 where
     C: Get<K, Key = K>,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     #[inline]
     fn get(&self, key: &K) -> Option<&C::Value> {
@@ -99,10 +99,10 @@ where
     }
 }
 
-impl<K, C, EC> Recorder<C, EC>
+impl<K, C, DC> Recorder<C, DC>
 where
     C: Get<K, Key = K>,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     /// Returns a reference to the value corresponding to the key.
     #[inline]
@@ -111,10 +111,10 @@ where
     }
 }
 
-impl<K, V, C, EC> Set<K> for Recorder<C, EC>
+impl<K, V, C, DC> Set<K> for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Get<K> + Set<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -124,33 +124,33 @@ where
     }
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Get<K> + Set<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
     /// Set the value of an already existing element under a key.
     #[inline]
     pub fn set(&mut self, key: K, value: V) {
-        if self.edit.inserted.get(&key).is_none() {
+        if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.collection.get(&key) {
-                self.edit
+                self.delta
                     .removed
                     .insert(key.clone(), value_to_remove.clone());
             }
         }
 
-        self.edit.inserted.insert(key.clone(), value.clone());
+        self.delta.inserted.insert(key.clone(), value.clone());
         self.collection.set(key, value);
     }
 }
 
-impl<K, V, C, EC> Insert<K> for Recorder<C, EC>
+impl<K, V, C, DC> Insert<K> for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -160,33 +160,33 @@ where
     }
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
     /// Insert a key-value pair into the collection.
     #[inline]
     pub fn insert(&mut self, key: K, value: V) {
-        if self.edit.inserted.get(&key).is_none() {
+        if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.collection.get(&key) {
-                self.edit
+                self.delta
                     .removed
                     .insert(key.clone(), value_to_remove.clone());
             }
         }
 
-        self.edit.inserted.insert(key.clone(), value.clone());
+        self.delta.inserted.insert(key.clone(), value.clone());
         self.collection.insert(key, value.clone());
     }
 }
 
-impl<K, V, C, EC> Remove<K> for Recorder<C, EC>
+impl<K, V, C, DC> Remove<K> for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Remove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -196,19 +196,19 @@ where
     }
 }
 
-impl<K, V, C, EC> StableRemove<K> for Recorder<C, EC>
+impl<K, V, C, DC> StableRemove<K> for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + StableRemove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + StableRemove<K>,
     K: Clone,
     V: Clone,
 {
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Remove<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -218,18 +218,18 @@ where
     pub fn remove(&mut self, key: &K) -> Option<V> {
         let value = self.collection.remove(key)?;
 
-        if self.edit.inserted.remove(key).is_none() {
-            self.edit.removed.insert(key.clone(), value.clone());
+        if self.delta.inserted.remove(key).is_none() {
+            self.delta.removed.insert(key.clone(), value.clone());
         }
 
         Some(value)
     }
 }
 
-impl<K, V, C, EC> Push<K> for Recorder<C, EC>
+impl<K, V, C, DC> Push<K> for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Push<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -239,10 +239,10 @@ where
     }
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Push<K>,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -251,16 +251,16 @@ where
     #[inline]
     pub fn push(&mut self, value: V) -> K {
         let key = self.collection.push(value.clone());
-        self.edit.inserted.insert(key.clone(), value);
+        self.delta.inserted.insert(key.clone(), value);
 
         key
     }
 }
 
-impl<K, V, C, EC> Pop for Recorder<C, EC>
+impl<K, V, C, DC> Pop for Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Len + Pop,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -270,10 +270,10 @@ where
     }
 }
 
-impl<K, V, C, EC> Recorder<C, EC>
+impl<K, V, C, DC> Recorder<C, DC>
 where
     C: KeyedCollection<Key = K, Value = V> + Len + Pop,
-    EC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
     K: Clone,
     V: Clone,
 {
@@ -283,8 +283,8 @@ where
     pub fn pop(&mut self) -> Option<V> {
         let value = self.collection.pop()?;
 
-        if self.edit.inserted.remove(&self.collection.len()).is_none() {
-            self.edit
+        if self.delta.inserted.remove(&self.collection.len()).is_none() {
+            self.delta
                 .removed
                 .insert(self.collection.len(), value.clone());
         }
@@ -293,10 +293,10 @@ where
     }
 }
 
-impl<C, EC> Len for Recorder<C, EC>
+impl<C, DC> Len for Recorder<C, DC>
 where
     C: Len,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     #[inline]
     fn len(&self) -> C::Key {
@@ -304,10 +304,10 @@ where
     }
 }
 
-impl<C, EC> Recorder<C, EC>
+impl<C, DC> Recorder<C, DC>
 where
     C: Len,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     /// Returns the length of the collection.
     #[inline]
@@ -316,10 +316,10 @@ where
     }
 }
 
-impl<K, C, EC> IntoIter<K> for Recorder<C, EC>
+impl<K, C, DC> IntoIter<K> for Recorder<C, DC>
 where
     C: IntoIter<K>,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     type IntoIter = C::IntoIter;
 
@@ -332,10 +332,10 @@ where
 // This won't compile because K is unconstrained type parameter.
 //
 // XXX: Remove `K` parameter from `IntoIter<K>`?
-/*impl<K, C, EC> Recorder<C, EC>
+/*impl<K, C, DC> Recorder<C, DC>
 where
     C: IntoIter<K>,
-    EC: KeyedCollection,
+    DC: KeyedCollection,
 {
     #[inline]
     pub fn into_iter(self) -> C::IntoIter {
@@ -344,89 +344,89 @@ where
 }*/
 
 impl<
-    C: KeyedCollection + ApplyEdit<EC>,
-    REC: KeyedCollection,
-    EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
-> ApplyEdit<EC> for Recorder<C, REC>
+    C: KeyedCollection + ApplyDelta<DC>,
+    RDC: KeyedCollection,
+    DC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
+> ApplyDelta<DC> for Recorder<C, RDC>
 where
     Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
 {
     #[inline]
-    fn apply_edit(&mut self, edit: &Edit<EC>) {
-        self.collection.apply_edit(edit)
+    fn apply_delta(&mut self, delta: &Delta<DC>) {
+        self.collection.apply_delta(delta)
     }
 }
 
 // This won't compile because K is unconstrained type parameter.
 //
 /*impl<
-    C: KeyedCollection + ApplyEdit<EC>,
-    REC: KeyedCollection,
-    EC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
-> Recorder<C, REC>
+    C: KeyedCollection + ApplyDelta<DC>,
+    RDC: KeyedCollection,
+    DC: Clone + IntoIter<C::Key> + KeyedCollection<Key = C::Key, Value = C::Value>,
+> Recorder<C, RDC>
 where
     Self: KeyedCollection<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
 {
     #[inline]
-    pub fn apply_edit(&mut self, edit: &Edit<EC>) {
-        self.collection.apply_edit(edit);
+    pub fn apply_delta(&mut self, delta: &Delta<DC>) {
+        self.collection.apply_delta(delta);
     }
 }*/
 
-/// Flush the recorder, returning the recorded edit and replacing it with a
+/// Flush the recorder, returning the recorded delta and replacing it with a
 /// new empty one.
-pub trait FlushEdit<EC> {
-    /// Flush the recorder, returning the recorded edit and replacing it with a
+pub trait FlushDelta<DC> {
+    /// Flush the recorder, returning the recorded delta and replacing it with a
     /// new empty one.
-    fn flush_edit(&mut self) -> Edit<EC>;
+    fn flush_delta(&mut self) -> Delta<DC>;
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection + Default> FlushEdit<EC> for Recorder<C, EC> {
+impl<C: KeyedCollection, DC: KeyedCollection + Default> FlushDelta<DC> for Recorder<C, DC> {
     #[inline]
-    fn flush_edit(&mut self) -> Edit<EC> {
-        self.flush_edit()
+    fn flush_delta(&mut self) -> Delta<DC> {
+        self.flush_delta()
     }
 }
 
-impl<C, EC> FlushEdit<Recorder<C, EC>> for Recorder<C, EC>
+impl<C, DC> FlushDelta<Recorder<C, DC>> for Recorder<C, DC>
 where
-    C: KeyedCollection + Default + ApplyEdit<EC>,
-    EC: KeyedCollection + Default,
+    C: KeyedCollection + Default + ApplyDelta<DC>,
+    DC: KeyedCollection + Default,
 {
     #[inline]
-    fn flush_edit(&mut self) -> Edit<Recorder<C, EC>> {
-        let (removed, inserted) = <Recorder<C, EC> as FlushEdit<EC>>::flush_edit(self).dissolve();
+    fn flush_delta(&mut self) -> Delta<Recorder<C, DC>> {
+        let (removed, inserted) = <Recorder<C, DC> as FlushDelta<DC>>::flush_delta(self).dissolve();
 
-        // HACK: This is currently the only way to turn EC to C. This may be
+        // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
         let mut removed_collection = C::default();
-        removed_collection.apply_edit(&Edit::with_removed_inserted(EC::default(), removed));
+        removed_collection.apply_delta(&Delta::with_removed_inserted(DC::default(), removed));
 
-        // HACK: This is currently the only way to turn EC to C. This may be
+        // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
         let mut inserted_collection = C::default();
-        inserted_collection.apply_edit(&Edit::with_removed_inserted(EC::default(), inserted));
+        inserted_collection.apply_delta(&Delta::with_removed_inserted(DC::default(), inserted));
 
-        Edit::with_removed_inserted(
+        Delta::with_removed_inserted(
             Recorder::new(removed_collection),
             Recorder::new(inserted_collection),
         )
     }
 }
 
-impl<C: KeyedCollection, EC: KeyedCollection + Default> Recorder<C, EC> {
-    /// Flush the recorder, returning the recorded edit and replacing it with a
+impl<C: KeyedCollection, DC: KeyedCollection + Default> Recorder<C, DC> {
+    /// Flush the recorder, returning the recorded delta and replacing it with a
     /// new empty one.
     #[inline]
-    pub fn flush_edit(&mut self) -> Edit<EC> {
-        core::mem::replace(&mut self.edit, Edit::new())
+    pub fn flush_delta(&mut self) -> Delta<DC> {
+        core::mem::replace(&mut self.delta, Delta::new())
     }
 }
 
-impl<V, EC: Default> FlushEdit<EC> for PhantomData<V> {
+impl<V, DC: Default> FlushDelta<DC> for PhantomData<V> {
     #[inline]
-    fn flush_edit(&mut self) -> Edit<EC> {
+    fn flush_delta(&mut self) -> Delta<DC> {
         // Nothing happens, obviously.
-        Edit::default()
+        Delta::default()
     }
 }

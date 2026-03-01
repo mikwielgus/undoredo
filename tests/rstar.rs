@@ -17,9 +17,9 @@ impl common::FromUsize for (i32, i32) {
 }
 
 #[test]
-fn test_apply_edit_on_set() {
+fn test_apply_delta_on_set() {
     let recorder = Recorder::<RTree<(i32, i32)>>::new(RTree::new());
-    common::test_apply_edit_on_set(recorder);
+    common::test_apply_delta_on_set(recorder);
 }
 
 #[test]

@@ -13,16 +13,16 @@ fn main() {
     let mut undoredo: UndoRedo<BTreeMap<thunderdome::Index, char>> = UndoRedo::new();
 
     recorder.push('A');
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     recorder.push('B');
     recorder.push('B');
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     let key = recorder.push('X');
     recorder.remove(&key);
     recorder.push('C');
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B', 'C']);

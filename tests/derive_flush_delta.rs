@@ -6,16 +6,16 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use undoredo::{FlushEdit, Recorder};
+use undoredo::{FlushDelta, Recorder};
 
-#[derive(undoredo::FlushEdit, undoredo::CompositeEdit)]
+#[derive(undoredo::FlushDelta, undoredo::CompositeDelta)]
 struct FlatStruct {
     map: Recorder<BTreeMap<i32, i32>>,
     set: Recorder<BTreeSet<i32>>,
 }
 
 #[test]
-fn test_derive_flush_edit_flat_struct() {
+fn test_derive_flush_delta_flat_struct() {
     let mut flat_struct = FlatStruct {
         map: Recorder::new(BTreeMap::from([
             (1, 10),
@@ -35,8 +35,8 @@ fn test_derive_flush_edit_flat_struct() {
     flat_struct.set.insert(30, ());
     flat_struct.set.insert(60, ());
 
-    let edit = flat_struct.flush_edit();
-    let (removed, inserted) = edit.dissolve();
+    let delta = flat_struct.flush_delta();
+    let (removed, inserted) = delta.dissolve();
 
     assert_eq!(removed.map, BTreeMap::from([(2, 20), (3, 30)]));
     assert_eq!(inserted.map, BTreeMap::from([(3, 30), (6, 60)]));

@@ -6,10 +6,10 @@
 mod common;
 
 use alloc::{collections::BTreeMap, vec::Vec};
-use undoredo::{ApplyEdit, Edit, Recorder, UndoRedo};
+use undoredo::{ApplyDelta, Delta, Recorder, UndoRedo};
 
 #[test]
-fn test_apply_edit_and_reverse() {
+fn test_apply_delta_and_reverse() {
     let mut recorder = Recorder::<Vec<i32>, BTreeMap<usize, i32>>::new(Vec::new());
 
     recorder.push(0);
@@ -28,11 +28,11 @@ fn test_apply_edit_and_reverse() {
     assert_eq!(recorder.get(&5), Some(&50));
     assert_eq!(recorder.get(&6), Some(&60));
 
-    let edit = Edit::with_removed_inserted(
+    let delta = Delta::with_removed_inserted(
         BTreeMap::from([(2, 20), (6, 60), (5, 50), (4, 40)]),
         BTreeMap::from([(2, 22), (5, 55), (4, 44)]),
     );
-    recorder.apply_edit(&edit);
+    recorder.apply_delta(&delta);
 
     assert_eq!(recorder.get(&0), Some(&0));
     assert_eq!(recorder.get(&1), Some(&10));
@@ -42,7 +42,7 @@ fn test_apply_edit_and_reverse() {
     assert_eq!(recorder.get(&5), Some(&55));
     assert_eq!(recorder.get(&6), None);
 
-    recorder.apply_edit(&edit.reverse());
+    recorder.apply_delta(&delta.reverse());
 
     assert_eq!(recorder.get(&0), Some(&0));
     assert_eq!(recorder.get(&1), Some(&10));
@@ -82,7 +82,7 @@ fn test_undo_redo() {
     let collection: Vec<i32> = Vec::new();
     let mut undoredo: UndoRedo<BTreeMap<usize, i32>> = UndoRedo::new();
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.push(0);
         recorder.push(10);
 
@@ -105,7 +105,7 @@ fn test_undo_redo() {
     assert_eq!(collection.get(5), Some(&50));
     assert_eq!(collection.get(6), None);
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.insert(1, 11);
         recorder.insert(3, 33);
         recorder.pop();
@@ -139,7 +139,7 @@ fn test_undo_redo() {
     assert_eq!(collection.get(5), None);
     assert_eq!(collection.get(6), None);
 
-    let mut collection = undoredo.edit(collection, |recorder| {
+    let mut collection = undoredo.delta(collection, |recorder| {
         recorder.push(50);
         recorder.push(60);
     });

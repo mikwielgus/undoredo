@@ -5,7 +5,7 @@
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
-// Representation of the command that originated the recorded edit.
+// Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
 enum Command {
     PushChar,
@@ -19,16 +19,16 @@ fn main() {
     recorder.insert(1, 'A');
 
     // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
-    // with the recorded edit.
-    undoredo.cmd_commit(Command::PushChar, recorder.flush_edit());
+    // with the recorded delta.
+    undoredo.cmd_commit(Command::PushChar, recorder.flush_delta());
 
-    // `Command::PushChar` is now the top element of the stack of done cmd-edits.
+    // `Command::PushChar` is now the top element of the stack of done cmd-deltas.
     assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChar);
 
     undoredo.undo(&mut recorder);
 
     // After undo, `Command::PushChar` is now the top element of the stack of
-    // undone cmd-edits.
+    // undone cmd-deltas.
     assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChar);
 }
 

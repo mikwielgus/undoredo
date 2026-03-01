@@ -20,10 +20,10 @@ fn main() {
 
     // Insert two rectangles, recording them in the R-tree.
     recorder.insert(1, Rectangle::from_corners((0, 0), (1, 1)));
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     recorder.insert(2, Rectangle::from_corners((1, 1), (2, 2)));
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     // Locate the two rectangles in the R-tree.
     assert_eq!(

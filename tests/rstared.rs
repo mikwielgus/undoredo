@@ -26,11 +26,11 @@ impl common::FromUsize for Rectangle<(i32, i32)> {
 }
 
 #[test]
-fn test_apply_edit_on_set() {
+fn test_apply_delta_on_set() {
     let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
     let recorder = Recorder::<
         RTreed<HashMap<i32, Rectangle<(i32, i32)>>>,
         HashMap<i32, Rectangle<(i32, i32)>>,
     >::new(RTreed::new(rect_hashmap));
-    common::test_apply_edit_at_specified_indices(recorder);
+    common::test_apply_delta_at_specified_indices(recorder);
 }

@@ -14,14 +14,14 @@ fn main() {
     // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
 
-    // Push elements while recording the changes in an edit.
+    // Push elements while recording the changes in an delta.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
-    // Flush the recorder and commit the recorded edit of pushing 'A', 'B', 'C'
+    // Flush the recorder and commit the recorded delta of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
-    undoredo.commit(recorder.flush_edit());
+    undoredo.commit(recorder.flush_delta());
 
     // The pushed elements are now present in the collection.
     assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));

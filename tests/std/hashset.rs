@@ -12,9 +12,9 @@ use std::collections::HashSet;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_edit_on_set() {
+fn test_apply_delta_on_set() {
     let recorder = Recorder::<HashSet<i32>>::new(HashSet::new());
-    common::test_apply_edit_on_set(recorder);
+    common::test_apply_delta_on_set(recorder);
 }
 
 #[test]

@@ -50,13 +50,13 @@ fn expand_apply_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             }
         }
         Fields::Unnamed(unnamed) => {
-            for (idx, field) in unnamed.unnamed.into_iter().enumerate() {
+            for (index, field) in unnamed.unnamed.into_iter().enumerate() {
                 push_field_apply_stmt(
                     where_clause,
                     &mut apply_stmts,
                     field.ty.clone(),
                     recorder_type_to_edit_collection_type(field.ty),
-                    syn::Member::Unnamed(syn::Index::from(idx)),
+                    syn::Member::Unnamed(syn::Index::from(index)),
                 );
             }
         }
@@ -157,7 +157,7 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
             )
         }
         Fields::Unnamed(unnamed) => {
-            for (idx, field) in unnamed.unnamed.into_iter().enumerate() {
+            for (index, field) in unnamed.unnamed.into_iter().enumerate() {
                 push_field_flush_parts(
                     where_clause,
                     &mut bindings,
@@ -165,10 +165,16 @@ fn expand_flush_edit(input: DeriveInput) -> syn::Result<TokenStream> {
                     &mut inserted_fields,
                     field.ty.clone(),
                     recorder_type_to_edit_collection_type(field.ty),
-                    syn::Member::Unnamed(syn::Index::from(idx)),
+                    syn::Member::Unnamed(syn::Index::from(index)),
                     None,
-                    syn::Ident::new(&format!("removed_{}", idx), proc_macro2::Span::call_site()),
-                    syn::Ident::new(&format!("inserted_{}", idx), proc_macro2::Span::call_site()),
+                    syn::Ident::new(
+                        &format!("removed_{}", index),
+                        proc_macro2::Span::call_site(),
+                    ),
+                    syn::Ident::new(
+                        &format!("inserted_{}", index),
+                        proc_macro2::Span::call_site(),
+                    ),
                 );
             }
 
@@ -316,7 +322,9 @@ fn recorder_type_to_edit_collection_type(field_ty: Type) -> Type {
                         }
 
                         if let Some(collection_ty) = type_args.first() {
-                            return collection_ty.clone();
+                            return syn::parse_quote! {
+                                <::undoredo::Recorder<#collection_ty> as ::undoredo::RecorderEditCollection>::EditCollection
+                            };
                         }
                     }
                 }

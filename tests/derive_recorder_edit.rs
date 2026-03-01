@@ -19,7 +19,7 @@ struct FlatStruct {
 fn test_derive_composite_edit_on_named_struct() {
     let _edit = FlatStructCompositeEdit {
         map: BTreeMap::from([(1, 10)]),
-        set: BTreeSet::from([1]),
+        set: BTreeMap::from([(1, ())]),
         plain: 42,
     };
 }

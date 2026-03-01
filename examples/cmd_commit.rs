@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded edit.
@@ -12,8 +12,9 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
+    let mut recorder: Recorder<HashMap<usize, char>, BTreeMap<usize, char>> =
+        Recorder::new(HashMap::new());
+    let mut undoredo: UndoRedo<BTreeMap<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
 

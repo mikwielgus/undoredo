@@ -19,7 +19,7 @@ mod recorder;
 mod undoredo;
 
 pub use crate::edit::{ApplyEdit, Edit};
-pub use crate::recorder::{FlushEdit, Recorder};
+pub use crate::recorder::{FlushEdit, Recorder, RecorderEditCollection};
 pub use crate::undoredo::UndoRedo;
 pub use maplike::{Get, Insert, IntoIter, KeyedCollection, Map, Push, Remove, StableRemove};
 

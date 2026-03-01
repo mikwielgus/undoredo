@@ -40,6 +40,6 @@ fn test_derive_flush_edit_flat_struct() {
 
     assert_eq!(removed.map, BTreeMap::from([(2, 20), (3, 30)]));
     assert_eq!(inserted.map, BTreeMap::from([(3, 30), (6, 60)]));
-    assert_eq!(removed.set, BTreeSet::from([20, 30]));
-    assert_eq!(inserted.set, BTreeSet::from([30, 60]));
+    assert_eq!(removed.set, BTreeMap::from([(20, ()), (30, ())]));
+    assert_eq!(inserted.set, BTreeMap::from([(30, ()), (60, ())]));
 }

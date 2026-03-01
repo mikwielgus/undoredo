@@ -60,15 +60,16 @@ over `HashMap`. You can find more examples in the
 directory.
 
 ```rust
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded collection.
-    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>> =
+        Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in an edit.
     recorder.insert(1, 'A');
@@ -117,7 +118,7 @@ and
 accessor methods.
 
 ```rust
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use undoredo::{Insert, Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded edit.
@@ -127,8 +128,9 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<HashMap<usize, char>, Command> = UndoRedo::new();
+    let mut recorder: Recorder<HashMap<usize, char>> =
+        Recorder::new(HashMap::new());
+    let mut undoredo: UndoRedo<BTreeMap<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');

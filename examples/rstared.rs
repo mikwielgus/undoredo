@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use rstar::{AABB, primitives::Rectangle};
 use rstared::RTreed;
@@ -14,9 +14,9 @@ fn main() {
     // Wrap `RTreed` around the hashmap and then `Recorder` around it.
     let mut recorder = Recorder::<
         RTreed<HashMap<i32, Rectangle<(i32, i32)>>>,
-        HashMap<i32, Rectangle<(i32, i32)>>,
+        BTreeMap<i32, Rectangle<(i32, i32)>>,
     >::new(RTreed::new(rect_hashmap));
-    let mut undoredo: UndoRedo<HashMap<i32, Rectangle<(i32, i32)>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMap<i32, Rectangle<(i32, i32)>>> = UndoRedo::new();
 
     // Insert two rectangles, recording them in the R-tree.
     recorder.insert(1, Rectangle::from_corners((0, 0), (1, 1)));

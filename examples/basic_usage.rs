@@ -2,16 +2,17 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
 #[allow(unused_mut)]
 fn main() {
     // The recorder records the ongoing changes to the recorded collection.
-    let mut recorder: Recorder<HashMap<usize, char>> = Recorder::new(HashMap::new());
+    let mut recorder: Recorder<HashMap<usize, char>, BTreeMap<usize, char>> =
+        Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<HashMap<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in an edit.
     recorder.insert(1, 'A');

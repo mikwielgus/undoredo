@@ -2,17 +2,32 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 
 use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove};
 
 use crate::{ApplyEdit, edit::Edit};
 
-/// Records edits applied to a collection so they can be replayed or reverted.
+/// Records edits applied to a collection so that they can be replayed or
+/// reverted.
 #[derive(Clone, Debug, Default)]
-pub struct Recorder<C: KeyedCollection, EC: KeyedCollection = C> {
+pub struct Recorder<
+    C: KeyedCollection,
+    EC: KeyedCollection = BTreeMap<<C as KeyedCollection>::Key, <C as KeyedCollection>::Value>,
+> {
     collection: C,
     edit: Edit<EC>,
+}
+
+/// Access the type of the edit collection carried by a recorder.
+pub trait RecorderEditCollection {
+    /// The collection type used to store recorder edits.
+    type EditCollection: KeyedCollection;
+}
+
+impl<C: KeyedCollection, EC: KeyedCollection> RecorderEditCollection for Recorder<C, EC> {
+    type EditCollection = EC;
 }
 
 impl<C: KeyedCollection, EC: KeyedCollection> AsRef<C> for Recorder<C, EC> {

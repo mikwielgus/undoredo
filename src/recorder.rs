@@ -311,25 +311,16 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Clone + KeyedCollection<Key = K, Value = V> + IntoIter<K, Value = V> + Remove<K>,
-    C::IntoIter: DoubleEndedIterator,
+    C: Clear + Clone + IntoIter<K, Value = V>,
     DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
-    K: Clone,
-    V: Clone,
 {
     /// Remove all elements from the collection.
     pub fn clear(&mut self) {
-        let keys: alloc::vec::Vec<K> = self
-            .collection
-            .clone()
-            .into_iter()
-            .rev()
-            .map(|(key, _)| key)
-            .collect();
-
-        for key in keys {
-            Remove::remove(self, &key);
+        for (key, value) in self.collection.clone().into_iter() {
+            self.delta.removed.insert(key, value);
         }
+
+        self.collection.clear();
     }
 }
 

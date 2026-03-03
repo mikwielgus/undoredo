@@ -5,7 +5,9 @@
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 
-use maplike::{Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove};
+use maplike::{
+    Clear, Get, Insert, IntoIter, KeyedCollection, Len, Pop, Push, Remove, Set, StableRemove,
+};
 
 use crate::{ApplyDelta, delta::Delta};
 
@@ -290,6 +292,44 @@ where
         }
 
         Some(value)
+    }
+}
+
+impl<K, V, C, DC> Clear for Recorder<C, DC>
+where
+    C: Clone + KeyedCollection<Key = K, Value = V> + IntoIter<K, Value = V> + Remove<K>,
+    C::IntoIter: DoubleEndedIterator,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn clear(&mut self) {
+        self.clear();
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Clone + KeyedCollection<Key = K, Value = V> + IntoIter<K, Value = V> + Remove<K>,
+    C::IntoIter: DoubleEndedIterator,
+    DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Remove all elements from the collection.
+    pub fn clear(&mut self) {
+        let keys: alloc::vec::Vec<K> = self
+            .collection
+            .clone()
+            .into_iter()
+            .rev()
+            .map(|(key, _)| key)
+            .collect();
+
+        for key in keys {
+            Remove::remove(self, &key);
+        }
     }
 }
 

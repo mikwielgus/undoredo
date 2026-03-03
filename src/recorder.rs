@@ -297,11 +297,8 @@ where
 
 impl<K, V, C, DC> Clear for Recorder<C, DC>
 where
-    C: Clone + KeyedCollection<Key = K, Value = V> + IntoIter<K, Value = V> + Remove<K>,
-    C::IntoIter: DoubleEndedIterator,
+    C: Clear + Clone + IntoIter<K, Value = V>,
     DC: KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
-    K: Clone,
-    V: Clone,
 {
     #[inline]
     fn clear(&mut self) {

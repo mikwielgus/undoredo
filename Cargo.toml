@@ -19,7 +19,7 @@ edition = "2024"
 maintenance = { status = "actively-developed" }
 
 [features]
-derive = ["undoredo_derive"]
+derive = []#["undoredo_derive"]
 default = ["std"]
 std = []
 rstar = ["dep:rstar", "maplike/rstar"]
@@ -33,7 +33,7 @@ stable-vec = { version = "0.4", optional = true }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.8", optional = true }
 thunderdome = { version = "0.6", optional = true }
-undoredo_derive = { version = "0.8", optional = true, path = "undoredo_derive" }
+#undoredo_derive = { version = "0.8", optional = true, path = "undoredo_derive" }
 
 [dev-dependencies]
 stable-vec = "0.4"

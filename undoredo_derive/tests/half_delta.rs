@@ -21,15 +21,15 @@ fn test_struct_half_delta() {
 #[derive(HalfDelta)]
 enum TestEnum {
     Unit,
-    Tuple(Vec<i32>),
-    Fields { n: i32 },
+    Tuple(Vec<i32>, Vec<i32>),
+    Fields { i: i32, u: u32 },
 }
 
 #[test]
 fn test_enum_half_delta() {
     let _: TestEnumHalfDelta = TestEnumHalfDelta::Unit;
-    let _: TestEnumHalfDelta = TestEnumHalfDelta::Tuple(BTreeMap::new());
-    let _: TestEnumHalfDelta = TestEnumHalfDelta::Fields { n: 0 };
+    let _: TestEnumHalfDelta = TestEnumHalfDelta::Tuple(BTreeMap::new(), BTreeMap::new());
+    let _: TestEnumHalfDelta = TestEnumHalfDelta::Fields { i: 0, u: 0 };
 }
 
 #[repr(C)]

@@ -58,13 +58,9 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 #vis struct #half_delta_name;
             },
         },
-        Data::Enum(enum_data) => {
-            let variants = enum_data.variants.iter();
+        Data::Enum(_) => {
             quote! {
-                #[derive(Clone, Debug)]
-                #vis enum #half_delta_name {
-                    #( #variants ),*
-                }
+                #vis type #half_delta_name = #name;
             }
         }
         Data::Union(_) => panic!("unions are not supported"),

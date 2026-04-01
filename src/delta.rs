@@ -74,8 +74,8 @@ impl<DC> Delta<DC> {
 
 /// Apply the changes in an delta to a container.
 ///
-/// This can be used to revert a previously recorded delta. The delta has to
-/// be reversed first with [`Delta::reverse()`].
+/// This can be used to revert a previously recorded delta if you reverse it
+/// with [`Delta::reverse()`].
 pub trait ApplyDelta<DC> {
     /// Apply the changes in an delta to a container.
     ///
@@ -149,7 +149,7 @@ impl<K: Ord, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelt
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
     fn apply_delta(&mut self, _delta: &Delta<DC>) {
-        // Nothing happens, obviously.
+        // Nothing happens here, obviously.
     }
 }
 

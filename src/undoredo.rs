@@ -46,7 +46,7 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
 }
 
 impl<Cmd: Default, DC> UndoRedo<DC, Cmd> {
-    /// Push the delta onto the done stack.
+    /// Push the delta onto the *done* stack.
     ///
     /// Clears the undone stack.
     pub fn commit(&mut self, delta: Delta<DC>) {
@@ -55,7 +55,7 @@ impl<Cmd: Default, DC> UndoRedo<DC, Cmd> {
 }
 
 impl<Cmd, DC> UndoRedo<DC, Cmd> {
-    /// Push the delta onto the done stack along with metadata.
+    /// Push the delta onto the *done* stack along with metadata.
     pub fn cmd_commit(&mut self, cmd: Cmd, delta: Delta<DC>) {
         self.done.push(CmdDelta { cmd, delta });
         self.undone.clear();
@@ -93,8 +93,8 @@ impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
 impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
     /// Undo the last done delta.
     ///
-    /// The undone delta is popped from the done stack, reversed, reverted, and
-    /// pushed onto the undone stack.
+    /// The undone delta is popped from the *done* stack, reversed, reverted,
+    /// and pushed onto the *undone* stack.
     pub fn undo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
         let CmdDelta { cmd, delta } = self.done.pop()?;
         let reverse_delta = delta.reverse();
@@ -110,8 +110,8 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
 
     /// Redo the last undone delta.
     ///
-    /// The redone delta is popped from the undone stack, reversed, reverted, and
-    /// pushed back onto the done stack.
+    /// The redone delta is popped from the *undone* stack, reversed, reverted,
+    /// and pushed back onto the *done* stack.
     pub fn redo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
         let CmdDelta { cmd, delta } = self.undone.pop()?;
         let reverse_delta = delta.reverse();

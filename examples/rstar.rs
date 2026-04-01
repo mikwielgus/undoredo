@@ -22,7 +22,7 @@ fn main() {
     undoredo.commit(recorder.flush_delta());
 
     assert_eq!(
-        recorder.collection().iter().collect::<Vec<_>>(),
+        recorder.container().iter().collect::<Vec<_>>(),
         RTree::bulk_load(vec![(1, 1), (2, 2), (3, 3)])
             .iter()
             .collect::<Vec<_>>()
@@ -30,7 +30,7 @@ fn main() {
 
     undoredo.undo(&mut recorder);
     assert_eq!(
-        *recorder.collection().iter().collect::<Vec<_>>(),
+        *recorder.container().iter().collect::<Vec<_>>(),
         RTree::bulk_load(vec![(1, 1), (2, 2)])
             .iter()
             .collect::<Vec<_>>()
@@ -38,13 +38,13 @@ fn main() {
 
     undoredo.undo(&mut recorder);
     assert_eq!(
-        *recorder.collection().iter().collect::<Vec<_>>(),
+        *recorder.container().iter().collect::<Vec<_>>(),
         RTree::bulk_load(vec![(1, 1)]).iter().collect::<Vec<_>>()
     );
 
     undoredo.redo(&mut recorder);
     assert_eq!(
-        *recorder.collection().iter().collect::<Vec<_>>(),
+        *recorder.container().iter().collect::<Vec<_>>(),
         RTree::bulk_load(vec![(1, 1), (2, 2)])
             .iter()
             .collect::<Vec<_>>()
@@ -52,7 +52,7 @@ fn main() {
 
     undoredo.redo(&mut recorder);
     assert_eq!(
-        *recorder.collection().iter().collect::<Vec<_>>(),
+        *recorder.container().iter().collect::<Vec<_>>(),
         RTree::bulk_load(vec![(1, 1), (2, 2), (3, 3)])
             .iter()
             .collect::<Vec<_>>()

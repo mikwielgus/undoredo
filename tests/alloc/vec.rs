@@ -79,10 +79,10 @@ fn test_push_and_pop() {
 
 #[test]
 fn test_undo_redo() {
-    let collection: Vec<i32> = Vec::new();
+    let container: Vec<i32> = Vec::new();
     let mut undoredo: UndoRedo<BTreeMap<usize, i32>> = UndoRedo::new();
 
-    let mut collection = undoredo.delta(collection, |recorder| {
+    let mut container = undoredo.delta(container, |recorder| {
         recorder.push(0);
         recorder.push(10);
 
@@ -95,87 +95,87 @@ fn test_undo_redo() {
         recorder.pop();
     });
 
-    assert_eq!(undoredo.redo(&mut collection), None);
+    assert_eq!(undoredo.redo(&mut container), None);
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&10));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&30));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), Some(&50));
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&10));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&30));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), Some(&50));
+    assert_eq!(container.get(6), None);
 
-    let mut collection = undoredo.delta(collection, |recorder| {
+    let mut container = undoredo.delta(container, |recorder| {
         recorder.set(1, 11);
         recorder.set(3, 33);
         recorder.pop();
     });
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&11));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&33));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), None);
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&11));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&33));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), None);
+    assert_eq!(container.get(6), None);
 
-    assert!(undoredo.undo(&mut collection).is_some());
+    assert!(undoredo.undo(&mut container).is_some());
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&10));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&30));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), Some(&50));
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&10));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&30));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), Some(&50));
+    assert_eq!(container.get(6), None);
 
-    assert!(undoredo.redo(&mut collection).is_some());
+    assert!(undoredo.redo(&mut container).is_some());
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&11));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&33));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), None);
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&11));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&33));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), None);
+    assert_eq!(container.get(6), None);
 
-    let mut collection = undoredo.delta(collection, |recorder| {
+    let mut container = undoredo.delta(container, |recorder| {
         recorder.push(50);
         recorder.push(60);
     });
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&11));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&33));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), Some(&50));
-    assert_eq!(collection.get(6), Some(&60));
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&11));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&33));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), Some(&50));
+    assert_eq!(container.get(6), Some(&60));
 
-    assert_eq!(undoredo.redo(&mut collection), None);
+    assert_eq!(undoredo.redo(&mut container), None);
 
-    assert!(undoredo.undo(&mut collection).is_some());
-    assert!(undoredo.undo(&mut collection).is_some());
-    assert!(undoredo.undo(&mut collection).is_some());
-    assert_eq!(undoredo.undo(&mut collection), None);
+    assert!(undoredo.undo(&mut container).is_some());
+    assert!(undoredo.undo(&mut container).is_some());
+    assert!(undoredo.undo(&mut container).is_some());
+    assert_eq!(undoredo.undo(&mut container), None);
 
-    assert!(undoredo.redo(&mut collection).is_some());
+    assert!(undoredo.redo(&mut container).is_some());
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&10));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&30));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), Some(&50));
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&10));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&30));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), Some(&50));
+    assert_eq!(container.get(6), None);
 
-    assert!(undoredo.redo(&mut collection).is_some());
+    assert!(undoredo.redo(&mut container).is_some());
 
-    assert_eq!(collection.get(0), Some(&0));
-    assert_eq!(collection.get(1), Some(&11));
-    assert_eq!(collection.get(2), Some(&20));
-    assert_eq!(collection.get(3), Some(&33));
-    assert_eq!(collection.get(4), Some(&40));
-    assert_eq!(collection.get(5), None);
-    assert_eq!(collection.get(6), None);
+    assert_eq!(container.get(0), Some(&0));
+    assert_eq!(container.get(1), Some(&11));
+    assert_eq!(container.get(2), Some(&20));
+    assert_eq!(container.get(3), Some(&33));
+    assert_eq!(container.get(4), Some(&40));
+    assert_eq!(container.get(5), None);
+    assert_eq!(container.get(6), None);
 }

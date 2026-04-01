@@ -9,7 +9,7 @@ use rstared::RTreed;
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    // A hashmap of 2D rectangles will be the underlying collection.
+    // A hashmap of 2D rectangles will be the underlying container.
     let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
     // Wrap `RTreed` around the hashmap and then `Recorder` around it.
     let mut recorder = Recorder::<
@@ -28,7 +28,7 @@ fn main() {
     // Locate the two rectangles in the R-tree.
     assert_eq!(
         recorder
-            .collection()
+            .container()
             .rtree()
             .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
             .count(),
@@ -40,7 +40,7 @@ fn main() {
     // After undo, there is now only one rectangle.
     assert_eq!(
         recorder
-            .collection()
+            .container()
             .rtree()
             .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
             .count(),
@@ -52,7 +52,7 @@ fn main() {
     // After another undo, there is no rectangles anymore.
     assert_eq!(
         recorder
-            .collection()
+            .container()
             .rtree()
             .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
             .count(),
@@ -64,7 +64,7 @@ fn main() {
     // After redo, we are back to one rectangle.
     assert_eq!(
         recorder
-            .collection()
+            .container()
             .rtree()
             .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
             .count(),
@@ -76,7 +76,7 @@ fn main() {
     // After another redo, we are back to two rectangles.
     assert_eq!(
         recorder
-            .collection()
+            .container()
             .rtree()
             .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
             .count(),

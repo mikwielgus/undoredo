@@ -7,7 +7,7 @@ use maplike::{Container, Get};
 
 use crate::{Delta, Recorder, delta::ApplyDelta};
 
-/// An delta along with metadata.
+/// A delta along with metadata.
 ///
 /// The metadata usually somehow represents the command that originated the
 /// delta, but it really can be anything, as it is only for the convenience of
@@ -32,13 +32,13 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
         }
     }
 
-    /// Returns a slice of the done stack, which contains all the done (or
+    /// Returns a slice of the *done* stack, which contains all the done (or
     /// redone) deltas.
     pub fn done(&self) -> &[CmdDelta<Cmd, DC>] {
         &self.done
     }
 
-    /// Returns a slice of the undone stack, which contains all the undone
+    /// Returns a slice of the *undone* stack, which contains all the undone
     /// deltas.
     pub fn undone(&self) -> &[CmdDelta<Cmd, DC>] {
         &self.undone
@@ -63,7 +63,7 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
 }
 
 impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
-    /// Make and record changes to the recorded collection from within a
+    /// Make and record changes to the recorded container from within a
     /// closure, automatically committing them once closure finishes.
     pub fn delta<
         K,
@@ -72,7 +72,7 @@ impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
         F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
     >(
         &mut self,
-        collection: C,
+        container: C,
         f: F,
     ) -> C
     where
@@ -80,7 +80,7 @@ impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
         K: Clone,
         V: Clone,
     {
-        let mut recorder = Recorder::<C, DC>::new(collection);
+        let mut recorder = Recorder::<C, DC>::new(container);
         let cmd = f(&mut recorder);
         let (container, delta) = recorder.dissolve();
 

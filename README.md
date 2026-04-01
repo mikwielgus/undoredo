@@ -11,9 +11,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is an undo-redo Rust library that wraps a collection inside a
-recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern) that
-observes the incoming insertions, removals and pushes while passively and
+`undoredo` is an undo-redo Rust library that wraps a data structure (*container*)
+inside a recorder [decorator](https://en.wikipedia.org/wiki/Decorator_pattern)
+that observes the incoming insertions, removals and pushes while passively and
 incrementally recording the changes in reversible *deltas*.
 
 This approach makes `undoredo` easier to use than other
@@ -25,23 +25,24 @@ on. The programmer is relieved from having to maintain application-specific
 implementations of commands, often complicated and prone to elusive runtime
 bugs, on which the Command pattern has to operate.
 
-Every delta is just a diff between subsequent states, so using them to store
-the changes requires substantially less memory than storing whole *snapshots* of
-past states, another common method for implementing the undo-redo pattern.
+Every delta is just a diff (alternative terms: *patch*, *edit*) between
+subsequent states, so using them to store the changes requires substantially
+less memory than storing whole *snapshots* of past states, another common method
+for implementing the undo-redo pattern.
 
 This library is `no_std`-compatible and has no mandatory third-party dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has
 convenience implementations for standard library collections:
-[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
-[`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html),
-[`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
-[`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html),
+[`HashMap`](https://doc.rust-lang.org/std/containers/struct.HashMap.html),
+[`HashSet`](https://doc.rust-lang.org/stable/std/containers/struct.HashSet.html),
+[`BTreeMap`](https://doc.rust-lang.org/std/containers/struct.BTreeMap.html),
+[`BTreeSet`](https://doc.rust-lang.org/stable/std/containers/struct.BTreeSet.html),
 and for some third-party feature-gated types:
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
-[Supported collections](#supported-collections) section).
+[Supported containers](#supported-containers) section).
 
 ## Usage
 
@@ -64,7 +65,7 @@ use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    // The recorder records the ongoing changes to the recorded collection.
+    // The recorder records the ongoing changes to the recorded container.
     let mut recorder: Recorder<HashMap<usize, char>> =
         Recorder::new(HashMap::new());
 
@@ -80,23 +81,23 @@ fn main() {
     // into the undo-redo bistack.
     undoredo.commit(recorder.flush_delta());
 
-    // The pushed elements are now present in the collection.
-    assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    // The pushed elements are now present in the container.
+    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Now undo the action.
     undoredo.undo(&mut recorder);
 
-    // The collection is now empty; the action of pushing elements has been undone.
-    assert!(*recorder.collection() == HashMap::from([]));
+    // The container is now empty; the action of pushing elements has been undone.
+    assert!(*recorder.container() == HashMap::from([]));
 
     // Now redo the action.
     undoredo.redo(&mut recorder);
 
-    // The elements are back in the collection; the action has been redone.
-    assert!(*recorder.collection() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    // The elements are back in the container; the action has been redone.
+    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Once you are done recording, you can dissolve the recorder to regain
-    // ownership and mutability over the recorded collection.
+    // ownership and mutability over the recorded container.
     let (mut hashmap, ..) = recorder.dissolve();
     assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }
@@ -181,7 +182,7 @@ set's values. This is actually also how Rust's standard library
 internally
 [represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115) its
 two set types, `HashSet`
-[and](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html#82)
+[and](https://doc.rust-lang.org/stable/src/alloc/containers/btree/set.rs.html#82)
 `BTreeSet`.
 
 As an example, the following code will construct a recorder and an undo-redo
@@ -221,17 +222,17 @@ If you believe that other people could benefit from your implementation,
 consider contributing it to `maplike`. We will integrate it in `undoredo` on our
 own afterwards (no need to open more than one pull request).
 
-## Supported collections
+## Supported containers
 
 ### Standard library
 
 Rust's standard library maps and sets are supported via built-in convenience
 implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
-- [`HashSet`](https://doc.rust-lang.org/stable/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
-- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
-- [`BTreeSet`](https://doc.rust-lang.org/stable/std/collections/struct.BTreeSet.html), not feature-gated.
+- [`HashMap`](https://doc.rust-lang.org/std/containers/struct.HashMap.html), gated by the `std` feature (enabled by default);
+- [`HashSet`](https://doc.rust-lang.org/stable/std/containers/struct.HashSet.html), gated by the `std` feature (enabled by default);
+- [`BTreeMap`](https://doc.rust-lang.org/std/containers/struct.BTreeMap.html), not feature-gated;
+- [`BTreeSet`](https://doc.rust-lang.org/stable/std/containers/struct.BTreeSet.html), not feature-gated.
 
 ### Third-party types
 
@@ -258,11 +259,11 @@ implementations, write
 undoredo = { version = "0.6", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
-## Unsupported collections
+## Unsupported containers
 
-Some collections cannot be supported because they lack an interface
+Some containers cannot be supported because they lack an interface
 on which `maplike`'s traits could be implemented. See the [Unsupported
-collections](https://docs.rs/maplike/latest/maplike/#unsupported-collections)
+containers](https://docs.rs/maplike/latest/maplike/#unsupported-containers)
 section in `maplike`'s documentation for details.
 
 ## Documentation

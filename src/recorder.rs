@@ -9,20 +9,20 @@ use maplike::{Clear, Container, Get, Insert, IntoIter, Len, Pop, Push, Remove, S
 
 use crate::{ApplyDelta, delta::Delta};
 
-/// Records deltas applied to a collection so that they can be replayed or
+/// Records deltas applied to a container so that they can be replayed or
 /// reverted.
 #[derive(Clone, Debug, Default)]
 pub struct Recorder<
     C: Container,
     DC: Container = BTreeMap<<C as Container>::Key, <C as Container>::Value>,
 > {
-    collection: C,
+    container: C,
     delta: Delta<DC>,
 }
 
-/// Access the type of the delta collection carried by a recorder.
+/// Access the type of the delta container carried by a recorder.
 pub trait RecorderDeltaCollection {
-    /// The collection type used to store recorder deltas.
+    /// The container type used to store recorder deltas.
     type DeltaCollection: Container;
 }
 
@@ -33,37 +33,37 @@ impl<C: Container, DC: Container> RecorderDeltaCollection for Recorder<C, DC> {
 impl<C: Container, DC: Container> AsRef<C> for Recorder<C, DC> {
     #[inline]
     fn as_ref(&self) -> &C {
-        &self.collection
+        &self.container
     }
 }
 
 impl<C: Container, DC: Container + Default> Recorder<C, DC> {
-    /// Create a new recorder recording changes to an owned collection.
+    /// Create a new recorder recording changes to an owned container.
     #[inline]
-    pub fn new(collection: C) -> Self {
-        Self::with_delta(collection, Default::default())
+    pub fn new(container: C) -> Self {
+        Self::with_delta(container, Default::default())
     }
 }
 
 impl<C: Container, DC: Container> Recorder<C, DC> {
-    /// Create a new recorder recording changes to an owned collection, storing
+    /// Create a new recorder recording changes to an owned container, storing
     /// them in an already existing delta.
     #[inline]
-    pub fn with_delta(collection: C, delta: Delta<DC>) -> Self {
-        Self { collection, delta }
+    pub fn with_delta(container: C, delta: Delta<DC>) -> Self {
+        Self { container, delta }
     }
 
-    /// Returns a reference to the recorded collection.
+    /// Returns a reference to the recorded container.
     #[inline]
-    pub fn collection(&self) -> &C {
-        &self.collection
+    pub fn container(&self) -> &C {
+        &self.container
     }
 
     /// Dissolve the recorder, returning and ceding ownership of its recorded
-    /// collection and delta.
+    /// container and delta.
     #[inline]
     pub fn dissolve(self) -> (C, Delta<DC>) {
-        (self.collection, self.delta)
+        (self.container, self.delta)
     }
 }
 
@@ -107,7 +107,7 @@ where
     /// Returns a reference to the value corresponding to the key.
     #[inline]
     pub fn get(&self, key: &K) -> Option<&C::Value> {
-        self.collection.get(key)
+        self.container.get(key)
     }
 }
 
@@ -135,7 +135,7 @@ where
     #[inline]
     pub fn set(&mut self, key: K, value: V) {
         if self.delta.inserted.get(&key).is_none() {
-            if let Some(value_to_remove) = self.collection.get(&key) {
+            if let Some(value_to_remove) = self.container.get(&key) {
                 self.delta
                     .removed
                     .insert(key.clone(), value_to_remove.clone());
@@ -143,7 +143,7 @@ where
         }
 
         self.delta.inserted.insert(key.clone(), value.clone());
-        self.collection.set(key, value);
+        self.container.set(key, value);
     }
 }
 
@@ -167,11 +167,11 @@ where
     K: Clone,
     V: Clone,
 {
-    /// Insert a key-value pair into the collection.
+    /// Insert a key-value pair into the container.
     #[inline]
     pub fn insert(&mut self, key: K, value: V) {
         if self.delta.inserted.get(&key).is_none() {
-            if let Some(value_to_remove) = self.collection.get(&key) {
+            if let Some(value_to_remove) = self.container.get(&key) {
                 self.delta
                     .removed
                     .insert(key.clone(), value_to_remove.clone());
@@ -179,7 +179,7 @@ where
         }
 
         self.delta.inserted.insert(key.clone(), value.clone());
-        self.collection.insert(key, value.clone());
+        self.container.insert(key, value.clone());
     }
 }
 
@@ -203,11 +203,11 @@ where
     K: Clone,
     V: Clone,
 {
-    /// Remove an element under a key from the collection, returning the value at
+    /// Remove an element under a key from the container, returning the value at
     /// the key if the key was previously in the map.
     #[inline]
     pub fn remove(&mut self, key: &K) -> Option<V> {
-        let value = self.collection.remove(key)?;
+        let value = self.container.remove(key)?;
 
         if self.delta.inserted.remove(key).is_none() {
             self.delta.removed.insert(key.clone(), value.clone());
@@ -237,11 +237,11 @@ where
     K: Clone,
     V: Clone,
 {
-    /// Insert a value into the collection without specifying a key, returning
+    /// Insert a value into the container without specifying a key, returning
     /// the key that was automatically generated.
     #[inline]
     pub fn push(&mut self, value: V) -> K {
-        let key = self.collection.push(value.clone());
+        let key = self.container.push(value.clone());
         self.delta.inserted.insert(key.clone(), value);
 
         key
@@ -268,16 +268,16 @@ where
     K: Clone,
     V: Clone,
 {
-    /// Insert a value into the collection without specifying a key, returning
+    /// Insert a value into the container without specifying a key, returning
     /// the key that was automatically generated.
     #[inline]
     pub fn pop(&mut self) -> Option<V> {
-        let value = self.collection.pop()?;
+        let value = self.container.pop()?;
 
-        if self.delta.inserted.remove(&self.collection.len()).is_none() {
+        if self.delta.inserted.remove(&self.container.len()).is_none() {
             self.delta
                 .removed
-                .insert(self.collection.len(), value.clone());
+                .insert(self.container.len(), value.clone());
         }
 
         Some(value)
@@ -300,13 +300,13 @@ where
     C: Clear + Clone + IntoIter<K, Value = V>,
     DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
 {
-    /// Remove all elements from the collection.
+    /// Remove all elements from the container.
     pub fn clear(&mut self) {
-        for (key, value) in self.collection.clone().into_iter() {
+        for (key, value) in self.container.clone().into_iter() {
             self.delta.removed.insert(key, value);
         }
 
-        self.collection.clear();
+        self.container.clear();
     }
 }
 
@@ -326,10 +326,10 @@ where
     C: Len,
     DC: Container,
 {
-    /// Returns the length of the collection.
+    /// Returns the length of the container.
     #[inline]
     fn len(&self) -> C::Key {
-        self.collection.len()
+        self.container.len()
     }
 }
 
@@ -342,7 +342,7 @@ where
 
     #[inline]
     fn into_iter(self) -> C::IntoIter {
-        self.collection.into_iter()
+        self.container.into_iter()
     }
 }
 
@@ -368,7 +368,7 @@ impl<
 {
     #[inline]
     fn apply_delta(&mut self, delta: &Delta<DC>) {
-        self.collection.apply_delta(delta)
+        self.container.apply_delta(delta)
     }
 }
 
@@ -384,7 +384,7 @@ where
 {
     #[inline]
     pub fn apply_delta(&mut self, delta: &Delta<DC>) {
-        self.collection.apply_delta(delta);
+        self.container.apply_delta(delta);
     }
 }*/
 
@@ -414,17 +414,17 @@ where
 
         // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
-        let mut removed_collection = C::default();
-        removed_collection.apply_delta(&Delta::with_removed_inserted(DC::default(), removed));
+        let mut removed_container = C::default();
+        removed_container.apply_delta(&Delta::with_removed_inserted(DC::default(), removed));
 
         // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
-        let mut inserted_collection = C::default();
-        inserted_collection.apply_delta(&Delta::with_removed_inserted(DC::default(), inserted));
+        let mut inserted_container = C::default();
+        inserted_container.apply_delta(&Delta::with_removed_inserted(DC::default(), inserted));
 
         Delta::with_removed_inserted(
-            Recorder::new(removed_collection),
-            Recorder::new(inserted_collection),
+            Recorder::new(removed_container),
+            Recorder::new(inserted_container),
         )
     }
 }

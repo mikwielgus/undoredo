@@ -29,9 +29,9 @@ use rstar::{RTree, RTreeObject};
 #[cfg(feature = "rstared")]
 use rstared::RTreed;
 
-/// A reversible set of changes to a collection.
+/// A reversible set of changes to a container.
 ///
-/// Consists of a collection of removed elements and another collection of
+/// Consists of a container of removed elements and another container of
 /// inserted elements.
 #[derive(Clone, Debug, Default)]
 pub struct Delta<DC> {
@@ -50,19 +50,19 @@ impl<DC: Default> Delta<DC> {
 }
 
 impl<DC> Delta<DC> {
-    /// Create an new delta from collections of removals and insertions.
+    /// Create an new delta from containers of removals and insertions.
     pub fn with_removed_inserted(removed: DC, inserted: DC) -> Self {
         Self { removed, inserted }
     }
 
-    /// Consume the delta and return removed and inserted collections.
+    /// Consume the delta and return removed and inserted containers.
     pub fn dissolve(self) -> (DC, DC) {
         (self.removed, self.inserted)
     }
 
     /// Reverse the delta.
     ///
-    /// This is done by swapping the collections of removed and inserted
+    /// This is done by swapping the containers of removed and inserted
     /// elements.
     pub fn reverse(self) -> Self {
         Self {
@@ -72,29 +72,29 @@ impl<DC> Delta<DC> {
     }
 }
 
-/// Apply the changes in an delta to a collection.
+/// Apply the changes in an delta to a container.
 ///
 /// This can be used to revert a previously recorded delta. The delta has to
 /// be reversed first with [`Delta::reverse()`].
 pub trait ApplyDelta<DC> {
-    /// Apply the changes in an delta to a collection.
+    /// Apply the changes in an delta to a container.
     ///
     /// This can be used to revert a previously recorded delta. The delta has to
     /// be reversed first with [`Delta::reverse()`].
     fn apply_delta(&mut self, delta: &Delta<DC>);
 }
 
-fn apply_delta_on_map<K, C, DC>(collection: &mut C, delta: &Delta<DC>)
+fn apply_delta_on_map<K, C, DC>(container: &mut C, delta: &Delta<DC>)
 where
     C: Container<Key = K> + Insert<K> + Remove<K>,
     DC: Clone + IntoIter<K> + Container<Key = K, Value = C::Value>,
 {
     for (removed_key, _removed_value) in delta.removed.clone().into_iter() {
-        collection.remove(&removed_key);
+        container.remove(&removed_key);
     }
 
     for (inserted_key, inserted_value) in delta.inserted.clone().into_iter() {
-        collection.insert(inserted_key, inserted_value);
+        container.insert(inserted_key, inserted_value);
     }
 }
 

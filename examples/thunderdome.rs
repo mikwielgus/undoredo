@@ -24,23 +24,23 @@ fn main() {
     recorder.push('C');
     undoredo.commit(recorder.flush_delta());
 
-    let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
+    let (_, values): (Vec<_>, Vec<char>) = recorder.container().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B', 'C']);
 
     undoredo.undo(&mut recorder);
-    let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
+    let (_, values): (Vec<_>, Vec<char>) = recorder.container().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B']);
 
     undoredo.undo(&mut recorder);
-    let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
+    let (_, values): (Vec<_>, Vec<char>) = recorder.container().clone().into_iter().unzip();
     assert!(values == vec!['A']);
 
     undoredo.redo(&mut recorder);
-    let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
+    let (_, values): (Vec<_>, Vec<char>) = recorder.container().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B']);
 
     undoredo.redo(&mut recorder);
-    let (_, values): (Vec<_>, Vec<char>) = recorder.collection().clone().into_iter().unzip();
+    let (_, values): (Vec<_>, Vec<char>) = recorder.container().clone().into_iter().unzip();
     assert!(values == vec!['A', 'B', 'B', 'C']);
 }
 

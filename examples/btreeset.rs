@@ -15,7 +15,7 @@ fn main() {
 
     recorder.insert('B', ());
     // Inserting to a set is idempotent: repeating the same insert does nothing.
-    // It is, however, a logic error if the recorded collection is a multiset,
+    // It is, however, a logic error if the recorded container is a multiset,
     // e.g. `rstar::RTree`.
     recorder.insert('B', ());
     undoredo.commit(recorder.flush_delta());
@@ -23,19 +23,19 @@ fn main() {
     recorder.insert('C', ());
     undoredo.commit(recorder.flush_delta());
 
-    assert_eq!(*recorder.collection(), BTreeSet::from(['A', 'B', 'C']));
+    assert_eq!(*recorder.container(), BTreeSet::from(['A', 'B', 'C']));
 
     undoredo.undo(&mut recorder);
-    assert_eq!(*recorder.collection(), BTreeSet::from(['A', 'B']));
+    assert_eq!(*recorder.container(), BTreeSet::from(['A', 'B']));
 
     undoredo.undo(&mut recorder);
-    assert_eq!(*recorder.collection(), BTreeSet::from(['A']));
+    assert_eq!(*recorder.container(), BTreeSet::from(['A']));
 
     undoredo.redo(&mut recorder);
-    assert_eq!(*recorder.collection(), BTreeSet::from(['A', 'B']));
+    assert_eq!(*recorder.container(), BTreeSet::from(['A', 'B']));
 
     undoredo.redo(&mut recorder);
-    assert_eq!(*recorder.collection(), BTreeSet::from(['A', 'B', 'C']));
+    assert_eq!(*recorder.container(), BTreeSet::from(['A', 'B', 'C']));
 }
 
 #[test]

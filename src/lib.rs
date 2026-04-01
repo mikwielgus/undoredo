@@ -21,7 +21,9 @@ mod undoredo;
 pub use crate::delta::{ApplyDelta, Delta};
 pub use crate::recorder::{FlushDelta, Recorder, RecorderDeltaCollection};
 pub use crate::undoredo::UndoRedo;
-pub use maplike::{Get, Insert, IntoIter, KeyedCollection, Map, Push, Remove, StableRemove};
+pub use maplike::{
+    Container, Get, Insert, IntoIter, Maplike, Push, Remove, Scalarlike, Setlike, Veclike,
+};
 
 //#[cfg(feature = "derive")]
 //pub use undoredo_derive::{ApplyDelta, CompositeDelta, FlushDelta};

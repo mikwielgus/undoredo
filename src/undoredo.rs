@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
-use maplike::{Get, Insert, KeyedCollection};
+use maplike::{Container, Get};
 
 use crate::{Delta, Recorder, delta::ApplyDelta};
 
@@ -11,7 +11,7 @@ use crate::{Delta, Recorder, delta::ApplyDelta};
 ///
 /// The metadata usually somehow represents the command that originated the
 /// delta, but it really can be anything, as it is only for the convenience of
-/// the programmer using the library and has no effect on logic.
+/// the programmer using the library, without any effect on logic.
 pub struct CmdDelta<Cmd, DC> {
     pub cmd: Cmd,
     pub delta: Delta<DC>,
@@ -62,13 +62,13 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
     }
 }
 
-impl<Cmd, DC: KeyedCollection + Default> UndoRedo<DC, Cmd> {
+impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
     /// Make and record changes to the recorded collection from within a
     /// closure, automatically committing them once closure finishes.
     pub fn delta<
         K,
         V,
-        C: KeyedCollection<Key = K, Value = V> + Get<K> + Insert<K>,
+        C: Container<Key = K, Value = V> + Get<K>,
         F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
     >(
         &mut self,
@@ -76,7 +76,7 @@ impl<Cmd, DC: KeyedCollection + Default> UndoRedo<DC, Cmd> {
         f: F,
     ) -> C
     where
-        DC: KeyedCollection<Key = K, Value = V>,
+        DC: Container<Key = K, Value = V>,
         K: Clone,
         V: Clone,
     {

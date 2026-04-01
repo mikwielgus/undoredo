@@ -8,7 +8,7 @@ use alloc::{
 };
 #[cfg(feature = "rstared")]
 use maplike::Get;
-use maplike::{Insert, IntoIter, KeyedCollection, Remove};
+use maplike::{Container, Insert, IntoIter, Remove};
 
 use core::marker::PhantomData;
 #[cfg(feature = "std")]
@@ -86,8 +86,8 @@ pub trait ApplyDelta<DC> {
 
 fn apply_delta_on_map<K, C, DC>(collection: &mut C, delta: &Delta<DC>)
 where
-    C: KeyedCollection<Key = K> + Insert<K> + Remove<K>,
-    DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = C::Value>,
+    C: Container<Key = K> + Insert<K> + Remove<K>,
+    DC: Clone + IntoIter<K> + Container<Key = K, Value = C::Value>,
 {
     for (removed_key, _removed_value) in delta.removed.clone().into_iter() {
         collection.remove(&removed_key);
@@ -121,13 +121,17 @@ where
             if inserted_index == self.len() {
                 self.push(inserted_value);
             } else {
-                Insert::insert(self, inserted_index, inserted_value);
+                if inserted_index < self.len() {
+                    self[inserted_index] = inserted_value;
+                } else {
+                    self.resize(inserted_index + 1, inserted_value);
+                }
             }
         }
     }
 }
 
-impl<K: Ord, V, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Ord, V, DC: Clone + IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for BTreeMap<K, V>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -135,7 +139,7 @@ impl<K: Ord, V, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>> A
     }
 }
 
-impl<K: Ord, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()>> ApplyDelta<DC>
+impl<K: Ord, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for BTreeSet<K>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -150,7 +154,7 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, V, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Eq + Hash, V, DC: Clone + IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for HashMap<K, V>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -159,7 +163,7 @@ impl<K: Eq + Hash, V, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value =
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()>> ApplyDelta<DC>
+impl<K: Eq + Hash, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for HashSet<K>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -171,7 +175,7 @@ impl<K: Eq + Hash, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()
 impl<
     V,
     C: stable_vec::core::Core<V>,
-    DC: Clone + IntoIter<usize> + KeyedCollection<Key = usize, Value = V>,
+    DC: Clone + IntoIter<usize> + Container<Key = usize, Value = V>,
 > ApplyDelta<DC> for StableVecFacade<V, C>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -180,7 +184,7 @@ impl<
 }
 
 #[cfg(feature = "thunderdome")]
-impl<V, DC: Clone + IntoIter<Index> + KeyedCollection<Key = Index, Value = V>> ApplyDelta<DC>
+impl<V, DC: Clone + IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC>
     for Arena<V>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -189,7 +193,7 @@ impl<V, DC: Clone + IntoIter<Index> + KeyedCollection<Key = Index, Value = V>> A
 }
 
 #[cfg(feature = "rstar")]
-impl<K: RTreeObject + PartialEq, DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = ()>>
+impl<K: RTreeObject + PartialEq, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>>
     ApplyDelta<DC> for RTree<K>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -201,8 +205,8 @@ impl<K: RTreeObject + PartialEq, DC: Clone + IntoIter<K> + KeyedCollection<Key =
 impl<
     K: Clone + PartialEq,
     V: Clone + PartialEq + RTreeObject,
-    C: Get<K> + KeyedCollection<Key = K, Value = V> + Insert<K> + Remove<K>,
-    DC: Clone + IntoIter<K> + KeyedCollection<Key = K, Value = V>,
+    C: Get<K> + Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Clone + IntoIter<K> + Container<Key = K, Value = V>,
 > ApplyDelta<DC> for RTreed<C>
 {
     fn apply_delta(&mut self, delta: &Delta<DC>) {

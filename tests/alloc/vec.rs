@@ -106,8 +106,8 @@ fn test_undo_redo() {
     assert_eq!(collection.get(6), None);
 
     let mut collection = undoredo.delta(collection, |recorder| {
-        recorder.insert(1, 11);
-        recorder.insert(3, 33);
+        recorder.set(1, 11);
+        recorder.set(3, 33);
         recorder.pop();
     });
 

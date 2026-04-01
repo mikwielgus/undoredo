@@ -28,10 +28,10 @@ stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
-maplike = "0.8"
+maplike = "0.9"
 stable-vec = { version = "0.4", optional = true }
 rstar = { version = "0.12", optional = true }
-rstared = { version = "0.8", optional = true }
+rstared = { version = "0.9", optional = true }
 thunderdome = { version = "0.6", optional = true }
 #undoredo_derive = { version = "0.8", optional = true, path = "undoredo_derive" }
 
@@ -39,7 +39,7 @@ thunderdome = { version = "0.6", optional = true }
 stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
-rstared = "0.8"
+rstared = "0.9"
 
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]

@@ -25,6 +25,7 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
     }
 
     let mut apply_stmts = Vec::new();
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     match &input.data {
         Data::Struct(data) => match &data.fields {
@@ -55,20 +56,20 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
             }
             Fields::Unit => {}
         },
+        Data::Enum(_data) => {
+            let output = quote! {
+                impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name> for #name #ty_generics
+                #where_clause
+                {
+                    fn apply_delta(&mut self, delta: &::undoredo::Delta<#half_delta_name>) {
+                        let (_, inserted) = delta.clone().dissolve();
+                        *self = inserted.clone();
+                    }
+                }
+            };
+            return Ok(output.into());
+        }
         _ => (),
-    };
-
-    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
-
-    let apply_body = if apply_stmts.is_empty() {
-        quote! {
-            let _ = delta.clone().dissolve();
-        }
-    } else {
-        quote! {
-            let (removed, inserted) = delta.clone().dissolve();
-            #(#apply_stmts)*
-        }
     };
 
     let output = quote! {
@@ -76,7 +77,8 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
         #where_clause
         {
             fn apply_delta(&mut self, delta: &::undoredo::Delta<#half_delta_name>) {
-                #apply_body
+                let (removed, inserted) = delta.clone().dissolve();
+                #(#apply_stmts)*
             }
         }
     };

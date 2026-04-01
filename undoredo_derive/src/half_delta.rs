@@ -37,7 +37,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                     }
                 });
                 quote! {
-                    #[derive(Clone)]
+                    #[derive(Clone, Debug)]
                     #vis struct #half_delta_name {
                         #( #transformed_fields )*
                     }
@@ -49,68 +49,25 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                     quote! { #ty }
                 });
                 quote! {
-                    #[derive(Clone)]
+                    #[derive(Clone, Debug)]
                     #vis struct #half_delta_name ( #( #transformed_fields ),* );
                 }
             }
             Fields::Unit => quote! {
-                #[derive(Clone)]
+                #[derive(Clone, Debug)]
                 #vis struct #half_delta_name;
             },
         },
         Data::Enum(enum_data) => {
-            let transformed_variants = enum_data.variants.iter().map(|v| {
-                let v_ident = &v.ident;
-                match &v.fields {
-                    Fields::Named(fields_named) => {
-                        let transformed_fields = fields_named.named.iter().map(|field| {
-                            let field_name = &field.ident;
-                            let ty = transform_field_type(&field.ty);
-                            quote! { #field_name: #ty }
-                        });
-                        quote! {
-                            #v_ident { #( #transformed_fields ),* }
-                        }
-                    }
-                    Fields::Unnamed(fields_unnamed) => {
-                        let types = fields_unnamed.unnamed.iter().map(|field| {
-                            let ty = transform_field_type(&field.ty);
-                            quote! { #ty }
-                        });
-                        quote! {
-                            #v_ident ( #( #types ),* )
-                        }
-                    }
-                    Fields::Unit => {
-                        if let Some((_, expr)) = &v.discriminant {
-                            quote! { #v_ident = #expr }
-                        } else {
-                            quote! { #v_ident }
-                        }
-                    }
-                }
-            });
+            let variants = enum_data.variants.iter();
             quote! {
-                #[derive(Clone)]
+                #[derive(Clone, Debug)]
                 #vis enum #half_delta_name {
-                    #( #transformed_variants ),*
+                    #( #variants ),*
                 }
             }
         }
-        Data::Union(union_data) => {
-            let transformed_fields = union_data.fields.named.iter().map(|field| {
-                let field_name = &field.ident;
-                let ty = transform_field_type(&field.ty);
-                quote! {
-                    #field_name: #ty,
-                }
-            });
-            quote! {
-                #vis union #half_delta_name {
-                    #( #transformed_fields )*
-                }
-            }
-        }
+        Data::Union(_) => panic!("unions are not supported"),
     };
 
     Ok(output.into())

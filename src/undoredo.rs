@@ -65,7 +65,7 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
 impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
     /// Make and record changes to the recorded container from within a
     /// closure, automatically committing them once closure finishes.
-    pub fn delta<
+    pub fn edit<
         K,
         V,
         C: Container<Key = K, Value = V> + Get<K>,

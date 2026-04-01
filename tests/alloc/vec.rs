@@ -82,7 +82,7 @@ fn test_undo_redo() {
     let container: Vec<i32> = Vec::new();
     let mut undoredo: UndoRedo<BTreeMap<usize, i32>> = UndoRedo::new();
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.push(0);
         recorder.push(10);
 
@@ -105,7 +105,7 @@ fn test_undo_redo() {
     assert_eq!(container.get(5), Some(&50));
     assert_eq!(container.get(6), None);
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.set(1, 11);
         recorder.set(3, 33);
         recorder.pop();
@@ -139,7 +139,7 @@ fn test_undo_redo() {
     assert_eq!(container.get(5), None);
     assert_eq!(container.get(6), None);
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.push(50);
         recorder.push(60);
     });

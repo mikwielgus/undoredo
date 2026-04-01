@@ -215,7 +215,7 @@ pub fn test_undo_redo_at_generated_indices<
 
     let mut indices = Vec::new();
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         indices.push(recorder.push(10));
         // Repeat the same index to start indexing from 1 like in the test with specified indices.
         indices.push(indices[0].clone());
@@ -237,7 +237,7 @@ pub fn test_undo_redo_at_generated_indices<
     assert_eq!(container.get(&indices[4]), Some(&40));
     assert_eq!(container.get(&indices[5]), Some(&50));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&indices[2]);
         recorder.insert(indices[1].clone(), 11);
         recorder.insert(indices[3].clone(), 33);
@@ -265,7 +265,7 @@ pub fn test_undo_redo_at_generated_indices<
     assert_eq!(container.get(&indices[4]), Some(&40));
     assert_eq!(container.get(&indices[5]), Some(&50));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&indices[3]);
         recorder.insert(indices[6].clone(), 60);
     });
@@ -313,7 +313,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(undoredo.undo(&mut container), None);
     assert_eq!(undoredo.redo(&mut container), None);
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.insert(K::from_usize(1), V::from_usize(10));
         recorder.insert(K::from_usize(2), V::from_usize(20));
         recorder.insert(K::from_usize(3), V::from_usize(30));
@@ -329,7 +329,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(container.get(&K::from_usize(4)), Some(&V::from_usize(40)));
     assert_eq!(container.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&K::from_usize(2));
         recorder.insert(K::from_usize(1), V::from_usize(11));
         recorder.insert(K::from_usize(3), V::from_usize(33));
@@ -357,7 +357,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(container.get(&K::from_usize(4)), Some(&V::from_usize(40)));
     assert_eq!(container.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&K::from_usize(3));
         recorder.insert(K::from_usize(6), V::from_usize(60));
     });
@@ -404,7 +404,7 @@ pub fn test_undo_redo_on_set<
     assert_eq!(undoredo.undo(&mut container), None);
     assert_eq!(undoredo.redo(&mut container), None);
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.insert(K::from_usize(10), ());
         recorder.insert(K::from_usize(20), ());
         recorder.insert(K::from_usize(30), ());
@@ -420,7 +420,7 @@ pub fn test_undo_redo_on_set<
     assert_eq!(container.get(&K::from_usize(40)), Some(&()));
     assert_eq!(container.get(&K::from_usize(50)), Some(&()));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&K::from_usize(20));
     });
 
@@ -446,7 +446,7 @@ pub fn test_undo_redo_on_set<
     assert_eq!(container.get(&K::from_usize(40)), Some(&()));
     assert_eq!(container.get(&K::from_usize(50)), Some(&()));
 
-    let mut container = undoredo.delta(container, |recorder| {
+    let mut container = undoredo.edit(container, |recorder| {
         recorder.remove(&K::from_usize(30));
         recorder.insert(K::from_usize(60), ());
     });

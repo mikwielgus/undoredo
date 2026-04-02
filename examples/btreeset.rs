@@ -11,17 +11,17 @@ fn main() {
     let mut undoredo: UndoRedo<BTreeMap<char, ()>> = UndoRedo::new();
 
     recorder.insert('A', ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     recorder.insert('B', ());
     // Inserting to a set is idempotent: repeating the same insert does nothing.
     // It is, however, a logic error if the recorded container is a multiset,
     // e.g. `rstar::RTree`.
     recorder.insert('B', ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     recorder.insert('C', ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     assert_eq!(*recorder.container(), BTreeSet::from(['A', 'B', 'C']));
 

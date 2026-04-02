@@ -13,13 +13,13 @@ fn main() {
     let mut undoredo: UndoRedo<BTreeMap<(i32, i32), ()>> = UndoRedo::new();
 
     recorder.insert((1, 1), ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     recorder.insert((2, 2), ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     recorder.insert((3, 3), ());
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     assert_eq!(
         recorder.container().iter().collect::<Vec<_>>(),

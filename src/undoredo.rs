@@ -5,7 +5,7 @@
 use alloc::vec::Vec;
 use maplike::{Container, Get};
 
-use crate::{Delta, Recorder, delta::ApplyDelta};
+use crate::{Delta, FlushDelta, Recorder, delta::ApplyDelta};
 
 /// A delta along with metadata.
 ///
@@ -46,11 +46,11 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
 }
 
 impl<Cmd: Default, DC> UndoRedo<DC, Cmd> {
-    /// Push the delta onto the *done* stack.
+    /// Flush and push changes onto the *done* stack.
     ///
     /// Clears the undone stack.
-    pub fn commit(&mut self, delta: Delta<DC>) {
-        self.cmd_commit(Default::default(), delta);
+    pub fn commit(&mut self, target: &mut impl FlushDelta<DC>) {
+        self.cmd_commit(Default::default(), target.flush_delta());
     }
 }
 

@@ -21,7 +21,7 @@ fn main() {
 
     // Flush the recorder and commit the recorded delta of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     // The pushed elements are now present in the container.
     assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));

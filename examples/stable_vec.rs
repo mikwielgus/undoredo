@@ -13,16 +13,16 @@ fn main() {
     let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
 
     recorder.push('A');
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     recorder.push('B');
     recorder.push('B');
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     let key = recorder.push('X');
     recorder.remove(&key);
     recorder.push('C');
-    undoredo.commit(recorder.flush_delta());
+    undoredo.commit(&mut recorder);
 
     assert!(
         recorder

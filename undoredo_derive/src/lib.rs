@@ -5,6 +5,7 @@
 mod apply_delta;
 mod flush_delta;
 mod half_delta;
+mod undoredo;
 
 use proc_macro::TokenStream;
 use syn::{DeriveInput, parse_macro_input};
@@ -25,4 +26,10 @@ pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
 pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     flush_delta::expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
+}
+
+#[proc_macro_derive(UndoRedo, attributes(half_delta, apply_delta, flush_delta))]
+pub fn derive_undoredo(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    undoredo::expand_undoredo(input).unwrap_or_else(|err| err.to_compile_error().into())
 }

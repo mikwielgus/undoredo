@@ -25,3 +25,4 @@ syn = { version = "2", features = ["full"] }
 
 [dev-dependencies]
 undoredo = { path = "..", default-features = true, features = ["std"] }
+maplike = "0.9"

@@ -33,7 +33,7 @@ use rstared::RTreed;
 ///
 /// Consists of a container of removed elements and another container of
 /// inserted elements.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Delta<DC> {
     pub(super) removed: DC,
     pub(super) inserted: DC,

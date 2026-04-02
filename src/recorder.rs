@@ -11,7 +11,7 @@ use crate::{ApplyDelta, delta::Delta};
 
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Recorder<
     C: Container,
     DC: Container = BTreeMap<<C as Container>::Key, <C as Container>::Value>,

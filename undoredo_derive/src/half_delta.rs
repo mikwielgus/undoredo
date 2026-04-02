@@ -84,19 +84,38 @@ fn transform_field_type(ty: &Type) -> TokenStream2 {
         return ty.to_token_stream();
     };
 
-    if ab.args.len() != 1 {
+    if name != "Recorder" || ab.args.is_empty() {
         return ty.to_token_stream();
     }
 
-    let GenericArgument::Type(ref t) = ab.args[0] else {
+    let GenericArgument::Type(container_ty) = &ab.args[0] else {
         return ty.to_token_stream();
     };
 
-    if name == "Vec" || name == "StableVec" {
+    let Type::Path(container_path) = container_ty else {
+        return ty.to_token_stream();
+    };
+    let Some(container_last) = container_path.path.segments.last() else {
+        return ty.to_token_stream();
+    };
+    let container_name = container_last.ident.to_string();
+
+    let PathArguments::AngleBracketed(container_ab) = &container_last.arguments else {
+        return ty.to_token_stream();
+    };
+    if container_ab.args.len() != 1 {
+        return ty.to_token_stream();
+    }
+
+    let GenericArgument::Type(ref t) = container_ab.args[0] else {
+        return ty.to_token_stream();
+    };
+
+    if container_name == "Vec" || container_name == "StableVec" {
         quote! { ::std::collections::BTreeMap<usize, #t> }
-    } else if name == "Arena" {
+    } else if container_name == "Arena" {
         quote! { ::std::collections::BTreeMap<::thunderdome::Index, #t> }
-    } else if name == "RTree" {
+    } else if container_name == "RTree" {
         quote! { ::std::collections::BTreeSet<#t> }
     } else {
         ty.to_token_stream()

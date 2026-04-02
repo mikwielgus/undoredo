@@ -6,11 +6,12 @@
 
 use std::collections::BTreeMap;
 
+use undoredo::Recorder;
 use undoredo_derive::HalfDelta;
 
 #[derive(HalfDelta)]
 struct TestStruct {
-    v: Vec<i32>,
+    v: Recorder<Vec<i32>>,
 }
 
 #[test]

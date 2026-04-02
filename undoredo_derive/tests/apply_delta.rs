@@ -32,22 +32,3 @@ fn test_apply_delta_struct() {
     s.apply_delta(&d);
     assert_eq!(*s.v.container(), vec![1, 2, 7]);
 }
-
-#[derive(Clone, HalfDelta, ApplyDelta, Debug, PartialEq)]
-enum TestEnum {
-    Unit,
-    Tuple(Vec<i32>, Vec<i32>),
-    Fields { i: i32, u: u32 },
-}
-
-#[test]
-fn test_apply_delta_enum() {
-    let mut e = TestEnum::Tuple(Vec::new(), Vec::new());
-    let d = Delta::with_removed_inserted(
-        TestEnumHalfDelta::Unit,
-        TestEnumHalfDelta::Fields { i: 1, u: 2 },
-    );
-    e.apply_delta(&d);
-
-    assert_eq!(e, TestEnum::Fields { i: 1, u: 2 });
-}

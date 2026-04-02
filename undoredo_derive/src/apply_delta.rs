@@ -56,20 +56,18 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
             }
             Fields::Unit => {}
         },
-        Data::Enum(_data) => {
-            let output = quote! {
-                impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name> for #name #ty_generics
-                #where_clause
-                {
-                    fn apply_delta(&mut self, delta: &::undoredo::Delta<#half_delta_name>) {
-                        let (_, inserted) = delta.clone().dissolve();
-                        *self = inserted.clone();
-                    }
-                }
-            };
-            return Ok(output.into());
+        Data::Enum(_) => {
+            return Err(syn::Error::new_spanned(
+                &name,
+                "derive(ApplyDelta) does not support enums",
+            ));
         }
-        _ => (),
+        Data::Union(_) => {
+            return Err(syn::Error::new_spanned(
+                &name,
+                "derive(ApplyDelta) does not support unions",
+            ));
+        }
     };
 
     let output = quote! {

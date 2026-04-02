@@ -18,17 +18,3 @@ struct TestStruct {
 fn test_struct_half_delta() {
     let _: TestStructHalfDelta = TestStructHalfDelta { v: BTreeMap::new() };
 }
-
-#[derive(HalfDelta)]
-enum TestEnum {
-    Unit,
-    Tuple(Vec<i32>, Vec<i32>),
-    Fields { i: i32, u: u32 },
-}
-
-#[test]
-fn test_enum_half_delta() {
-    let _: TestEnumHalfDelta = TestEnumHalfDelta::Unit;
-    let _: TestEnumHalfDelta = TestEnumHalfDelta::Tuple(Vec::new(), Vec::new());
-    let _: TestEnumHalfDelta = TestEnumHalfDelta::Fields { i: 0, u: 0 };
-}

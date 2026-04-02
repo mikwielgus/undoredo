@@ -76,14 +76,16 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
             }
             Fields::Unit => (quote! { #half_delta_name }, quote! { #half_delta_name }),
         },
-        Data::Enum(_) => (
-            quote! { self.clone() },
-            quote! { self.clone() },
-        ),
+        Data::Enum(_) => {
+            return Err(syn::Error::new_spanned(
+                &name,
+                "derive(FlushDelta) does not support enums",
+            ));
+        }
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "FlushDelta does not support unions",
+                "derive(FlushDelta) does not support unions",
             ));
         }
     };

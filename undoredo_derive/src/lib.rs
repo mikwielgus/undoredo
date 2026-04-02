@@ -20,3 +20,9 @@ pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     apply_delta::expand_apply_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
+
+#[proc_macro_derive(FlushDelta, attributes(flush_delta))]
+pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    flush_delta::expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
+}

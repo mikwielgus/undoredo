@@ -20,7 +20,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                     half_delta_name = format_ident!("{}", value.value());
                     Ok(())
                 } else {
-                    Err(meta.error("unsupported half_delta attribute"))
+                    Err(meta.error("unsupported half_delta attribute key"))
                 }
             })?;
         }

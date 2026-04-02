@@ -23,7 +23,7 @@ derive = ["undoredo_derive"]
 default = ["std"]
 std = []
 rstar = ["dep:rstar", "maplike/rstar"]
-rstared = ["dep:rstared", "dep:rstar"]
+rstared = ["rstar", "dep:rstared", "dep:rstar"]
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 

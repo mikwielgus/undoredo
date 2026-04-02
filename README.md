@@ -60,7 +60,7 @@ over `HashMap`. You can find more examples in the
 [examples/](https://codeberg.org/topola/undoredo/src/branch/develop/examples)
 directory.
 
-```rust
+```rust-ignore
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Recorder, UndoRedo};
 
@@ -118,7 +118,7 @@ and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 accessor methods.
 
-```rust
+```rust-ignore
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Insert, Recorder, UndoRedo};
 

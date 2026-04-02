@@ -53,7 +53,7 @@ pub fn test_apply_delta_at_generated_indices<
         BTreeMap::from([(second.clone(), 20)]),
         BTreeMap::from([(third.clone(), 33), (sixth.clone(), 66)]),
     );
-    recorder.apply_delta(&delta);
+    recorder.apply_delta(delta);
 
     assert_eq!(recorder.get(&first), Some(&10));
     assert_eq!(recorder.get(&second), None);
@@ -86,7 +86,7 @@ pub fn test_apply_delta_at_specified_indices<
             (K::from_usize(6), V::from_usize(66)),
         ]),
     );
-    recorder.apply_delta(&delta);
+    recorder.apply_delta(delta);
 
     assert_eq!(recorder.get(&K::from_usize(1)), Some(&V::from_usize(10)));
     assert_eq!(recorder.get(&K::from_usize(2)), None);
@@ -115,7 +115,7 @@ pub fn test_apply_delta_on_set<
         BTreeMap::from([(K::from_usize(20), ())]),
         BTreeMap::from([(K::from_usize(30), ()), (K::from_usize(60), ())]),
     );
-    recorder.apply_delta(&delta);
+    recorder.apply_delta(delta);
 
     assert_eq!(recorder.get(&K::from_usize(10)), Some(&()));
     assert_eq!(recorder.get(&K::from_usize(20)), None);

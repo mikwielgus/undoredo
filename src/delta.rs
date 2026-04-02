@@ -81,19 +81,21 @@ pub trait ApplyDelta<DC> {
     ///
     /// This can be used to revert a previously recorded delta. The delta has to
     /// be reversed first with [`Delta::reverse()`].
-    fn apply_delta(&mut self, delta: &Delta<DC>);
+    fn apply_delta(&mut self, delta: Delta<DC>);
 }
 
-fn apply_delta_on_map<K, C, DC>(container: &mut C, delta: &Delta<DC>)
+fn apply_delta_on_map<K, C, DC>(container: &mut C, delta: Delta<DC>)
 where
     C: Container<Key = K> + Insert<K> + Remove<K>,
-    DC: Clone + IntoIter<K> + Container<Key = K, Value = C::Value>,
+    DC: IntoIter<K> + Container<Key = K, Value = C::Value>,
 {
-    for (removed_key, _removed_value) in delta.removed.clone().into_iter() {
+    let (removed, inserted) = delta.dissolve();
+
+    for (removed_key, _removed_value) in removed.into_iter() {
         container.remove(&removed_key);
     }
 
-    for (inserted_key, inserted_value) in delta.inserted.clone().into_iter() {
+    for (inserted_key, inserted_value) in inserted.into_iter() {
         container.insert(inserted_key, inserted_value);
     }
 }
@@ -102,13 +104,14 @@ impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
 where
     DC::IntoIter: DoubleEndedIterator,
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        let (removed, inserted) = delta.dissolve();
         // This implementation is different than the others because stable
         // removal is impossible on `Vec`.
 
         // We reverse the order of removeds to be descending so that we never
         // miss a pop.
-        for (removed_index, _removed_value) in delta.removed.clone().into_iter().rev() {
+        for (removed_index, _removed_value) in removed.into_iter().rev() {
             if removed_index + 1 == self.len() {
                 self.pop();
             } else {
@@ -117,7 +120,7 @@ where
             }
         }
 
-        for (inserted_index, inserted_value) in delta.inserted.clone().into_iter() {
+        for (inserted_index, inserted_value) in inserted.into_iter() {
             if inserted_index == self.len() {
                 self.push(inserted_value);
             } else {
@@ -131,42 +134,42 @@ where
     }
 }
 
-impl<K: Ord, V, DC: Clone + IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for BTreeMap<K, V>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
-impl<K: Ord, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
+impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for BTreeSet<K>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
-    fn apply_delta(&mut self, _delta: &Delta<DC>) {
+    fn apply_delta(&mut self, _delta: Delta<DC>) {
         // Nothing happens here, obviously.
     }
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, V, DC: Clone + IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for HashMap<K, V>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
+impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for HashSet<K>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
@@ -175,28 +178,28 @@ impl<K: Eq + Hash, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>> App
 impl<
     V,
     C: stable_vec::core::Core<V>,
-    DC: Clone + IntoIter<usize> + Container<Key = usize, Value = V>,
+    DC: IntoIter<usize> + Container<Key = usize, Value = V>,
 > ApplyDelta<DC> for StableVecFacade<V, C>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 #[cfg(feature = "thunderdome")]
-impl<V, DC: Clone + IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC>
+impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC>
     for Arena<V>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 #[cfg(feature = "rstar")]
-impl<K: RTreeObject + PartialEq, DC: Clone + IntoIter<K> + Container<Key = K, Value = ()>>
+impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>>
     ApplyDelta<DC> for RTree<K>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
@@ -206,10 +209,10 @@ impl<
     K: Clone + PartialEq,
     V: Clone + PartialEq + RTreeObject,
     C: Get<K> + Container<Key = K, Value = V> + Insert<K> + Remove<K>,
-    DC: Clone + IntoIter<K> + Container<Key = K, Value = V>,
+    DC: IntoIter<K> + Container<Key = K, Value = V>,
 > ApplyDelta<DC> for RTreed<C>
 {
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }

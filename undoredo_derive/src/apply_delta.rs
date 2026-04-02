@@ -38,7 +38,7 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
                             removed.#field_member,
                             inserted.#field_member,
                         );
-                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, &field_delta);
+                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, field_delta);
                     });
                 }
             }
@@ -50,7 +50,7 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
                             removed.#field_member,
                             inserted.#field_member,
                         );
-                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, &field_delta);
+                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, field_delta);
                     });
                 }
             }
@@ -74,8 +74,8 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
         impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name> for #name #ty_generics
         #where_clause
         {
-            fn apply_delta(&mut self, delta: &::undoredo::Delta<#half_delta_name>) {
-                let (removed, inserted) = delta.clone().dissolve();
+            fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta_name>) {
+                let (removed, inserted) = delta.dissolve();
                 #(#apply_stmts)*
             }
         }

@@ -29,6 +29,6 @@ fn test_apply_delta_struct() {
         },
     );
 
-    s.apply_delta(&d);
+    s.apply_delta(d);
     assert_eq!(*s.v.container(), vec![1, 2, 7]);
 }

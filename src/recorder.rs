@@ -363,11 +363,11 @@ where
 impl<
     C: Container + ApplyDelta<DC>,
     RDC: Container,
-    DC: Clone + IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
+    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
 > ApplyDelta<DC> for Recorder<C, RDC>
 {
     #[inline]
-    fn apply_delta(&mut self, delta: &Delta<DC>) {
+    fn apply_delta(&mut self, delta: Delta<DC>) {
         self.container.apply_delta(delta)
     }
 }
@@ -415,12 +415,12 @@ where
         // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
         let mut removed_container = C::default();
-        removed_container.apply_delta(&Delta::with_removed_inserted(DC::default(), removed));
+        removed_container.apply_delta(Delta::with_removed_inserted(DC::default(), removed));
 
         // HACK: This is currently the only way to turn DC to C. This may be
         // improved later.
         let mut inserted_container = C::default();
-        inserted_container.apply_delta(&Delta::with_removed_inserted(DC::default(), inserted));
+        inserted_container.apply_delta(Delta::with_removed_inserted(DC::default(), inserted));
 
         Delta::with_removed_inserted(
             Recorder::new(removed_container),

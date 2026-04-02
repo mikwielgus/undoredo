@@ -32,7 +32,7 @@ fn test_apply_delta_and_reverse() {
         BTreeMap::from([(2, 20), (6, 60), (5, 50), (4, 40)]),
         BTreeMap::from([(2, 22), (5, 55), (4, 44)]),
     );
-    recorder.apply_delta(&delta);
+    recorder.apply_delta(delta.clone());
 
     assert_eq!(recorder.get(&0), Some(&0));
     assert_eq!(recorder.get(&1), Some(&10));
@@ -42,7 +42,7 @@ fn test_apply_delta_and_reverse() {
     assert_eq!(recorder.get(&5), Some(&55));
     assert_eq!(recorder.get(&6), None);
 
-    recorder.apply_delta(&delta.reverse());
+    recorder.apply_delta(delta.reverse());
 
     assert_eq!(recorder.get(&0), Some(&0));
     assert_eq!(recorder.get(&1), Some(&10));

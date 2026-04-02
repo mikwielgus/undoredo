@@ -99,7 +99,7 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
         let CmdDelta { cmd, delta } = self.done.pop()?;
         let reverse_delta = delta.reverse();
 
-        target.apply_delta(&reverse_delta);
+        target.apply_delta(reverse_delta.clone());
         self.undone.push(CmdDelta {
             cmd: cmd.clone(),
             delta: reverse_delta,
@@ -116,7 +116,7 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
         let CmdDelta { cmd, delta } = self.undone.pop()?;
         let reverse_delta = delta.reverse();
 
-        target.apply_delta(&reverse_delta);
+        target.apply_delta(reverse_delta.clone());
         self.done.push(CmdDelta {
             cmd: cmd.clone(),
             delta: reverse_delta,

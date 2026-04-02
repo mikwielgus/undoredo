@@ -29,7 +29,7 @@ fn test_undoredo_struct_derives() {
             v: BTreeMap::from([(2, 7)]),
         },
     );
-    s.apply_delta(&d);
+    s.apply_delta(d);
 
     assert_eq!(s.v.as_ref(), &vec![1, 2, 7]);
 }

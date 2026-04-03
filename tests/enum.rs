@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use std::collections::BTreeMap;
+
 use undoredo::{Recorder, UndoRedo};
 use undoredo_derive::UndoRedo;
 
@@ -18,29 +20,102 @@ fn test_enum() {
     let mut undoredo: UndoRedo<_> = UndoRedo::new();
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
-    recorder.assign(TestEnum::Tuple(Vec::new(), Vec::new()));
+    recorder.assign(TestEnum::Tuple(vec![1], vec![2, 3]));
     undoredo.commit(&mut recorder);
-    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![], vec![]));
+    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![1], vec![2, 3]));
 
     recorder.assign(TestEnum::Fields { i: 1, u: 2 });
     undoredo.commit(&mut recorder);
     assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
 
     assert!(undoredo.undo(&mut recorder).is_some());
-    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![], vec![]));
+    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![1], vec![2, 3]));
 
     assert!(undoredo.undo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
-    assert_eq!(undoredo.undo(&mut recorder), None);
+    assert!(undoredo.undo(&mut recorder).is_none());
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
     assert!(undoredo.redo(&mut recorder).is_some());
-    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![], vec![]));
+    assert_eq!(recorder.container(), &TestEnum::Tuple(vec![1], vec![2, 3]));
 
     assert!(undoredo.redo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
 
-    assert_eq!(undoredo.redo(&mut recorder), None);
+    assert!(undoredo.redo(&mut recorder).is_none());
     assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
+}
+
+#[test]
+fn test_enum_vec() {
+    let mut recorder: Recorder<Vec<TestEnum>> = Recorder::new(vec![]);
+    let mut undoredo: UndoRedo<BTreeMap<usize, TestEnum>> = UndoRedo::new();
+    assert_eq!(*recorder.container(), vec![]);
+
+    recorder.push(TestEnum::Unit);
+    undoredo.commit(&mut recorder);
+    assert_eq!(*recorder.container(), vec![TestEnum::Unit]);
+
+    recorder.push(TestEnum::Tuple(vec![1], vec![2, 3]));
+    undoredo.commit(&mut recorder);
+    assert_eq!(
+        *recorder.container(),
+        vec![TestEnum::Unit, TestEnum::Tuple(vec![1], vec![2, 3])]
+    );
+
+    recorder.push(TestEnum::Fields { i: 1, u: 2 });
+    undoredo.commit(&mut recorder);
+    assert_eq!(
+        *recorder.container(),
+        vec![
+            TestEnum::Unit,
+            TestEnum::Tuple(vec![1], vec![2, 3]),
+            TestEnum::Fields { i: 1, u: 2 }
+        ]
+    );
+
+    assert!(undoredo.undo(&mut recorder).is_some());
+    assert_eq!(
+        *recorder.container(),
+        vec![TestEnum::Unit, TestEnum::Tuple(vec![1], vec![2, 3])]
+    );
+
+    assert!(undoredo.undo(&mut recorder).is_some());
+    assert_eq!(*recorder.container(), vec![TestEnum::Unit]);
+
+    assert!(undoredo.undo(&mut recorder).is_some());
+    assert_eq!(*recorder.container(), vec![]);
+
+    assert!(undoredo.undo(&mut recorder).is_none());
+    assert_eq!(*recorder.container(), vec![]);
+
+    assert!(undoredo.redo(&mut recorder).is_some());
+    assert_eq!(*recorder.container(), vec![TestEnum::Unit]);
+
+    assert!(undoredo.redo(&mut recorder).is_some());
+    assert_eq!(
+        *recorder.container(),
+        vec![TestEnum::Unit, TestEnum::Tuple(vec![1], vec![2, 3])]
+    );
+
+    assert!(undoredo.redo(&mut recorder).is_some());
+    assert_eq!(
+        *recorder.container(),
+        vec![
+            TestEnum::Unit,
+            TestEnum::Tuple(vec![1], vec![2, 3]),
+            TestEnum::Fields { i: 1, u: 2 }
+        ]
+    );
+
+    assert!(undoredo.redo(&mut recorder).is_none());
+    assert_eq!(
+        *recorder.container(),
+        vec![
+            TestEnum::Unit,
+            TestEnum::Tuple(vec![1], vec![2, 3]),
+            TestEnum::Fields { i: 1, u: 2 }
+        ]
+    );
 }

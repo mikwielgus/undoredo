@@ -25,12 +25,20 @@ pub(crate) fn expand_undoredo(input: DeriveInput) -> syn::Result<TokenStream> {
             }
         }
         Data::Enum(_) => {
+            let apply = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
             quote! {
+                impl #impl_generics ::maplike::Container for #name #ty_generics #where_clause {
+                    type Key = usize;
+                    type Value = Self;
+                }
+
                 impl #impl_generics ::maplike::Assign for #name #ty_generics #where_clause {
                     fn assign(&mut self, value: Self) {
                         *self = value;
                     }
                 }
+
+                #apply
             }
         }
         Data::Union(_) => {

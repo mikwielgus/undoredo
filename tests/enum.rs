@@ -2,11 +2,10 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Assign, Container};
 use undoredo::{Recorder, UndoRedo};
-use undoredo_derive::ApplyDelta;
+use undoredo_derive::UndoRedo;
 
-#[derive(ApplyDelta, Assign, Container, Clone, Debug, PartialEq)]
+#[derive(UndoRedo, Clone, Debug, PartialEq)]
 enum TestEnum {
     Unit,
     Tuple(Vec<i32>, Vec<i32>),

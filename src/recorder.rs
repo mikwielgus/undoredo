@@ -5,7 +5,7 @@
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 
-use maplike::{Clear, Container, Get, Insert, IntoIter, Len, Pop, Push, Remove, Set};
+use maplike::{Assign, Clear, Container, Get, Insert, IntoIter, Len, Pop, Push, Remove, Set};
 
 use crate::{ApplyDelta, delta::Delta};
 
@@ -18,16 +18,6 @@ pub struct Recorder<
 > {
     container: C,
     delta: Delta<DC>,
-}
-
-/// Access the type of the delta container carried by a recorder.
-pub trait RecorderDeltaCollection {
-    /// The container type used to store recorder deltas.
-    type DeltaCollection: Container;
-}
-
-impl<C: Container, DC: Container> RecorderDeltaCollection for Recorder<C, DC> {
-    type DeltaCollection = DC;
 }
 
 impl<C: Container, DC: Container> AsRef<C> for Recorder<C, DC> {
@@ -86,6 +76,34 @@ where
 impl<C: Container, DC: Container> Container for Recorder<C, DC> {
     type Key = C::Key;
     type Value = C::Value;
+}
+
+impl<C, DC> Assign<C> for Recorder<C, DC>
+where
+    C: Assign + Clone,
+    DC: Get<usize, Value = C> + Set<usize>,
+{
+    #[inline]
+    fn assign(&mut self, value: C) {
+        self.assign(value);
+    }
+}
+
+impl<C, DC> Recorder<C, DC>
+where
+    C: Assign + Clone,
+    DC: Get<usize, Value = C> + Set<usize>,
+{
+    /// Assign a new value to `*self`.
+    #[inline]
+    pub fn assign(&mut self, value: C) {
+        if self.delta.inserted.get(&0).is_none() {
+            self.delta.removed.set(0, self.container.clone());
+        }
+
+        self.delta.inserted.set(0, value.clone());
+        self.container.assign(value);
+    }
 }
 
 impl<K, C, DC> Get<K> for Recorder<C, DC>

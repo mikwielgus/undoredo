@@ -96,24 +96,28 @@ fn transform_field_type(ty: &Type) -> TokenStream2 {
     };
     let container_name = container_last.ident.to_string();
 
-    let PathArguments::AngleBracketed(container_ab) = &container_last.arguments else {
-        return ty.to_token_stream();
-    };
-    if container_ab.args.len() != 1 {
-        return ty.to_token_stream();
-    }
+    match &container_last.arguments {
+        PathArguments::AngleBracketed(container_ab) => {
+            if container_ab.args.len() != 1 {
+                return ty.to_token_stream();
+            }
 
-    let GenericArgument::Type(ref t) = container_ab.args[0] else {
-        return ty.to_token_stream();
-    };
+            let GenericArgument::Type(ref t) = container_ab.args[0] else {
+                return ty.to_token_stream();
+            };
 
-    if container_name == "Vec" || container_name == "StableVec" {
-        quote! { ::std::collections::BTreeMap<usize, #t> }
-    } else if container_name == "Arena" {
-        quote! { ::std::collections::BTreeMap<::thunderdome::Index, #t> }
-    } else if container_name == "RTree" {
-        quote! { ::std::collections::BTreeSet<#t> }
-    } else {
-        ty.to_token_stream()
+            if container_name == "Vec" || container_name == "StableVec" {
+                quote! { ::std::collections::BTreeMap<usize, #t> }
+            } else if container_name == "Arena" {
+                quote! { ::std::collections::BTreeMap<::thunderdome::Index, #t> }
+            } else if container_name == "RTree" {
+                quote! { ::std::collections::BTreeSet<#t> }
+            } else {
+                // Scalars and enums use a `BTreeMap` with a single element that
+                // is a recorded version of the container itself.
+                quote! { ::std::collections::BTreeMap<usize, #container_ty> }
+            }
+        }
+        _ => quote! { ::std::collections::BTreeMap<usize, #container_ty> },
     }
 }

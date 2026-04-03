@@ -10,7 +10,7 @@ use maplike::Assign;
 use undoredo::{ApplyDelta, Delta, FlushDelta, Recorder};
 use undoredo_derive::undoredo;
 
-#[derive(undoredo)]
+#[derive(UndoRedo)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }
@@ -34,7 +34,7 @@ fn test_undoredo_struct_derives() {
     assert_eq!(s.v.as_ref(), &vec![1, 2, 7]);
 }
 
-#[derive(Clone, Debug, PartialEq, undoredo)]
+#[derive(Clone, Debug, PartialEq, UndoRedo)]
 enum TestEnum {
     Unit,
     Fields { i: i32, u: u32 },

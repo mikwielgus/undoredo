@@ -36,7 +36,7 @@ pub(crate) fn expand_undoredo(input: DeriveInput) -> syn::Result<TokenStream> {
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(undoredo) does not support unions",
+                "derive(UndoRedo) does not support unions",
             ));
         }
     };

@@ -134,21 +134,69 @@ where
     }
 }
 
-impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
-    for BTreeMap<K, V>
-{
+impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
-impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
-    for BTreeSet<K>
-{
+impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
+
+macro_rules! impl_apply_delta_for_scalar {
+    ($($t:ty),+ $(,)?) => {
+        $(
+            impl ApplyDelta<BTreeMap<usize, $t>> for $t {
+                fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, $t>>) {
+                    let (_removed, mut inserted) = delta.dissolve();
+                    if let Some(value) = inserted.remove(&0) {
+                        *self = value;
+                    }
+                }
+            }
+        )+
+    };
+}
+
+impl_apply_delta_for_scalar!(i8, i16, i32, i64, i128, isize);
+impl_apply_delta_for_scalar!(u8, u16, u32, u64, u128, usize);
+impl_apply_delta_for_scalar!(f32, f64);
+impl_apply_delta_for_scalar!(char, bool, ());
+
+macro_rules! impl_apply_delta_for_tuple {
+    ($($idx:tt $typ:ident),+ $(,)?) => {
+        impl<$($typ,)+> ApplyDelta<BTreeMap<usize, ($($typ,)+)>> for ($($typ,)+) {
+            fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, ($($typ,)+)>>) {
+                let (_removed, mut inserted) = delta.dissolve();
+                if let Some(value) = inserted.remove(&0) {
+                    *self = value;
+                }
+            }
+        }
+    };
+}
+
+impl_apply_delta_for_tuple!(0 T0);
+impl_apply_delta_for_tuple!(0 T0, 1 T1);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7);
+impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8);
+impl_apply_delta_for_tuple!(
+    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9
+);
+impl_apply_delta_for_tuple!(
+    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9, 10 T10
+);
+impl_apply_delta_for_tuple!(
+    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9, 10 T10, 11 T11
+);
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
     fn apply_delta(&mut self, _delta: Delta<DC>) {
@@ -166,20 +214,15 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
-    for HashSet<K>
-{
+impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 #[cfg(feature = "stable-vec")]
-impl<
-    V,
-    C: stable_vec::core::Core<V>,
-    DC: IntoIter<usize> + Container<Key = usize, Value = V>,
-> ApplyDelta<DC> for StableVecFacade<V, C>
+impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
+    ApplyDelta<DC> for StableVecFacade<V, C>
 {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -187,17 +230,15 @@ impl<
 }
 
 #[cfg(feature = "thunderdome")]
-impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC>
-    for Arena<V>
-{
+impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
 
 #[cfg(feature = "rstar")]
-impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>>
-    ApplyDelta<DC> for RTree<K>
+impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
+    for RTree<K>
 {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);

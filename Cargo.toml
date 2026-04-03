@@ -40,6 +40,7 @@ stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
 rstared = "0.9"
+undoredo_derive = { path = "undoredo_derive" }
 
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]

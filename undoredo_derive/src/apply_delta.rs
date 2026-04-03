@@ -57,10 +57,23 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
             Fields::Unit => {}
         },
         Data::Enum(_) => {
-            return Err(syn::Error::new_spanned(
-                &name,
-                "derive(ApplyDelta) does not support enums",
-            ));
+            let output = quote! {
+                impl #impl_generics ::undoredo::ApplyDelta<::std::collections::BTreeMap<usize, #name #ty_generics>>
+                    for #name #ty_generics
+                #where_clause
+                {
+                    fn apply_delta(
+                        &mut self,
+                        delta: ::undoredo::Delta<::std::collections::BTreeMap<usize, #name #ty_generics>>,
+                    ) {
+                        let (_removed, mut inserted) = delta.dissolve();
+                        if let Some(value) = inserted.remove(&0) {
+                            *self = value;
+                        }
+                    }
+                }
+            };
+            return Ok(output.into());
         }
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(

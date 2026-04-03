@@ -4,8 +4,9 @@
 
 use maplike::{Assign, Container};
 use undoredo::{Recorder, UndoRedo};
+use undoredo_derive::ApplyDelta;
 
-#[derive(Assign, Container, Clone, Debug, PartialEq)]
+#[derive(ApplyDelta, Assign, Container, Clone, Debug, PartialEq)]
 enum TestEnum {
     Unit,
     Tuple(Vec<i32>, Vec<i32>),
@@ -26,21 +27,21 @@ fn test_enum() {
     undoredo.commit(&mut recorder);
     assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
 
-    /*undoredo.undo(&mut recorder);
+    assert!(undoredo.undo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Tuple(vec![], vec![]));
 
-    undoredo.undo(&mut recorder);
+    assert!(undoredo.undo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
-    undoredo.undo(&mut recorder);
+    assert_eq!(undoredo.undo(&mut recorder), None);
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
-    undoredo.redo(&mut recorder);
+    assert!(undoredo.redo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Tuple(vec![], vec![]));
 
-    undoredo.redo(&mut recorder);
+    assert!(undoredo.redo(&mut recorder).is_some());
     assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
 
-    undoredo.redo(&mut recorder);
-    assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });*/
+    assert_eq!(undoredo.redo(&mut recorder), None);
+    assert_eq!(recorder.container(), &TestEnum::Fields { i: 1, u: 2 });
 }

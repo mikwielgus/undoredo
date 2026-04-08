@@ -7,6 +7,14 @@ use maplike::{Container, Get};
 
 use crate::{Delta, FlushDelta, Recorder, delta::ApplyDelta};
 
+pub trait Revert<T> {
+    fn revert(self, target: &mut T) -> Self;
+}
+
+pub trait Extract<T> {
+    fn extract(target: &mut T) -> Self;
+}
+
 /// A delta along with metadata.
 ///
 /// The metadata usually somehow represents the command that originated the
@@ -50,12 +58,14 @@ impl<Cmd: Default, DC> UndoRedo<DC, Cmd> {
     ///
     /// Clears the undone stack.
     pub fn commit(&mut self, target: &mut impl FlushDelta<DC>) {
-        self.cmd_commit(Default::default(), target.flush_delta());
+        self.cmd_commit(Default::default(), Extract::extract(target));
     }
 }
 
 impl<Cmd, DC> UndoRedo<DC, Cmd> {
-    /// Push the delta onto the *done* stack along with metadata.
+    /// Flush and push changes onto the *done* stack.
+    ///
+    /// Clears the undone stack.
     pub fn cmd_commit(&mut self, cmd: Cmd, delta: Delta<DC>) {
         self.done.push(CmdDelta { cmd, delta });
         self.undone.clear();
@@ -97,12 +107,9 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
     /// and pushed onto the *undone* stack.
     pub fn undo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
         let CmdDelta { cmd, delta } = self.done.pop()?;
-        let reverse_delta = delta.reverse();
-
-        target.apply_delta(reverse_delta.clone());
         self.undone.push(CmdDelta {
             cmd: cmd.clone(),
-            delta: reverse_delta,
+            delta: delta.revert(target),
         });
 
         Some(cmd)
@@ -114,12 +121,9 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
     /// and pushed back onto the *done* stack.
     pub fn redo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
         let CmdDelta { cmd, delta } = self.undone.pop()?;
-        let reverse_delta = delta.reverse();
-
-        target.apply_delta(reverse_delta.clone());
         self.done.push(CmdDelta {
             cmd: cmd.clone(),
-            delta: reverse_delta,
+            delta: delta.revert(target),
         });
 
         Some(cmd)

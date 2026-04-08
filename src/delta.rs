@@ -29,6 +29,11 @@ use rstar::{RTree, RTreeObject};
 #[cfg(feature = "rstared")]
 use rstared::RTreed;
 
+use crate::{
+    FlushDelta,
+    undoredo::{Extract, Revert},
+};
+
 /// A reversible set of changes to a container.
 ///
 /// Consists of a container of removed elements and another container of
@@ -69,6 +74,21 @@ impl<DC> Delta<DC> {
             removed: self.inserted,
             inserted: self.removed,
         }
+    }
+}
+
+impl<DC: Clone, T: ApplyDelta<DC>> Revert<T> for Delta<DC> {
+    fn revert(self, target: &mut T) -> Self {
+        let reverse = self.reverse();
+        target.apply_delta(reverse.clone());
+
+        reverse
+    }
+}
+
+impl<DC, T: FlushDelta<DC>> Extract<T> for Delta<DC> {
+    fn extract(target: &mut T) -> Self {
+        target.flush_delta()
     }
 }
 

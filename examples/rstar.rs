@@ -5,12 +5,12 @@
 use std::collections::BTreeMap;
 
 use rstar::RTree;
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<RTree<(i32, i32)>, BTreeMap<(i32, i32), ()>> =
         Recorder::new(RTree::new());
-    let mut undoredo: UndoRedo<BTreeMap<(i32, i32), ()>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<(i32, i32), ()>>> = UndoRedo::new();
 
     recorder.insert((1, 1), ());
     undoredo.commit(&mut recorder);

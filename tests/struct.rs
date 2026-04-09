@@ -1,7 +1,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 use undoredo_derive::UndoRedo;
 
 #[derive(UndoRedo, Clone, Debug, PartialEq)]
@@ -22,7 +22,7 @@ fn test_struct() {
         v: Recorder::new(vec![]),
         i: Recorder::new(0),
     };
-    let mut undoredo: UndoRedo<_> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<TestStructHalfDelta>> = UndoRedo::new();
     assert_eq!(*s.v.container(), vec![]);
     assert_eq!(s.i.container(), &0);
 
@@ -77,7 +77,8 @@ fn test_struct() {
 #[test]
 fn test_struct_vec() {
     let mut recorder: Recorder<Vec<TestStruct>> = Recorder::new(vec![]);
-    let mut undoredo: UndoRedo<std::collections::BTreeMap<usize, TestStruct>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<std::collections::BTreeMap<usize, TestStruct>>> =
+        UndoRedo::new();
     assert_eq!(*recorder.container(), vec![]);
 
     recorder.push(TestStruct {

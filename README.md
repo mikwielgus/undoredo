@@ -62,7 +62,7 @@ directory.
 
 ```rust-ignore
 use std::collections::{BTreeMap, HashMap};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
@@ -70,7 +70,7 @@ fn main() {
         Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
 
     // Push elements while recording the changes in an delta.
     recorder.insert(1, 'A');
@@ -120,7 +120,7 @@ accessor methods.
 
 ```rust-ignore
 use std::collections::{BTreeMap, HashMap};
-use undoredo::{Insert, Recorder, UndoRedo};
+use undoredo::{Delta, Insert, Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
@@ -131,7 +131,7 @@ enum Command {
 fn main() {
     let mut recorder: Recorder<HashMap<usize, char>> =
         Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<BTreeMap<usize, char>, Command> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
@@ -190,7 +190,7 @@ bistack for a `BTreeSet`:
 
 ```rust-ignore
 let mut recorder: Recorder<BTreeSet<char>> = Recorder::new(BTreeSet::new());
-let mut undoredo: UndoRedo<BTreeSet<char>> = UndoRedo::new();
+let mut undoredo: UndoRedo<Delta<BTreeSet<char>>> = UndoRedo::new();
 ```
 
 Keeping in mind to pass values as keys, `recorder` and

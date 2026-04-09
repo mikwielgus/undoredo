@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::{BTreeMap, HashMap};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
@@ -14,7 +14,7 @@ enum Command {
 fn main() {
     let mut recorder: Recorder<HashMap<usize, char>, BTreeMap<usize, char>> =
         Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<BTreeMap<usize, char>, Command> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
 

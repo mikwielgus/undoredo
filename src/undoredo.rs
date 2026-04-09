@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
-use maplike::{Container, Get};
-
-use crate::{Delta, FlushDelta, Recorder, delta::ApplyDelta};
 
 pub trait Revert<T> {
     fn revert(self, target: &mut T) -> Self;
@@ -23,17 +20,20 @@ pub trait Extract<T> {
 pub struct CmdEdit<Cmd, E> {
     /// Command or other metadata associated with this edit.
     pub cmd: Cmd,
-    /// The recorded change.
+    /// The recorded change (for example a flushed diff from a [`Recorder`](crate::Recorder)).
     pub edit: E,
 }
 
 /// An undo-redo bistack.
-pub struct UndoRedo<DC, Cmd = ()> {
-    done: Vec<CmdEdit<Cmd, Delta<DC>>>,
-    undone: Vec<CmdEdit<Cmd, Delta<DC>>>,
+///
+/// `E` is the type of each committed edit (for example, the concrete diff type
+/// your recorder or domain uses).
+pub struct UndoRedo<E, Cmd = ()> {
+    done: Vec<CmdEdit<Cmd, E>>,
+    undone: Vec<CmdEdit<Cmd, E>>,
 }
 
-impl<Cmd, DC> UndoRedo<DC, Cmd> {
+impl<Cmd, E> UndoRedo<E, Cmd> {
     /// Create a new empty undo-redo bistack.
     pub fn new() -> Self {
         Self {
@@ -44,70 +44,48 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
 
     /// Returns a slice of the *done* stack, which contains all the done (or
     /// redone) edits.
-    pub fn done(&self) -> &[CmdEdit<Cmd, Delta<DC>>] {
+    pub fn done(&self) -> &[CmdEdit<Cmd, E>] {
         &self.done
     }
 
     /// Returns a slice of the *undone* stack, which contains all the undone
     /// edits.
-    pub fn undone(&self) -> &[CmdEdit<Cmd, Delta<DC>>] {
+    pub fn undone(&self) -> &[CmdEdit<Cmd, E>] {
         &self.undone
     }
 }
 
-impl<Cmd: Default, DC> UndoRedo<DC, Cmd> {
+impl<Cmd: Default, E> UndoRedo<E, Cmd> {
     /// Flush and push changes onto the *done* stack.
     ///
     /// Clears the undone stack.
-    pub fn commit(&mut self, target: &mut impl FlushDelta<DC>) {
-        self.cmd_commit(Default::default(), Extract::extract(target));
+    pub fn commit<T>(&mut self, target: &mut T)
+    where
+        E: Extract<T>,
+    {
+        self.cmd_commit(Default::default(), E::extract(target));
     }
 }
 
-impl<Cmd, DC> UndoRedo<DC, Cmd> {
+impl<Cmd, E> UndoRedo<E, Cmd> {
     /// Flush and push changes onto the *done* stack.
     ///
     /// Clears the undone stack.
-    pub fn cmd_commit(&mut self, cmd: Cmd, delta: Delta<DC>) {
-        self.done.push(CmdEdit { cmd, edit: delta });
+    pub fn cmd_commit(&mut self, cmd: Cmd, edit: E) {
+        self.done.push(CmdEdit { cmd, edit });
         self.undone.clear();
     }
 }
 
-impl<Cmd, DC: Container + Default> UndoRedo<DC, Cmd> {
-    /// Make and record changes to the recorded container from within a
-    /// closure, automatically committing them once closure finishes.
-    pub fn edit<
-        K,
-        V,
-        C: Container<Key = K, Value = V> + Get<K>,
-        F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
-    >(
-        &mut self,
-        container: C,
-        f: F,
-    ) -> C
-    where
-        DC: Container<Key = K, Value = V>,
-        K: Clone,
-        V: Clone,
-    {
-        let mut recorder = Recorder::<C, DC>::new(container);
-        let cmd = f(&mut recorder);
-        let (container, delta) = recorder.dissolve();
-
-        self.cmd_commit(cmd, delta);
-
-        container
-    }
-}
-
-impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
-    /// Undo the last done delta.
+impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
+    /// Undo the last done edit.
     ///
-    /// The undone delta is popped from the *done* stack, reversed, reverted,
+    /// The undone edit is popped from the *done* stack, reversed, reverted,
     /// and pushed onto the *undone* stack.
-    pub fn undo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
+    pub fn undo<T>(&mut self, target: &mut T) -> Option<Cmd>
+    where
+        E: Revert<T>,
+    {
         let CmdEdit { cmd, edit } = self.done.pop()?;
         self.undone.push(CmdEdit {
             cmd: cmd.clone(),
@@ -117,11 +95,14 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
         Some(cmd)
     }
 
-    /// Redo the last undone delta.
+    /// Redo the last undone edit.
     ///
-    /// The redone delta is popped from the *undone* stack, reversed, reverted,
+    /// The redone edit is popped from the *undone* stack, reversed, reverted,
     /// and pushed back onto the *done* stack.
-    pub fn redo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
+    pub fn redo<T>(&mut self, target: &mut T) -> Option<Cmd>
+    where
+        E: Revert<T>,
+    {
         let CmdEdit { cmd, edit } = self.undone.pop()?;
         self.done.push(CmdEdit {
             cmd: cmd.clone(),

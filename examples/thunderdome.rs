@@ -5,12 +5,12 @@
 use std::collections::BTreeMap;
 
 use thunderdome::Arena;
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<Arena<char>, BTreeMap<thunderdome::Index, char>> =
         Recorder::new(Arena::new());
-    let mut undoredo: UndoRedo<BTreeMap<thunderdome::Index, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<thunderdome::Index, char>>> = UndoRedo::new();
 
     recorder.push('A');
     undoredo.commit(&mut recorder);

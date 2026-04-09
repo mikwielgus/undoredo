@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::{BTreeMap, HashMap};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 #[allow(unused_mut)]
 fn main() {
@@ -12,7 +12,7 @@ fn main() {
         Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
 
     // Push elements while recording the changes in an delta.
     recorder.insert(1, 'A');

@@ -6,7 +6,7 @@ use std::collections::{BTreeMap, HashMap};
 
 use rstar::{AABB, primitives::Rectangle};
 use rstared::RTreed;
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     // A hashmap of 2D rectangles will be the underlying container.
@@ -16,7 +16,7 @@ fn main() {
         RTreed<HashMap<i32, Rectangle<(i32, i32)>>>,
         BTreeMap<i32, Rectangle<(i32, i32)>>,
     >::new(RTreed::new(rect_hashmap));
-    let mut undoredo: UndoRedo<BTreeMap<i32, Rectangle<(i32, i32)>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<i32, Rectangle<(i32, i32)>>>> = UndoRedo::new();
 
     // Insert two rectangles, recording them in the R-tree.
     recorder.insert(1, Rectangle::from_corners((0, 0), (1, 1)));

@@ -209,7 +209,7 @@ pub fn test_undo_redo_at_generated_indices<
 >(
     mut container: C,
 ) {
-    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<DC>> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut container), None);
     assert_eq!(undoredo.redo(&mut container), None);
 
@@ -309,7 +309,7 @@ pub fn test_undo_redo_at_specified_indices<
 >(
     mut container: C,
 ) {
-    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<DC>> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut container), None);
     assert_eq!(undoredo.redo(&mut container), None);
 
@@ -400,7 +400,7 @@ pub fn test_undo_redo_on_set<
 >(
     mut container: C,
 ) {
-    let mut undoredo: UndoRedo<DC> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<DC>> = UndoRedo::new();
     assert_eq!(undoredo.undo(&mut container), None);
     assert_eq!(undoredo.redo(&mut container), None);
 

@@ -5,12 +5,12 @@
 use std::collections::BTreeMap;
 
 use stable_vec::StableVec;
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<StableVec<char>, BTreeMap<usize, char>> =
         Recorder::new(StableVec::new());
-    let mut undoredo: UndoRedo<BTreeMap<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
 
     recorder.push('A');
     undoredo.commit(&mut recorder);

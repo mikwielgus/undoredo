@@ -4,11 +4,11 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{Delta, Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<BTreeSet<char>, BTreeMap<char, ()>> = Recorder::new(BTreeSet::new());
-    let mut undoredo: UndoRedo<BTreeMap<char, ()>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<char, ()>>> = UndoRedo::new();
 
     recorder.insert('A', ());
     undoredo.commit(&mut recorder);

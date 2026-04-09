@@ -7,7 +7,7 @@ use core::marker::PhantomData;
 
 use maplike::{Assign, Clear, Container, Get, Insert, IntoIter, Len, Pop, Push, Remove, Set};
 
-use crate::{ApplyDelta, delta::Delta};
+use crate::{ApplyDelta, UndoRedo, delta::Delta};
 
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
@@ -461,5 +461,33 @@ impl<V, DC: Default> FlushDelta<DC> for PhantomData<V> {
     fn flush_delta(&mut self) -> Delta<DC> {
         // Nothing happens, obviously.
         Delta::default()
+    }
+}
+
+impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
+    /// Make and record changes to the recorded container from within a
+    /// closure, automatically committing them once closure finishes.
+    pub fn edit<
+        K,
+        V,
+        C: Container<Key = K, Value = V> + Get<K>,
+        F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
+    >(
+        &mut self,
+        container: C,
+        f: F,
+    ) -> C
+    where
+        DC: Container<Key = K, Value = V>,
+        K: Clone,
+        V: Clone,
+    {
+        let mut recorder = Recorder::<C, DC>::new(container);
+        let cmd = f(&mut recorder);
+        let (container, delta) = recorder.dissolve();
+
+        self.cmd_commit(cmd, delta);
+
+        container
     }
 }

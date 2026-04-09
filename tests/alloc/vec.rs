@@ -80,7 +80,7 @@ fn test_push_and_pop() {
 #[test]
 fn test_undo_redo() {
     let container: Vec<i32> = Vec::new();
-    let mut undoredo: UndoRedo<BTreeMap<usize, i32>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, i32>>> = UndoRedo::new();
 
     let mut container = undoredo.edit(container, |recorder| {
         recorder.push(0);

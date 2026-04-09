@@ -9,7 +9,7 @@ use syn::{Data, DeriveInput};
 
 use crate::{apply_delta, flush_delta, half_delta};
 
-pub(crate) fn expand_undoredo(input: DeriveInput) -> syn::Result<TokenStream> {
+pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
@@ -44,7 +44,7 @@ pub(crate) fn expand_undoredo(input: DeriveInput) -> syn::Result<TokenStream> {
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(UndoRedo) does not support unions",
+                "derive(Delta) does not support unions",
             ));
         }
     };

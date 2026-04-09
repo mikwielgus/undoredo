@@ -28,8 +28,8 @@ pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
     flush_delta::expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-#[proc_macro_derive(UndoRedo, attributes(half_delta, apply_delta, flush_delta))]
-pub fn derive_undoredo(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(Delta, attributes(half_delta, apply_delta, flush_delta))]
+pub fn derive_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    undoredo::expand_undoredo(input).unwrap_or_else(|err| err.to_compile_error().into())
+    undoredo::expand_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }

@@ -16,10 +16,12 @@ extern crate alloc;
 
 mod delta;
 mod recorder;
+mod snapshot;
 mod undoredo;
 
 pub use crate::delta::{ApplyDelta, Delta};
 pub use crate::recorder::{FlushDelta, Recorder};
+pub use crate::snapshot::Snapshot;
 pub use crate::undoredo::{CmdEdit, UndoRedo};
 pub use maplike::{
     Container, Get, Insert, IntoIter, Maplike, Push, Remove, Scalarlike, Setlike, Veclike,

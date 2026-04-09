@@ -20,7 +20,7 @@ mod undoredo;
 
 pub use crate::delta::{ApplyDelta, Delta};
 pub use crate::recorder::{FlushDelta, Recorder};
-pub use crate::undoredo::UndoRedo;
+pub use crate::undoredo::{CmdEdit, UndoRedo};
 pub use maplike::{
     Container, Get, Insert, IntoIter, Maplike, Push, Remove, Scalarlike, Setlike, Veclike,
 };

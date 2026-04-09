@@ -15,20 +15,22 @@ pub trait Extract<T> {
     fn extract(target: &mut T) -> Self;
 }
 
-/// A delta along with metadata.
+/// An edit along with metadata.
 ///
 /// The metadata usually somehow represents the command that originated the
-/// delta, but it really can be anything, as it is only for the convenience of
+/// edit, but it really can be anything, as it is only for the convenience of
 /// the programmer using the library, without any effect on logic.
-pub struct CmdDelta<Cmd, DC> {
+pub struct CmdEdit<Cmd, E> {
+    /// Command or other metadata associated with this edit.
     pub cmd: Cmd,
-    pub delta: Delta<DC>,
+    /// The recorded change.
+    pub edit: E,
 }
 
 /// An undo-redo bistack.
 pub struct UndoRedo<DC, Cmd = ()> {
-    done: Vec<CmdDelta<Cmd, DC>>,
-    undone: Vec<CmdDelta<Cmd, DC>>,
+    done: Vec<CmdEdit<Cmd, Delta<DC>>>,
+    undone: Vec<CmdEdit<Cmd, Delta<DC>>>,
 }
 
 impl<Cmd, DC> UndoRedo<DC, Cmd> {
@@ -41,14 +43,14 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
     }
 
     /// Returns a slice of the *done* stack, which contains all the done (or
-    /// redone) deltas.
-    pub fn done(&self) -> &[CmdDelta<Cmd, DC>] {
+    /// redone) edits.
+    pub fn done(&self) -> &[CmdEdit<Cmd, Delta<DC>>] {
         &self.done
     }
 
     /// Returns a slice of the *undone* stack, which contains all the undone
-    /// deltas.
-    pub fn undone(&self) -> &[CmdDelta<Cmd, DC>] {
+    /// edits.
+    pub fn undone(&self) -> &[CmdEdit<Cmd, Delta<DC>>] {
         &self.undone
     }
 }
@@ -67,7 +69,7 @@ impl<Cmd, DC> UndoRedo<DC, Cmd> {
     ///
     /// Clears the undone stack.
     pub fn cmd_commit(&mut self, cmd: Cmd, delta: Delta<DC>) {
-        self.done.push(CmdDelta { cmd, delta });
+        self.done.push(CmdEdit { cmd, edit: delta });
         self.undone.clear();
     }
 }
@@ -106,10 +108,10 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
     /// The undone delta is popped from the *done* stack, reversed, reverted,
     /// and pushed onto the *undone* stack.
     pub fn undo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
-        let CmdDelta { cmd, delta } = self.done.pop()?;
-        self.undone.push(CmdDelta {
+        let CmdEdit { cmd, edit } = self.done.pop()?;
+        self.undone.push(CmdEdit {
             cmd: cmd.clone(),
-            delta: delta.revert(target),
+            edit: edit.revert(target),
         });
 
         Some(cmd)
@@ -120,10 +122,10 @@ impl<Cmd: Clone, DC: Clone> UndoRedo<DC, Cmd> {
     /// The redone delta is popped from the *undone* stack, reversed, reverted,
     /// and pushed back onto the *done* stack.
     pub fn redo(&mut self, target: &mut impl ApplyDelta<DC>) -> Option<Cmd> {
-        let CmdDelta { cmd, delta } = self.undone.pop()?;
-        self.done.push(CmdDelta {
+        let CmdEdit { cmd, edit } = self.undone.pop()?;
+        self.done.push(CmdEdit {
             cmd: cmd.clone(),
-            delta: delta.revert(target),
+            edit: edit.revert(target),
         });
 
         Some(cmd)

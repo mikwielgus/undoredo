@@ -9,6 +9,7 @@ mod common;
 
 use std::collections::HashSet;
 
+use undoredo::delta::HashSetHalfDelta;
 use undoredo::Recorder;
 
 #[test]
@@ -25,5 +26,5 @@ fn test_insert_and_remove_on_set() {
 
 #[test]
 fn test_undo_redo_on_set() {
-    common::test_undo_redo_on_set::<i32, HashSet<i32>, HashSet<i32>>(HashSet::new());
+    common::test_undo_redo_on_set::<i32, HashSet<i32>, HashSetHalfDelta<i32>>(HashSet::new());
 }

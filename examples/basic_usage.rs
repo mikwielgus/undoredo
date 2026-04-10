@@ -2,17 +2,18 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::{BTreeMap, HashMap};
-use undoredo::{Delta, Recorder, UndoRedo};
+use std::collections::HashMap;
+use undoredo::delta::{VecDelta, VecHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 #[allow(unused_mut)]
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
-    let mut recorder: Recorder<HashMap<usize, char>, BTreeMap<usize, char>> =
+    let mut recorder: Recorder<HashMap<usize, char>, VecHalfDelta<char>> =
         Recorder::new(HashMap::new());
 
     // The undo-redo struct maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<VecDelta<char>> = UndoRedo::new();
 
     // Push elements while recording the changes in an delta.
     recorder.insert(1, 'A');

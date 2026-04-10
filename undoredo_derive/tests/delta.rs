@@ -4,9 +4,8 @@
 
 #![allow(dead_code)]
 
-use std::collections::BTreeMap;
-
 use maplike::Assign;
+use undoredo::delta::VecHalfDelta;
 use undoredo::{ApplyDelta, Recorder};
 use undoredo_derive::Delta;
 
@@ -25,10 +24,10 @@ fn test_delta_derive_struct() {
 
     let d = TestStructDelta::with_removed_inserted(
         TestStructHalfDelta {
-            v: BTreeMap::from([(2, 3)]),
+            v: VecHalfDelta::from([(2, 3)]),
         },
         TestStructHalfDelta {
-            v: BTreeMap::from([(2, 7)]),
+            v: VecHalfDelta::from([(2, 7)]),
         },
     );
     s.apply_delta(d);

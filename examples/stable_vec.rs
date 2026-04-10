@@ -2,15 +2,14 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::BTreeMap;
-
 use stable_vec::StableVec;
-use undoredo::{Delta, Recorder, UndoRedo};
+use undoredo::delta::{StableVecDelta, StableVecHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<StableVec<char>, BTreeMap<usize, char>> =
+    let mut recorder: Recorder<StableVec<char>, StableVecHalfDelta<char>> =
         Recorder::new(StableVec::new());
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<StableVecDelta<char>> = UndoRedo::new();
 
     recorder.push('A');
     undoredo.commit(&mut recorder);

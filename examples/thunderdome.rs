@@ -2,15 +2,13 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::BTreeMap;
-
 use thunderdome::Arena;
-use undoredo::{Delta, Recorder, UndoRedo};
+use undoredo::delta::{ThunderdomeDelta, ThunderdomeHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<Arena<char>, BTreeMap<thunderdome::Index, char>> =
-        Recorder::new(Arena::new());
-    let mut undoredo: UndoRedo<Delta<BTreeMap<thunderdome::Index, char>>> = UndoRedo::new();
+    let mut recorder: Recorder<Arena<char>, ThunderdomeHalfDelta<char>> = Recorder::new(Arena::new());
+    let mut undoredo: UndoRedo<ThunderdomeDelta<char>> = UndoRedo::new();
 
     recorder.push('A');
     undoredo.commit(&mut recorder);

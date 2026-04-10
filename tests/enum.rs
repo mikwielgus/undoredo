@@ -2,9 +2,8 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::BTreeMap;
-
-use undoredo::{Delta, Recorder, UndoRedo};
+use undoredo::{Recorder, UndoRedo};
+use undoredo::delta::BTreeMapDelta;
 use undoredo_derive::Delta;
 
 #[derive(Delta, Clone, Debug, PartialEq)]
@@ -17,7 +16,7 @@ enum TestEnum {
 #[test]
 fn test_enum() {
     let mut recorder: Recorder<TestEnum> = Recorder::new(TestEnum::Unit);
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, TestEnum>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMapDelta<usize, TestEnum>> = UndoRedo::new();
     assert_eq!(recorder.container(), &TestEnum::Unit);
 
     recorder.assign(TestEnum::Tuple(vec![1], vec![2, 3]));
@@ -50,7 +49,7 @@ fn test_enum() {
 #[test]
 fn test_enum_vec() {
     let mut recorder: Recorder<Vec<TestEnum>> = Recorder::new(vec![]);
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, TestEnum>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMapDelta<usize, TestEnum>> = UndoRedo::new();
     assert_eq!(*recorder.container(), vec![]);
 
     recorder.push(TestEnum::Unit);

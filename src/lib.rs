@@ -14,7 +14,7 @@ extern crate std;
 // No feature for `alloc` because it would be always enabled anyway.
 extern crate alloc;
 
-mod delta;
+pub mod delta;
 mod recorder;
 mod snapshot;
 mod undoredo;

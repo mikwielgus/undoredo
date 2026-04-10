@@ -6,6 +6,7 @@
 mod common;
 
 use alloc::collections::BTreeSet;
+use undoredo::delta::BTreeSetHalfDelta;
 use undoredo::Recorder;
 
 #[test]
@@ -22,5 +23,5 @@ fn test_insert_and_remove_on_set() {
 
 #[test]
 fn test_undo_redo_on_set() {
-    common::test_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSet<i32>>(BTreeSet::new());
+    common::test_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSetHalfDelta<i32>>(BTreeSet::new());
 }

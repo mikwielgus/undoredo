@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+//! Named [`Delta`] container aliases (`…HalfDelta`, `…Delta`) for built-in types.
+
+#![allow(missing_docs)]
+
 use alloc::{
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
@@ -120,8 +124,8 @@ where
     }
 }
 
-type VecHalfDelta<V> = BTreeMap<usize, V>;
-type VecDelta<V> = Delta<VecHalfDelta<V>>;
+pub type VecHalfDelta<V> = BTreeMap<usize, V>;
+pub type VecDelta<V> = Delta<VecHalfDelta<V>>;
 
 impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
 where
@@ -157,8 +161,8 @@ where
     }
 }
 
-type BTreeMapHalfDelta<K, V> = BTreeMap<K, V>;
-type BTreeMapDelta<K, V> = Delta<BTreeMapHalfDelta<K, V>>;
+pub type BTreeMapHalfDelta<K, V> = BTreeMap<K, V>;
+pub type BTreeMapDelta<K, V> = Delta<BTreeMapHalfDelta<K, V>>;
 
 impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -166,8 +170,8 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
     }
 }
 
-type BTreeSetHalfDelta<K> = BTreeMap<K, ()>;
-type BTreeSetDelta<K> = Delta<BTreeSetHalfDelta<K>>;
+pub type BTreeSetHalfDelta<K> = BTreeMap<K, ()>;
+pub type BTreeSetDelta<K> = Delta<BTreeSetHalfDelta<K>>;
 
 impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -178,8 +182,8 @@ impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> fo
 macro_rules! impl_delta_for_scalar {
     ($($half_delta:ident, $delta:ident, $t:ty);+ $(;)?) => {
         $(
-            type $half_delta = BTreeMap<usize, $t>;
-            type $delta = Delta<$half_delta>;
+            pub type $half_delta = BTreeMap<usize, $t>;
+            pub type $delta = Delta<$half_delta>;
 
             impl ApplyDelta<$half_delta> for $t {
                 fn apply_delta(&mut self, delta: $delta) {
@@ -215,8 +219,8 @@ impl_delta_for_scalar! {
 
 macro_rules! impl_delta_for_tuple {
     ($half_delta:ident, $delta:ident, $($idx:tt $typ:ident),+ $(,)?) => {
-        type $half_delta<$($typ),+> = BTreeMap<usize, ($($typ,)+)>;
-        type $delta<$($typ),+> = Delta<$half_delta<$($typ),+>>;
+        pub type $half_delta<$($typ),+> = BTreeMap<usize, ($($typ,)+)>;
+        pub type $delta<$($typ),+> = Delta<$half_delta<$($typ),+>>;
 
         impl<$($typ,)+> ApplyDelta<$half_delta<$($typ),+>> for ($($typ,)+) {
             fn apply_delta(&mut self, delta: $delta<$($typ),+>) {
@@ -307,8 +311,8 @@ impl_delta_for_tuple!(
     11 T11
 );
 
-type PhantomDataHalfDelta = BTreeMap<usize, ()>;
-type PhantomDataDelta = Delta<PhantomDataHalfDelta>;
+pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
+pub type PhantomDataDelta = Delta<PhantomDataHalfDelta>;
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
     fn apply_delta(&mut self, _delta: Delta<DC>) {
@@ -317,9 +321,9 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
-type HashMapHalfDelta<K, V> = HashMap<K, V>;
+pub type HashMapHalfDelta<K, V> = HashMap<K, V>;
 #[cfg(feature = "std")]
-type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
+pub type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
 
 #[cfg(feature = "std")]
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
@@ -331,9 +335,9 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "std")]
-type HashSetHalfDelta<K> = HashMap<K, ()>;
+pub type HashSetHalfDelta<K> = HashMap<K, ()>;
 #[cfg(feature = "std")]
-type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
+pub type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
 
 #[cfg(feature = "std")]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
@@ -343,9 +347,9 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "stable-vec")]
-type StableVecHalfDelta<V> = BTreeMap<usize, V>;
+pub type StableVecHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg(feature = "stable-vec")]
-type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
+pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 
 #[cfg(feature = "stable-vec")]
 impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
@@ -357,9 +361,9 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
-type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
+pub type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
 #[cfg(feature = "thunderdome")]
-type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
+pub type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
 
 #[cfg(feature = "thunderdome")]
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
@@ -369,10 +373,10 @@ impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "rstar")]
-type RTreeHalfDelta<K> = BTreeMap<K, ()>;
+pub type RTreeHalfDelta<K> = BTreeMap<K, ()>;
 
 #[cfg(feature = "rstar")]
-type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
+pub type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
@@ -384,10 +388,10 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 }
 
 #[cfg(feature = "rstared")]
-type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
+pub type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
 
 #[cfg(feature = "rstared")]
-type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
+pub type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
 
 #[cfg(feature = "rstared")]
 impl<

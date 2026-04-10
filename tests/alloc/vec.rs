@@ -6,11 +6,12 @@
 mod common;
 
 use alloc::{collections::BTreeMap, vec::Vec};
+use undoredo::delta::{VecDelta, VecHalfDelta};
 use undoredo::{ApplyDelta, Delta, Recorder, UndoRedo};
 
 #[test]
 fn test_apply_delta_and_reverse() {
-    let mut recorder = Recorder::<Vec<i32>, BTreeMap<usize, i32>>::new(Vec::new());
+    let mut recorder = Recorder::<Vec<i32>, VecHalfDelta<i32>>::new(Vec::new());
 
     recorder.push(0);
     recorder.push(10);
@@ -28,7 +29,7 @@ fn test_apply_delta_and_reverse() {
     assert_eq!(recorder.get(&5), Some(&50));
     assert_eq!(recorder.get(&6), Some(&60));
 
-    let delta = Delta::with_removed_inserted(
+    let delta: VecDelta<i32> = Delta::with_removed_inserted(
         BTreeMap::from([(2, 20), (6, 60), (5, 50), (4, 40)]),
         BTreeMap::from([(2, 22), (5, 55), (4, 44)]),
     );
@@ -55,7 +56,7 @@ fn test_apply_delta_and_reverse() {
 
 #[test]
 fn test_push_and_pop() {
-    let mut recorder = Recorder::<Vec<i32>, BTreeMap<usize, i32>>::new(Vec::new());
+    let mut recorder = Recorder::<Vec<i32>, VecHalfDelta<i32>>::new(Vec::new());
 
     recorder.push(0);
     recorder.push(10);
@@ -80,7 +81,7 @@ fn test_push_and_pop() {
 #[test]
 fn test_undo_redo() {
     let container: Vec<i32> = Vec::new();
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, i32>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<VecDelta<i32>> = UndoRedo::new();
 
     let mut container = undoredo.edit(container, |recorder| {
         recorder.push(0);

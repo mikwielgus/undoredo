@@ -6,6 +6,7 @@
 mod common;
 
 use alloc::collections::BTreeMap;
+use undoredo::delta::BTreeMapHalfDelta;
 use undoredo::Recorder;
 
 #[test]
@@ -26,6 +27,6 @@ fn test_undo_redo_at_specified_indices() {
         usize,
         i32,
         BTreeMap<usize, i32>,
-        BTreeMap<usize, i32>,
+        BTreeMapHalfDelta<usize, i32>,
     >(BTreeMap::new());
 }

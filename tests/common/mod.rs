@@ -6,6 +6,7 @@
 
 use std::collections::BTreeMap;
 
+use undoredo::delta::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::{
     ApplyDelta, Container, Delta, Get, Insert, IntoIter, Push, Recorder, Remove, UndoRedo,
 };
@@ -39,7 +40,7 @@ pub fn test_apply_delta_at_generated_indices<
 >(
     mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyDelta<BTreeMap<K, i32>>,
+    C: ApplyDelta<BTreeMapHalfDelta<K, i32>>,
 {
     let first = recorder.push(10);
     let second = recorder.push(20);
@@ -71,7 +72,7 @@ pub fn test_apply_delta_at_specified_indices<
 >(
     mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyDelta<BTreeMap<K, V>>,
+    C: ApplyDelta<BTreeMapHalfDelta<K, V>>,
 {
     recorder.insert(K::from_usize(1), V::from_usize(10));
     recorder.insert(K::from_usize(2), V::from_usize(20));
@@ -103,7 +104,7 @@ pub fn test_apply_delta_on_set<
 >(
     mut recorder: Recorder<C, DC>,
 ) where
-    C: ApplyDelta<BTreeMap<K, ()>>,
+    C: ApplyDelta<BTreeSetHalfDelta<K>>,
 {
     recorder.insert(K::from_usize(10), ());
     recorder.insert(K::from_usize(20), ());

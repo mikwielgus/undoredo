@@ -2,15 +2,14 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::BTreeMap;
-
 use rstar::RTree;
-use undoredo::{Delta, Recorder, UndoRedo};
+use undoredo::delta::{RTreeDelta, RTreeHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<RTree<(i32, i32)>, BTreeMap<(i32, i32), ()>> =
+    let mut recorder: Recorder<RTree<(i32, i32)>, RTreeHalfDelta<(i32, i32)>> =
         Recorder::new(RTree::new());
-    let mut undoredo: UndoRedo<Delta<BTreeMap<(i32, i32), ()>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<RTreeDelta<(i32, i32)>> = UndoRedo::new();
 
     recorder.insert((1, 1), ());
     undoredo.commit(&mut recorder);

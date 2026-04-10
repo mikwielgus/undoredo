@@ -9,6 +9,7 @@ mod common;
 
 use std::collections::HashMap;
 
+use undoredo::delta::HashMapHalfDelta;
 use undoredo::Recorder;
 
 #[test]
@@ -29,6 +30,6 @@ fn test_undo_redo_at_specified_indices() {
         usize,
         i32,
         HashMap<usize, i32>,
-        HashMap<usize, i32>,
+        HashMapHalfDelta<usize, i32>,
     >(HashMap::new());
 }

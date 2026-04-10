@@ -2,8 +2,9 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::collections::{BTreeMap, HashMap};
-use undoredo::{Delta, Recorder, UndoRedo};
+use std::collections::HashMap;
+use undoredo::delta::{VecDelta, VecHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
@@ -12,9 +13,9 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<HashMap<usize, char>, BTreeMap<usize, char>> =
+    let mut recorder: Recorder<HashMap<usize, char>, VecHalfDelta<char>> =
         Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>, Command> = UndoRedo::new();
+    let mut undoredo: UndoRedo<VecDelta<char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
 

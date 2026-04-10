@@ -25,3 +25,8 @@ fn test_insert_and_remove_on_set() {
 fn test_delta_undo_redo_on_set() {
     common::test_delta_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSetHalfDelta<i32>>(BTreeSet::new());
 }
+
+#[test]
+fn test_snapshot_undo_redo() {
+    common::test_snapshot_undo_redo_set::<i32, BTreeSet<i32>>(BTreeSet::new());
+}

@@ -2,8 +2,13 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use undoredo::{Recorder, UndoRedo};
+#[path = "common/mod.rs"]
+mod common;
+
+use std::collections::BTreeMap;
+
 use undoredo::delta::BTreeMapDelta;
+use undoredo::{Recorder, UndoRedo};
 use undoredo_derive::Delta;
 
 #[derive(Delta, Clone, Debug, PartialEq)]
@@ -117,4 +122,9 @@ fn test_enum_vec() {
             TestEnum::Fields { i: 1, u: 2 }
         ]
     );
+}
+
+#[test]
+fn test_snapshot_undo_redo() {
+    common::test_snapshot_undo_redo::<usize, i32, BTreeMap<usize, i32>>(BTreeMap::new());
 }

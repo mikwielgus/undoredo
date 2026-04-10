@@ -5,10 +5,11 @@
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
+use std::vec::Vec;
 
 use undoredo::delta::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::{
-    ApplyDelta, Container, Delta, Get, Insert, IntoIter, Push, Recorder, Remove, UndoRedo,
+    ApplyDelta, Container, Delta, Get, Insert, IntoIter, Push, Recorder, Remove, Snapshot, UndoRedo,
 };
 
 pub(crate) trait Keyed<K>: Container<Key = K> {}
@@ -481,4 +482,129 @@ pub fn test_delta_undo_redo_on_set<
     assert_eq!(container.get(&K::from_usize(30)), Some(&()));
     assert_eq!(container.get(&K::from_usize(40)), Some(&()));
     assert_eq!(container.get(&K::from_usize(50)), Some(&()));
+}
+
+pub fn test_snapshot_undo_redo<
+    K: Clone + FromUsize + std::fmt::Debug + PartialEq,
+    V: Clone + FromUsize + std::fmt::Debug + PartialEq,
+    C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
+>(
+    mut container: C,
+) {
+    let mut undoredo: UndoRedo<Snapshot<C>> = UndoRedo::new();
+    assert_eq!(undoredo.undo(&mut container), None);
+    assert_eq!(undoredo.redo(&mut container), None);
+
+    container.insert(K::from_usize(1), V::from_usize(10));
+    container.insert(K::from_usize(2), V::from_usize(20));
+    container.insert(K::from_usize(3), V::from_usize(30));
+    container.insert(K::from_usize(4), V::from_usize(40));
+    container.insert(K::from_usize(5), V::from_usize(50));
+
+    undoredo.commit(&mut container);
+
+    container.remove(&K::from_usize(2));
+    container.insert(K::from_usize(1), V::from_usize(11));
+    container.insert(K::from_usize(3), V::from_usize(33));
+
+    assert!(undoredo.undo(&mut container).is_some());
+    assert_eq!(container.get(&K::from_usize(1)), Some(&V::from_usize(10)));
+    assert_eq!(container.get(&K::from_usize(2)), Some(&V::from_usize(20)));
+    assert_eq!(container.get(&K::from_usize(3)), Some(&V::from_usize(30)));
+    assert_eq!(container.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(container.get(&K::from_usize(5)), Some(&V::from_usize(50)));
+
+    assert_eq!(undoredo.undo(&mut container), None);
+
+    assert!(undoredo.redo(&mut container).is_some());
+    assert_eq!(container.get(&K::from_usize(1)), Some(&V::from_usize(11)));
+    assert_eq!(container.get(&K::from_usize(2)), None);
+    assert_eq!(container.get(&K::from_usize(3)), Some(&V::from_usize(33)));
+    assert_eq!(container.get(&K::from_usize(4)), Some(&V::from_usize(40)));
+    assert_eq!(container.get(&K::from_usize(5)), Some(&V::from_usize(50)));
+
+    assert_eq!(undoredo.redo(&mut container), None);
+}
+
+pub fn test_snapshot_undo_redo_vec<
+    K: Clone,
+    C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K> + Push<K> + IntoIter<K> + Clone,
+>(
+    mut container: C,
+) {
+    let mut undoredo: UndoRedo<Snapshot<C>> = UndoRedo::new();
+    assert_eq!(undoredo.undo(&mut container), None);
+
+    let mut indices = Vec::new();
+    indices.push(container.push(10));
+    indices.push(indices[0].clone());
+    indices.push(container.push(20));
+    indices.push(container.push(30));
+    indices.push(container.push(40));
+    indices.push(container.push(50));
+    indices.push(container.push(60));
+    container.remove(&indices[6]);
+
+    undoredo.commit(&mut container);
+
+    container.remove(&indices[2]);
+    container.insert(indices[1].clone(), 11);
+    container.insert(indices[3].clone(), 33);
+
+    assert!(undoredo.undo(&mut container).is_some());
+    assert_eq!(undoredo.undo(&mut container), None);
+
+    assert_eq!(container.get(&indices[1]), Some(&10));
+    assert_eq!(container.get(&indices[2]), Some(&20));
+    assert_eq!(container.get(&indices[3]), Some(&30));
+    assert_eq!(container.get(&indices[4]), Some(&40));
+    assert_eq!(container.get(&indices[5]), Some(&50));
+
+    assert!(undoredo.redo(&mut container).is_some());
+
+    assert_eq!(container.get(&indices[1]), Some(&11));
+    assert_eq!(container.get(&indices[2]), None);
+    assert_eq!(container.get(&indices[3]), Some(&33));
+    assert_eq!(container.get(&indices[4]), Some(&40));
+    assert_eq!(container.get(&indices[5]), Some(&50));
+
+    assert_eq!(undoredo.redo(&mut container), None);
+}
+
+pub fn test_snapshot_undo_redo_set<
+    K: Clone + FromUsize,
+    C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
+>(
+    mut container: C,
+) {
+    let mut undoredo: UndoRedo<Snapshot<C>> = UndoRedo::new();
+    assert_eq!(undoredo.undo(&mut container), None);
+
+    container.insert(K::from_usize(10), ());
+    container.insert(K::from_usize(20), ());
+    container.insert(K::from_usize(30), ());
+    container.insert(K::from_usize(40), ());
+    container.insert(K::from_usize(50), ());
+
+    undoredo.commit(&mut container);
+
+    container.remove(&K::from_usize(20));
+
+    assert!(undoredo.undo(&mut container).is_some());
+    assert_eq!(container.get(&K::from_usize(10)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(20)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(30)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(40)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(50)), Some(&()));
+
+    assert_eq!(undoredo.undo(&mut container), None);
+
+    assert!(undoredo.redo(&mut container).is_some());
+    assert_eq!(container.get(&K::from_usize(10)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(20)), None);
+    assert_eq!(container.get(&K::from_usize(30)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(40)), Some(&()));
+    assert_eq!(container.get(&K::from_usize(50)), Some(&()));
+
+    assert_eq!(undoredo.redo(&mut container), None);
 }

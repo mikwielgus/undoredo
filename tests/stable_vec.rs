@@ -47,3 +47,13 @@ fn test_delta_undo_redo_at_specified_indices() {
         StableVec::new(),
     );
 }
+
+#[test]
+fn test_snapshot_undo_redo_vec() {
+    common::test_snapshot_undo_redo_vec::<usize, StableVec<i32>>(StableVec::new());
+}
+
+#[test]
+fn test_snapshot_undo_redo() {
+    common::test_snapshot_undo_redo::<usize, i32, StableVec<i32>>(StableVec::new());
+}

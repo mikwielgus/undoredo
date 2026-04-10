@@ -4,11 +4,21 @@
 
 use alloc::vec::Vec;
 
+/// Revert an edit and return an edit that reverts the revert.
 pub trait Revert<T> {
+    /// Revert an edit and return an edit that reverts the revert.
     fn revert(self, target: &mut T) -> Self;
 }
 
+/// Extract an edit corresponding to the current state.
+///
+/// In delta-based undo-redo, this flushes the delta. In snapshot-based
+/// undo-redo, this clones the current state into a snapshot.
 pub trait Extract<T> {
+    /// Extract an edit corresponding to the current state.
+    ///
+    /// In delta-based undo-redo, this flushes the delta. In snapshot-based
+    /// undo-redo, this clones the current state into a snapshot.
     fn extract(target: &mut T) -> Self;
 }
 

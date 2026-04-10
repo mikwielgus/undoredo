@@ -34,3 +34,9 @@ fn test_recorder_apply_delta_on_set() {
     >::new(RTreed::new(rect_hashmap));
     common::test_recorder_apply_delta_at_specified_indices(recorder);
 }
+
+#[test]
+fn test_snapshot_undo_redo() {
+    let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
+    common::test_snapshot_undo_redo::<i32, Rectangle<(i32, i32)>, _>(RTreed::new(rect_hashmap));
+}

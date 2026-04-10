@@ -180,3 +180,8 @@ fn test_delta_undo_redo() {
     assert_eq!(container.get(5), None);
     assert_eq!(container.get(6), None);
 }
+
+#[test]
+fn test_snapshot_undo_redo() {
+    common::test_snapshot_undo_redo::<usize, i32, BTreeMap<usize, i32>>(BTreeMap::new());
+}

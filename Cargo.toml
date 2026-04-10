@@ -4,7 +4,7 @@
 
 [package]
 name = "undoredo"
-version = "0.9.1"
+version = "0.9.2"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Delta-based undo-redo decorator for collections such as HashMap, BTreeMap, StableVec, thunderdome::Arena, rstar::RTree. No need to implement commands."
 repository = "https://codeberg.org/topola/undoredo"

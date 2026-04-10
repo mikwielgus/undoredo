@@ -17,9 +17,9 @@ impl common::FromUsize for (i32, i32) {
 }
 
 #[test]
-fn test_apply_delta_on_set() {
+fn test_recorder_apply_delta_on_set() {
     let recorder = Recorder::<RTree<(i32, i32)>>::new(RTree::new());
-    common::test_apply_delta_on_set(recorder);
+    common::test_recorder_apply_delta_on_set(recorder);
 }
 
 #[test]
@@ -29,8 +29,8 @@ fn test_insert_and_remove_on_set() {
 }
 
 #[test]
-fn test_undo_redo_on_set() {
-    common::test_undo_redo_on_set::<(i32, i32), RTree<(i32, i32)>, RTree<(i32, i32)>>(
+fn test_delta_undo_redo_on_set() {
+    common::test_delta_undo_redo_on_set::<(i32, i32), RTree<(i32, i32)>, RTree<(i32, i32)>>(
         RTree::new(),
     );
 }

@@ -15,7 +15,7 @@ struct TestStruct {
 }
 
 #[test]
-fn test_apply_delta_struct() {
+fn test_recorder_apply_delta_struct() {
     let mut s = TestStruct {
         v: Recorder::new(vec![1, 2, 3]),
     };

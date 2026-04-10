@@ -10,7 +10,7 @@ use undoredo::delta::{VecDelta, VecHalfDelta};
 use undoredo::{ApplyDelta, Delta, Recorder, UndoRedo};
 
 #[test]
-fn test_apply_delta_and_reverse() {
+fn test_recorder_apply_delta_and_reverse() {
     let mut recorder = Recorder::<Vec<i32>, VecHalfDelta<i32>>::new(Vec::new());
 
     recorder.push(0);
@@ -55,7 +55,7 @@ fn test_apply_delta_and_reverse() {
 }
 
 #[test]
-fn test_push_and_pop() {
+fn test_recorder_push_and_pop() {
     let mut recorder = Recorder::<Vec<i32>, VecHalfDelta<i32>>::new(Vec::new());
 
     recorder.push(0);
@@ -79,7 +79,7 @@ fn test_push_and_pop() {
 }
 
 #[test]
-fn test_undo_redo() {
+fn test_delta_undo_redo() {
     let container: Vec<i32> = Vec::new();
     let mut undoredo: UndoRedo<VecDelta<i32>> = UndoRedo::new();
 

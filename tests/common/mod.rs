@@ -33,7 +33,7 @@ impl FromUsize for usize {
     }
 }
 
-pub fn test_apply_delta_at_generated_indices<
+pub fn test_recorder_apply_delta_at_generated_indices<
     K: Ord + Clone,
     C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K> + Push<K>,
     DC: Clone + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + Remove<K>,
@@ -64,7 +64,7 @@ pub fn test_apply_delta_at_generated_indices<
     assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
-pub fn test_apply_delta_at_specified_indices<
+pub fn test_recorder_apply_delta_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     C: Keyed<K> + Map<V> + Insert<K> + Remove<K> + Get<K>,
@@ -97,7 +97,7 @@ pub fn test_apply_delta_at_specified_indices<
     assert_eq!(recorder.get(&K::from_usize(6)), Some(&V::from_usize(66)));
 }
 
-pub fn test_apply_delta_on_set<
+pub fn test_recorder_apply_delta_on_set<
     K: Clone + FromUsize + Ord,
     C: Keyed<K> + Map<()> + Insert<K> + Remove<K> + Get<K>,
     DC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K>,
@@ -154,7 +154,7 @@ pub fn test_insert_and_remove_at_generated_indices<
     assert_eq!(recorder.get(&sixth), Some(&66));
 }
 
-pub fn test_insert_and_remove_at_specified_indices<
+pub fn test_recorder_insert_and_remove_at_specified_indices<
     C: Keyed<usize> + Map<i32> + Insert<usize> + Remove<usize> + Get<usize>,
     DC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + Remove<usize>,
 >(
@@ -203,7 +203,7 @@ pub fn test_insert_and_remove_on_set<
     assert_eq!(recorder.get(&K::from_usize(60)), Some(&()));
 }
 
-pub fn test_undo_redo_at_generated_indices<
+pub fn test_delta_undo_redo_at_generated_indices<
     K: Clone,
     C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K> + Push<K> + IntoIter<K> + ApplyDelta<DC>,
     DC: Clone + Default + Keyed<K> + Map<i32> + Get<K> + Insert<K> + IntoIter<K> + Remove<K>,
@@ -302,7 +302,7 @@ pub fn test_undo_redo_at_generated_indices<
     assert_eq!(container.get(&indices[5]), Some(&50));
 }
 
-pub fn test_undo_redo_at_specified_indices<
+pub fn test_delta_undo_redo_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
     C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + ApplyDelta<DC>,
@@ -394,7 +394,7 @@ pub fn test_undo_redo_at_specified_indices<
     assert_eq!(container.get(&K::from_usize(5)), Some(&V::from_usize(50)));
 }
 
-pub fn test_undo_redo_on_set<
+pub fn test_delta_undo_redo_on_set<
     K: Clone + FromUsize,
     C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + ApplyDelta<DC>,
     DC: Clone + Default + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K>,

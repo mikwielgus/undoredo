@@ -10,9 +10,9 @@ use undoredo::delta::BTreeSetHalfDelta;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_delta_on_set() {
+fn test_recorder_apply_delta_on_set() {
     let recorder = Recorder::<BTreeSet<i32>>::new(BTreeSet::new());
-    common::test_apply_delta_on_set(recorder);
+    common::test_recorder_apply_delta_on_set(recorder);
 }
 
 #[test]
@@ -22,6 +22,6 @@ fn test_insert_and_remove_on_set() {
 }
 
 #[test]
-fn test_undo_redo_on_set() {
-    common::test_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSetHalfDelta<i32>>(BTreeSet::new());
+fn test_delta_undo_redo_on_set() {
+    common::test_delta_undo_redo_on_set::<i32, BTreeSet<i32>, BTreeSetHalfDelta<i32>>(BTreeSet::new());
 }

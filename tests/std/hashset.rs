@@ -13,9 +13,9 @@ use undoredo::delta::HashSetHalfDelta;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_delta_on_set() {
+fn test_recorder_apply_delta_on_set() {
     let recorder = Recorder::<HashSet<i32>>::new(HashSet::new());
-    common::test_apply_delta_on_set(recorder);
+    common::test_recorder_apply_delta_on_set(recorder);
 }
 
 #[test]
@@ -25,6 +25,6 @@ fn test_insert_and_remove_on_set() {
 }
 
 #[test]
-fn test_undo_redo_on_set() {
-    common::test_undo_redo_on_set::<i32, HashSet<i32>, HashSetHalfDelta<i32>>(HashSet::new());
+fn test_delta_undo_redo_on_set() {
+    common::test_delta_undo_redo_on_set::<i32, HashSet<i32>, HashSetHalfDelta<i32>>(HashSet::new());
 }

@@ -11,9 +11,9 @@ use thunderdome::{Arena, Index};
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_delta_at_generated_indices() {
+fn test_recorder_apply_delta_at_generated_indices() {
     let recorder = Recorder::<Arena<i32>>::new(Arena::new());
-    common::test_apply_delta_at_generated_indices::<Index, _, _>(recorder);
+    common::test_recorder_apply_delta_at_generated_indices::<Index, _, _>(recorder);
 }
 
 #[test]
@@ -23,6 +23,6 @@ fn test_insert_and_remove_at_generated_indices() {
 }
 
 #[test]
-fn test_undo_redo_at_generated_indices() {
-    common::test_undo_redo_at_generated_indices::<Index, Arena<i32>, Arena<i32>>(Arena::new());
+fn test_delta_undo_redo_at_generated_indices() {
+    common::test_delta_undo_redo_at_generated_indices::<Index, Arena<i32>, Arena<i32>>(Arena::new());
 }

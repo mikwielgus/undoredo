@@ -11,15 +11,15 @@ use stable_vec::StableVec;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_delta_at_generated_indices() {
+fn test_recorder_apply_delta_at_generated_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_delta_at_generated_indices::<usize, _, _>(recorder);
+    common::test_recorder_apply_delta_at_generated_indices::<usize, _, _>(recorder);
 }
 
 #[test]
-fn test_apply_delta_at_specified_indices() {
+fn test_recorder_apply_delta_at_specified_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_apply_delta_at_specified_indices(recorder);
+    common::test_recorder_apply_delta_at_specified_indices(recorder);
 }
 
 #[test]
@@ -29,21 +29,21 @@ fn test_insert_and_remove_at_generated_indices() {
 }
 
 #[test]
-fn test_insert_and_remove_at_specified_indices() {
+fn test_recorder_insert_and_remove_at_specified_indices() {
     let recorder = Recorder::<StableVec<i32>>::new(StableVec::new());
-    common::test_insert_and_remove_at_specified_indices(recorder);
+    common::test_recorder_insert_and_remove_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_undo_redo_at_generated_indices() {
-    common::test_undo_redo_at_generated_indices::<usize, StableVec<i32>, StableVec<i32>>(
+fn test_delta_undo_redo_at_generated_indices() {
+    common::test_delta_undo_redo_at_generated_indices::<usize, StableVec<i32>, StableVec<i32>>(
         StableVec::new(),
     );
 }
 
 #[test]
-fn test_undo_redo_at_specified_indices() {
-    common::test_undo_redo_at_specified_indices::<usize, i32, StableVec<i32>, StableVec<i32>>(
+fn test_delta_undo_redo_at_specified_indices() {
+    common::test_delta_undo_redo_at_specified_indices::<usize, i32, StableVec<i32>, StableVec<i32>>(
         StableVec::new(),
     );
 }

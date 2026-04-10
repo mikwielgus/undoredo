@@ -10,20 +10,20 @@ use undoredo::delta::BTreeMapHalfDelta;
 use undoredo::Recorder;
 
 #[test]
-fn test_apply_delta_at_specified_indices() {
+fn test_recorder_apply_delta_at_specified_indices() {
     let recorder = Recorder::<BTreeMap<usize, i32>>::new(BTreeMap::new());
-    common::test_apply_delta_at_specified_indices(recorder);
+    common::test_recorder_apply_delta_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_insert_and_remove_at_specified_indices() {
+fn test_recorder_insert_and_remove_at_specified_indices() {
     let recorder = Recorder::<BTreeMap<usize, i32>>::new(BTreeMap::new());
-    common::test_insert_and_remove_at_specified_indices(recorder);
+    common::test_recorder_insert_and_remove_at_specified_indices(recorder);
 }
 
 #[test]
-fn test_undo_redo_at_specified_indices() {
-    common::test_undo_redo_at_specified_indices::<
+fn test_delta_undo_redo_at_specified_indices() {
+    common::test_delta_undo_redo_at_specified_indices::<
         usize,
         i32,
         BTreeMap<usize, i32>,

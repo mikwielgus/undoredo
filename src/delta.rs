@@ -120,6 +120,9 @@ where
     }
 }
 
+type VecHalfDelta<V> = BTreeMap<usize, V>;
+type VecDelta<V> = Delta<VecHalfDelta<V>>;
+
 impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
 where
     DC::IntoIter: DoubleEndedIterator,
@@ -154,11 +157,17 @@ where
     }
 }
 
+type BTreeMapHalfDelta<K, V> = BTreeMap<K, V>;
+type BTreeMapDelta<K, V> = Delta<BTreeMapHalfDelta<K, V>>;
+
 impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
+
+type BTreeSetHalfDelta<K> = BTreeMap<K, ()>;
+type BTreeSetDelta<K> = Delta<BTreeSetHalfDelta<K>>;
 
 impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -166,11 +175,14 @@ impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> fo
     }
 }
 
-macro_rules! impl_apply_delta_for_scalar {
-    ($($t:ty),+ $(,)?) => {
+macro_rules! impl_delta_for_scalar {
+    ($($half_delta:ident, $delta:ident, $t:ty);+ $(;)?) => {
         $(
-            impl ApplyDelta<BTreeMap<usize, $t>> for $t {
-                fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, $t>>) {
+            type $half_delta = BTreeMap<usize, $t>;
+            type $delta = Delta<$half_delta>;
+
+            impl ApplyDelta<$half_delta> for $t {
+                fn apply_delta(&mut self, delta: $delta) {
                     let (_removed, mut inserted) = delta.dissolve();
                     if let Some(value) = inserted.remove(&0) {
                         *self = value;
@@ -181,15 +193,33 @@ macro_rules! impl_apply_delta_for_scalar {
     };
 }
 
-impl_apply_delta_for_scalar!(i8, i16, i32, i64, i128, isize);
-impl_apply_delta_for_scalar!(u8, u16, u32, u64, u128, usize);
-impl_apply_delta_for_scalar!(f32, f64);
-impl_apply_delta_for_scalar!(char, bool, ());
+impl_delta_for_scalar! {
+    I8HalfDelta, I8Delta, i8;
+    I16HalfDelta, I16Delta, i16;
+    I32HalfDelta, I32Delta, i32;
+    I64HalfDelta, I64Delta, i64;
+    I128HalfDelta, I128Delta, i128;
+    IsizeHalfDelta, IsizeDelta, isize;
+    U8HalfDelta, U8Delta, u8;
+    U16HalfDelta, U16Delta, u16;
+    U32HalfDelta, U32Delta, u32;
+    U64HalfDelta, U64Delta, u64;
+    U128HalfDelta, U128Delta, u128;
+    UsizeHalfDelta, UsizeDelta, usize;
+    F32HalfDelta, F32Delta, f32;
+    F64HalfDelta, F64Delta, f64;
+    CharHalfDelta, CharDelta, char;
+    BoolHalfDelta, BoolDelta, bool;
+    UnitHalfDelta, UnitDelta, ();
+}
 
-macro_rules! impl_apply_delta_for_tuple {
-    ($($idx:tt $typ:ident),+ $(,)?) => {
-        impl<$($typ,)+> ApplyDelta<BTreeMap<usize, ($($typ,)+)>> for ($($typ,)+) {
-            fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, ($($typ,)+)>>) {
+macro_rules! impl_delta_for_tuple {
+    ($half_delta:ident, $delta:ident, $($idx:tt $typ:ident),+ $(,)?) => {
+        type $half_delta<$($typ),+> = BTreeMap<usize, ($($typ,)+)>;
+        type $delta<$($typ),+> = Delta<$half_delta<$($typ),+>>;
+
+        impl<$($typ,)+> ApplyDelta<$half_delta<$($typ),+>> for ($($typ,)+) {
+            fn apply_delta(&mut self, delta: $delta<$($typ),+>) {
                 let (_removed, mut inserted) = delta.dissolve();
                 if let Some(value) = inserted.remove(&0) {
                     *self = value;
@@ -199,30 +229,97 @@ macro_rules! impl_apply_delta_for_tuple {
     };
 }
 
-impl_apply_delta_for_tuple!(0 T0);
-impl_apply_delta_for_tuple!(0 T0, 1 T1);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7);
-impl_apply_delta_for_tuple!(0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8);
-impl_apply_delta_for_tuple!(
-    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9
+impl_delta_for_tuple!(Tuple1HalfDelta, Tuple1Delta, 0 T0);
+impl_delta_for_tuple!(Tuple2HalfDelta, Tuple2Delta, 0 T0, 1 T1);
+impl_delta_for_tuple!(Tuple3HalfDelta, Tuple3Delta, 0 T0, 1 T1, 2 T2);
+impl_delta_for_tuple!(Tuple4HalfDelta, Tuple4Delta, 0 T0, 1 T1, 2 T2, 3 T3);
+impl_delta_for_tuple!(Tuple5HalfDelta, Tuple5Delta, 0 T0, 1 T1, 2 T2, 3 T3, 4 T4);
+impl_delta_for_tuple!(Tuple6HalfDelta, Tuple6Delta, 0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5);
+impl_delta_for_tuple!(Tuple7HalfDelta, Tuple7Delta, 0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6);
+impl_delta_for_tuple!(
+    Tuple8HalfDelta,
+    Tuple8Delta,
+    0 T0,
+    1 T1,
+    2 T2,
+    3 T3,
+    4 T4,
+    5 T5,
+    6 T6,
+    7 T7
 );
-impl_apply_delta_for_tuple!(
-    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9, 10 T10
+impl_delta_for_tuple!(
+    Tuple9HalfDelta,
+    Tuple9Delta,
+    0 T0,
+    1 T1,
+    2 T2,
+    3 T3,
+    4 T4,
+    5 T5,
+    6 T6,
+    7 T7,
+    8 T8
 );
-impl_apply_delta_for_tuple!(
-    0 T0, 1 T1, 2 T2, 3 T3, 4 T4, 5 T5, 6 T6, 7 T7, 8 T8, 9 T9, 10 T10, 11 T11
+impl_delta_for_tuple!(
+    Tuple10HalfDelta,
+    Tuple10Delta,
+    0 T0,
+    1 T1,
+    2 T2,
+    3 T3,
+    4 T4,
+    5 T5,
+    6 T6,
+    7 T7,
+    8 T8,
+    9 T9
 );
+impl_delta_for_tuple!(
+    Tuple11HalfDelta,
+    Tuple11Delta,
+    0 T0,
+    1 T1,
+    2 T2,
+    3 T3,
+    4 T4,
+    5 T5,
+    6 T6,
+    7 T7,
+    8 T8,
+    9 T9,
+    10 T10
+);
+impl_delta_for_tuple!(
+    Tuple12HalfDelta,
+    Tuple12Delta,
+    0 T0,
+    1 T1,
+    2 T2,
+    3 T3,
+    4 T4,
+    5 T5,
+    6 T6,
+    7 T7,
+    8 T8,
+    9 T9,
+    10 T10,
+    11 T11
+);
+
+type PhantomDataHalfDelta = BTreeMap<usize, ()>;
+type PhantomDataDelta = Delta<PhantomDataHalfDelta>;
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
     fn apply_delta(&mut self, _delta: Delta<DC>) {
         // Nothing happens here, obviously.
     }
 }
+
+#[cfg(feature = "std")]
+type HashMapHalfDelta<K, V> = HashMap<K, V>;
+#[cfg(feature = "std")]
+type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
 
 #[cfg(feature = "std")]
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
@@ -234,11 +331,21 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "std")]
+type HashSetHalfDelta<K> = HashMap<K, ()>;
+#[cfg(feature = "std")]
+type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
+
+#[cfg(feature = "std")]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
+
+#[cfg(feature = "stable-vec")]
+type StableVecHalfDelta<V> = BTreeMap<usize, V>;
+#[cfg(feature = "stable-vec")]
+type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 
 #[cfg(feature = "stable-vec")]
 impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
@@ -250,11 +357,22 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
+type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
+#[cfg(feature = "thunderdome")]
+type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
+
+#[cfg(feature = "thunderdome")]
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
 }
+
+#[cfg(feature = "rstar")]
+type RTreeHalfDelta<K> = BTreeMap<K, ()>;
+
+#[cfg(feature = "rstar")]
+type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
@@ -264,6 +382,12 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
         apply_delta_on_map(self, delta);
     }
 }
+
+#[cfg(feature = "rstared")]
+type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
+
+#[cfg(feature = "rstared")]
+type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
 
 #[cfg(feature = "rstared")]
 impl<

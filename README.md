@@ -49,7 +49,7 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = "0.8"
+undoredo = "0.9"
 ```
 
 ### Basic usage

@@ -59,7 +59,7 @@ over `HashMap`. You can find more examples in the
 [examples/](https://codeberg.org/topola/undoredo/src/branch/develop/examples)
 directory.
 
-```rust-ignore
+```rust,ignore
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Delta, Recorder, UndoRedo};
 
@@ -117,7 +117,7 @@ and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 accessor methods.
 
-```rust-ignore
+```rust,ignore
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Delta, Insert, Recorder, UndoRedo};
 
@@ -162,7 +162,7 @@ easily as insertions and removals by calling
 [`.push()`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html#impl-Push%3CK%3E-for-Recorder%3CK,+V,+C,+DC%3E)
 on the recorder, like this:
 
-```rust-ignore
+```rust,ignore
 recorder.push('A');
 ```
 
@@ -187,7 +187,7 @@ two set types, `HashSet`
 As an example, the following code will construct a recorder and an undo-redo
 bistack for a `BTreeSet`:
 
-```rust-ignore
+```rust,ignore
 let mut recorder: Recorder<BTreeSet<char>> = Recorder::new(BTreeSet::new());
 let mut undoredo: UndoRedo<Delta<BTreeSet<char>>> = UndoRedo::new();
 ```

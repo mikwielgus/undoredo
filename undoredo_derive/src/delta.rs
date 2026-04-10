@@ -9,6 +9,20 @@ use syn::{Data, DeriveInput};
 
 use crate::{apply_delta, flush_delta, half_delta};
 
+fn resolve_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
+    let mut delta_name = format_ident!("{}Delta", input.ident);
+
+    for attr in &input.attrs {
+        if attr.path().is_ident("delta") {
+            delta_name = attr
+                .parse_args::<syn::Ident>()
+                .map_err(|_| syn::Error::new_spanned(attr, "expected #[delta(Name)]"))?;
+        }
+    }
+
+    Ok(delta_name)
+}
+
 pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
@@ -16,7 +30,7 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let output = match &input.data {
         Data::Struct(_) => {
             let half_id = half_delta::resolve_half_delta_ident(&input)?;
-            let delta_alias_ident = format_ident!("{}Delta", name);
+            let delta_alias_ident = resolve_delta_ident(&input)?;
             let vis = &input.vis;
             let half_delta = TokenStream2::from(half_delta::expand_half_delta(input.clone())?);
             let delta_alias = quote! {

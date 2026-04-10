@@ -16,19 +16,19 @@ pub fn derive_half_delta(input: TokenStream) -> TokenStream {
     half_delta::expand_half_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-#[proc_macro_derive(ApplyDelta, attributes(apply_delta))]
+#[proc_macro_derive(ApplyDelta, attributes(half_delta))]
 pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     apply_delta::expand_apply_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-#[proc_macro_derive(FlushDelta, attributes(flush_delta))]
+#[proc_macro_derive(FlushDelta, attributes(half_delta))]
 pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     flush_delta::expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-#[proc_macro_derive(Delta, attributes(half_delta, apply_delta, flush_delta))]
+#[proc_macro_derive(Delta, attributes(half_delta, delta))]
 pub fn derive_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     delta::expand_delta(input).unwrap_or_else(|err| err.to_compile_error().into())

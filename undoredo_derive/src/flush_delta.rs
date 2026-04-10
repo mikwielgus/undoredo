@@ -7,22 +7,8 @@ use quote::{format_ident, quote};
 use syn::{Data, DeriveInput, Fields, Index};
 
 pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream> {
-    let name = input.ident;
-    let mut half_delta_name = format_ident!("{}HalfDelta", name);
-
-    for attr in &input.attrs {
-        if attr.path().is_ident("flush_delta") {
-            attr.parse_nested_meta(|meta| {
-                if meta.path.is_ident("name") {
-                    let value: syn::LitStr = meta.value()?.parse()?;
-                    half_delta_name = format_ident!("{}", value.value());
-                    Ok(())
-                } else {
-                    Err(meta.error("unsupported flush_delta attribute key"))
-                }
-            })?;
-        }
-    }
+    let name = input.ident.clone();
+    let half_delta_name = crate::half_delta::resolve_half_delta_ident(&input)?;
 
     let mut flush_stmts = Vec::new();
 

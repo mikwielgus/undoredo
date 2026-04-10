@@ -10,6 +10,7 @@ use undoredo::Recorder;
 use undoredo_derive::HalfDelta;
 
 #[derive(HalfDelta)]
+#[half_delta(TestStructHalfDelta)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }

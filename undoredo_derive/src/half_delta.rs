@@ -12,15 +12,9 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
 
     for attr in &input.attrs {
         if attr.path().is_ident("half_delta") {
-            attr.parse_nested_meta(|meta| {
-                if meta.path.is_ident("name") {
-                    let value: syn::LitStr = meta.value()?.parse()?;
-                    half_delta_name = format_ident!("{}", value.value());
-                    Ok(())
-                } else {
-                    Err(meta.error("unsupported half_delta attribute key"))
-                }
-            })?;
+            half_delta_name = attr
+                .parse_args::<syn::Ident>()
+                .map_err(|_| syn::Error::new_spanned(attr, "expected #[half_delta(Name)]"))?;
         }
     }
 

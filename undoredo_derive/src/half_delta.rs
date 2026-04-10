@@ -7,10 +7,8 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{ToTokens, format_ident, quote};
 use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type};
 
-pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {
-    let vis = &input.vis;
-    let name = input.ident;
-    let mut half_delta_name = format_ident!("{}HalfDelta", name);
+pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
+    let mut half_delta_name = format_ident!("{}HalfDelta", input.ident);
 
     for attr in &input.attrs {
         if attr.path().is_ident("half_delta") {
@@ -25,6 +23,13 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
             })?;
         }
     }
+
+    Ok(half_delta_name)
+}
+
+pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {
+    let vis = &input.vis;
+    let half_delta_name = resolve_half_delta_ident(&input)?;
 
     let output = match &input.data {
         Data::Struct(data) => match &data.fields {

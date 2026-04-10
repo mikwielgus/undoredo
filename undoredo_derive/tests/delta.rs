@@ -21,7 +21,7 @@ fn test_delta_derive_struct() {
         v: Recorder::new(vec![1, 2, 3]),
     };
 
-    let d = undoredo::Delta::with_removed_inserted(
+    let d = TestStructDelta::with_removed_inserted(
         TestStructHalfDelta {
             v: BTreeMap::from([(2, 3)]),
         },

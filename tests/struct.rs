@@ -22,7 +22,7 @@ fn test_struct() {
         v: Recorder::new(vec![]),
         i: Recorder::new(0),
     };
-    let mut undoredo: UndoRedo<undoredo::Delta<TestStructHalfDelta>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<TestStructDelta> = UndoRedo::new();
     assert_eq!(*s.v.container(), vec![]);
     assert_eq!(s.i.container(), &0);
 

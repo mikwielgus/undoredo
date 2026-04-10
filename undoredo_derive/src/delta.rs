@@ -4,7 +4,7 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::{Data, DeriveInput};
 
 use crate::{apply_delta, flush_delta, half_delta};
@@ -15,13 +15,20 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
 
     let output = match &input.data {
         Data::Struct(_) => {
-            let half = TokenStream2::from(half_delta::expand_half_delta(input.clone())?);
-            let apply = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
-            let flush = TokenStream2::from(flush_delta::expand_flush_delta(input)?);
+            let half_id = half_delta::resolve_half_delta_ident(&input)?;
+            let delta_alias_ident = format_ident!("{}Delta", name);
+            let vis = &input.vis;
+            let half_delta = TokenStream2::from(half_delta::expand_half_delta(input.clone())?);
+            let delta_alias = quote! {
+                #vis type #delta_alias_ident = ::undoredo::Delta<#half_id> #where_clause;
+            };
+            let apply_delta = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
+            let flush_delta = TokenStream2::from(flush_delta::expand_flush_delta(input)?);
             quote! {
-                #half
-                #apply
-                #flush
+                #half_delta
+                #delta_alias
+                #apply_delta
+                #flush_delta
             }
         }
         Data::Enum(_) => {

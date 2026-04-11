@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
+[workspace]
+members = [".", "undoredo_derive"]
+
 [package]
 name = "undoredo"
 version = "0.9.5"

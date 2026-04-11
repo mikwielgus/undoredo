@@ -1,0 +1,7 @@
+
+# SPDX-FileCopyrightText: 2026 undoredo contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+shared-version = true
+pre-release-commit-message = "Release {{version}}"

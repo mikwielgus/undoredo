@@ -5,3 +5,4 @@
 
 shared-version = true
 pre-release-commit-message = "Release {{version}}"
+tag-name = "{{version}}"

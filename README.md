@@ -10,13 +10,17 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements Undo/Redo functionality
-on an arbitrary data structure by maintaining a pair of stacks
-(*bistack*) of sparse *deltas* of changes (alternative terms:
-*patches*, *edits*) or whole *snapshots* of past states ([Memento
-pattern](https://en.wikipedia.org/wiki/Memento_pattern)),
-or with commands that originated each change ([Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern)).
+`undoredo` is a Rust library that implements Undo/Redo functionality on
+arbitrary data structures automatically recording sparse *deltas* of changes
+(*deltas* are sometimes also called *patches*) or whole *snapshots* of past
+states ([Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
+
+This approach is much easier than the commonly used ([Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern)), which is used by
+other Undo/Redo crates, as it does not require maintenance of any additional
+application logic, which can lead to elusive bugs. Nonetheless, `undoredo` can
+also store a command or other metadata along with every edit, allowing easy
+implementation of the Command pattern as well.
 
 This library is `no_std`-compatible and has no mandatory third-party dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has

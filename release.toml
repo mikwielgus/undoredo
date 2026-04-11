@@ -1,0 +1,4 @@
+pre-release-replacements = [
+  {file="README.md", search="predicates = .*", replace="{{crate_name}} = \"{{version}}\""},
+  {file="src/lib.rs", search="predicates = .*", replace="{{crate_name}} = \"{{version}}\""},
+]

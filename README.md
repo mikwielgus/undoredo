@@ -10,12 +10,13 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements Undo/Redo functionality on an
-arbitrary data structure by maintaining a *bistack* of sparse *deltas* of
-changes (alternative terms: *patches*, *edits*) or whole *snapshots* of past
-states ((Memento pattern)[https://en.wikipedia.org/wiki/Memento_pattern]),
-or with commands that originated each change ((Command
-pattern)[https://en.wikipedia.org/wiki/Command_pattern]).
+`undoredo` is a Rust library that implements Undo/Redo functionality
+on an arbitrary data structure by maintaining a pair of stacks
+(*bistack*) of sparse *deltas* of changes (alternative terms:
+*patches*, *edits*) or whole *snapshots* of past states ([Memento
+pattern](https://en.wikipedia.org/wiki/Memento_pattern)),
+or with commands that originated each change ([Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern)).
 
 This library is `no_std`-compatible and has no mandatory third-party dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has
@@ -44,7 +45,7 @@ undoredo = "0.9"
 
 Following is a basic usage example of `undoredo`
 over `HashMap`. You can find more examples in the
-[examples/](https://codeberg.org/topola/undoredo/src/branch/develop/examples)
+[examples/](https://github.com/mikwielgus/undoredo/src/branch/develop/examples)
 directory.
 
 ```rust,ignore
@@ -155,9 +156,9 @@ recorder.push('A');
 ```
 
 `StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
-[examples/stable_vec.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/stable_vec.rs)
+[examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/stable_vec.rs)
 and
-[examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs)
+[examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/thunderdome.rs)
 for complete examples of their usage.
 
 ### Undo-redo on sets
@@ -182,12 +183,12 @@ let mut undoredo: UndoRedo<Delta<BTreeSet<char>>> = UndoRedo::new();
 
 Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
-[examples/btreeset.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/btreeset.rs)
+[examples/btreeset.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/btreeset.rs)
 for a complete example.
 
 Among the supported third-party types, `rstar::RTree` is an instance of a data
 structure with a convenience implementation over set semantics. See
-[examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs)
+[examples/rstar.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstar.rs)
 for an example of its usage.
 
 **NOTE:** Some set-like data structures are actually multisets: they allow
@@ -228,14 +229,14 @@ convenience implementations for data structures from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature (example usage:
-  [examples/stable_vec.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/stable_vec.rs)),
+  [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
   gated by the `thunderdome` feature (example usage:
-  [examples/thunderdome.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/thunderdome.rs));
+  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/thunderdome.rs));
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature (example usage: [examples/rstar.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstar.rs));
+  `rstar` feature (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature (example usage: [examples/rstared.rs](https://codeberg.org/topola/undoredo/src/branch/develop/examples/rstared.rs)).
+  `rstared` feature (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstared.rs)).
 
 To use these, enable their corresponding features next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type
@@ -266,7 +267,7 @@ on `undoredo`'s usage.
 ## Contributing
 
 We welcome issues and pull requests from anyone both to our canonical
-[repository](https://codeberg.org/topola/undoredo) on Codeberg and to our GitHub
+[repository](https://github.com/mikwielgus/undoredo) on Codeberg and to our GitHub
 [mirror](https://github.com/mikwielgus/undoredo).
 
 ## Licence

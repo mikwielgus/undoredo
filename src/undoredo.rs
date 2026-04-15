@@ -78,12 +78,24 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
 }
 
 impl<Cmd, E> UndoRedo<E, Cmd> {
-    /// Flush and push changes onto the *done* stack.
+    /// Flush and push changes onto the *done* stack along with additional
+    /// metadata ("cmd").
     ///
     /// Clears the undone stack.
     pub fn cmd_commit(&mut self, cmd: Cmd, edit: E) {
         self.done.push(CmdEdit { cmd, edit });
         self.undone.clear();
+    }
+}
+
+impl<Cmd> UndoRedo<(), Cmd> {
+    /// Push command onto the *done* stack without any edit (delta or snapshot).
+    ///
+    /// This is convenience interface for [Command
+    /// pattern](https://en.wikipedia.org/wiki/Command_pattern), equivalent to
+    /// calling [`cmd_commit()`] with the `command` as `cmd` and `()` as `edit`.
+    pub fn command(&mut self, command: Cmd) {
+        self.cmd_commit(command, ());
     }
 }
 

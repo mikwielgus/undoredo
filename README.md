@@ -10,21 +10,24 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements Undo/Redo functionality on
-arbitrary data structures automatically recording sparse *deltas* of changes
-(*deltas* are sometimes also called *patches*) or whole *snapshots* of past
-states ([Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
+`undoredo` is a Rust library that implements Undo/Redo functionality
+on arbitrary data structures by automatically recording sparse *deltas*
+(*patches*) of changes, or whole *snapshots* of past states ([Memento
+pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
 
-This approach is much easier than the commonly used ([Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern)), which is used by
-other Undo/Redo crates, as it does not require maintenance of any additional
-application logic, which can lead to elusive bugs. Nonetheless, `undoredo` can
-also store a command or other metadata along with every edit, allowing easy
-implementation of the Command pattern as well.
+These approaches are much easier than the commonly used ([Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern)), which is what is
+used by other Undo/Redo crates, as having to implement commands requires
+maintenance of additional application logic, which is often complicated and
+can lead to elusive bugs. Nevertheless, `undoredo` can also store a command or
+other metadata along with every edit, allowing easy use of the Command pattern
+as well.
 
-This library is `no_std`-compatible and has no mandatory third-party dependencies except
-for [`alloc`](https://doc.rust-lang.org/alloc/). For ease of use, `undoredo` has
-convenience implementations for standard library collections:
+Delta-recording undo-redo requires creating a separate delta edit type
+for each data structure. For ease of use, `undoredo` has derive macros
+(`#[derive(Delta)]`) to automatically generate these types on arbitrary custom
+`struct`s and `enum`s, as well as convenience implementations for standard
+library collections:
 [`HashMap`](https://doc.rust-lang.org/std/containers/struct.HashMap.html),
 [`HashSet`](https://doc.rust-lang.org/stable/std/containers/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/containers/struct.BTreeMap.html),
@@ -36,19 +39,30 @@ and for some third-party feature-gated types:
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
 [Supported containers](#supported-containers) section).
 
+This library is `no_std`-compatible and has no mandatory third-party dependencies except
+for [`alloc`](https://doc.rust-lang.org/alloc/).
+
 ## Usage
+
+### Adding dependency
 
 First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = "0.9"
+undoredo = { version = "0.9", features = ["derive"] }
 ```
 
-### Basic usage
+The `derive` feature flag is only required when using delta-recording undo-redo
+on custom `struct` or `enum` types to derive delta edit types. Snapshots and
+commands work without any derives.
 
-Following is a basic usage example of `undoredo`
-over `HashMap`. You can find more examples in the
+### Usage examples
+
+#### Delta recorder over `HashMap`
+
+Following is a basic usage example of delta-recording undo-redo over `HashMap`.
+You can find more examples in the
 [examples/](https://github.com/mikwielgus/undoredo/src/branch/develop/examples)
 directory.
 
@@ -95,11 +109,11 @@ fn main() {
 }
 ```
 
-### Storing and accessing command metadata along with deltas
+#### Using command metadata along with deltas
 
 It is often desirable to store some metadata along with every recorded delta,
-usually a representation of the command that originated it. This can be done by
-instead committing the delta using the
+usually some representation of the command that originated it. This can be done
+by instead committing the delta using the
 [`.cmd_commit()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.cmd_commit)
 method.
 
@@ -146,12 +160,12 @@ fn main() {
 ### Undo-redo on maps with pushing
 
 Some data structures with map semantics also provide a special type of insertion
-where a value is inserted without specifying a key, which the structure
-instead automatically generates and returns by itself. This operation is called
-"pushing".
+where a value is inserted without specifying a key, which the structure instead
+automatically generates and returns by itself. In `undoredo`, this operation is
+called "pushing".
 
-If a supported type has a push interface, you can record its changes just as
-easily as insertions and removals by calling
+If a supported type has such a push interface, you can record its changes just
+as easily as insertions and removals by calling
 [`.push()`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html#impl-Push%3CK%3E-for-Recorder%3CK,+V,+C,+DC%3E)
 on the recorder, like this:
 
@@ -160,6 +174,7 @@ recorder.push('A');
 ```
 
 `StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
+See
 [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/stable_vec.rs)
 and
 [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/thunderdome.rs)
@@ -169,9 +184,8 @@ for complete examples of their usage.
 
 Some data structures have set semantics: they operate only on values, without
 exposing any usable notion of key or index. `undoredo` can provide its
-functionality to a set by treating it as a `()`-valued map whose keys are the
-set's values. This is actually also how Rust's standard library
-internally
+functionality to such a set by treating it as a `()`-valued map whose keys are
+the set's values. This is actually also how Rust's standard library internally
 [represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115) its
 two set types, `HashSet`
 [and](https://doc.rust-lang.org/stable/src/alloc/containers/btree/set.rs.html#82)
@@ -190,8 +204,8 @@ Keeping in mind to pass values as keys, `recorder` and
 [examples/btreeset.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/btreeset.rs)
 for a complete example.
 
-Among the supported third-party types, `rstar::RTree` is an instance of a data
-structure with a convenience implementation over set semantics. See
+Among the supported third-party types, `rstar::RTree` is one data structure for
+which `undoredo` has a convenience implementation over set semantics. See
 [examples/rstar.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstar.rs)
 for an example of its usage.
 
@@ -205,10 +219,10 @@ a multiset.
 ### Undo-redo on custom types
 
 To make `undoredo` work with a map-like data structure for which there is no
-convenience implementation, you can create one on your own by implementing
-the traits from the [maplike](https://docs.rs/maplike/latest/maplike/) crate.
-Refer to that crate's documentation for details. These traits are also
-re-exported by `undoredo`, so it is not necessary to add another dependency.
+convenience implementation, you can create one on your own by implementing the
+traits from the [maplike](https://crates.io/crates/maplike) crate. Refer to
+that crate's documentation for details. These traits are also re-exported by
+`undoredo`, so it is not necessary to add another dependency.
 
 If you believe that other people could benefit from your implementation,
 consider contributing it to `maplike`. We will integrate it in `undoredo` on our
@@ -248,7 +262,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.6", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
+undoredo = { version = "0.6", features = ["rstar", "rstared", "stable-vec", "thunderdome"] }
 ```
 
 ## Unsupported containers
@@ -270,9 +284,8 @@ on `undoredo`'s usage.
 
 ## Contributing
 
-We welcome issues and pull requests from anyone both to our canonical
-[repository](https://github.com/mikwielgus/undoredo) on Codeberg and to our GitHub
-[mirror](https://github.com/mikwielgus/undoredo).
+We welcome issues, pull requests and any other contributions from anyone to our
+[repository](https://github.com/mikwielgus/undoredo) on GitHub.
 
 ## Licence
 

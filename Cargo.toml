@@ -18,6 +18,13 @@ keywords = ["undo", "redo", "no_std"]
 categories = ["data-structures", "gui", "no-std", "rust-patterns"]
 edition = "2024"
 
+# README version snippets apply only to this crate; workspace `release.toml` is inherited by
+# `undoredo_derive`, which does not contain the same dependency lines (see cargo-release FAQ).
+[package.metadata.release]
+pre-release-replacements = [
+  { file = "README.md", search = 'undoredo = \{ version = "[^"]+"([^}]*)\}', replace = '{{crate_name}} = { version = "{{version}}"$1}' },
+]
+
 [badges]
 maintenance = { status = "actively-developed" }
 

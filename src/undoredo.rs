@@ -10,6 +10,12 @@ pub trait Revert<T> {
     fn revert(self, target: &mut T) -> Self;
 }
 
+impl<T> Revert<T> for () {
+    fn revert(self, _target: &mut T) -> Self {
+        ()
+    }
+}
+
 /// Extract an edit corresponding to the current state.
 ///
 /// In delta-based undo-redo, this flushes the delta. In snapshot-based
@@ -20,6 +26,12 @@ pub trait Extract<T> {
     /// In delta-based undo-redo, this flushes the delta. In snapshot-based
     /// undo-redo, this clones the current state into a snapshot.
     fn extract(target: &mut T) -> Self;
+}
+
+impl<T> Extract<T> for () {
+    fn extract(_target: &mut T) -> Self {
+        ()
+    }
 }
 
 /// An edit along with metadata.

@@ -15,7 +15,7 @@ on arbitrary data structures by automatically recording sparse *deltas*
 (*patches*) of changes, or whole *snapshots* of past states ([Memento
 pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
 
-These approaches are much easier than the commonly used ([Command
+This approach is much easier than the commonly used ([Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern)), which is what is
 used by other Undo/Redo crates, as having to implement commands requires
 maintenance of additional application logic, which is often complicated and

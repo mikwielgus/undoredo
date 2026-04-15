@@ -59,6 +59,11 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
+name = "command"
+required-features = ["std"]
+doc-scrape-examples = true
+
+[[example]]
 name = "stable_vec"
 required-features = ["stable-vec"]
 doc-scrape-examples = true

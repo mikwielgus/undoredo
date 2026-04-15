@@ -2,11 +2,13 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+//! Example showing how to store metadata ("cmd") along with each edit.
+
 use std::collections::HashMap;
 use undoredo::delta::{VecDelta, VecHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
-// Representation of the command that originated the recorded delta.
+/// Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
 enum Command {
     PushChar,

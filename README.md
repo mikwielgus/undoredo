@@ -109,16 +109,16 @@ fn main() {
 }
 ```
 
-#### Using command metadata along with deltas
+#### Storing command metadata along with edits
 
-It is often desirable to store some metadata along with every recorded delta,
+It is often desirable to store some metadata along with every recorded edit,
 usually some representation of the command that originated it. This can be done
-by instead committing the delta using the
+by instead committing the edit using the
 [`.cmd_commit()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.cmd_commit)
 method.
 
-The bistack of done and undone committed deltas, together with their
-command metadatas ("cmd") if present, can be accessed as slices from the
+The bistack of done and undone committed edits, together with their command
+metadatas ("cmd") if present, can be accessed as slices from the
 [`.done()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
@@ -156,6 +156,13 @@ fn main() {
     assert_eq!(undoredo.undone().last().unwrap().cmd, Command::PushChar);
 }
 ```
+
+#### Command pattern
+
+You can also give up edits altogether and only store commands in the metadata
+field, thereby implementing the Command pattern. See
+[examples/command.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/command.rs)
+for an example.
 
 ### Undo-redo on maps with pushing
 

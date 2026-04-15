@@ -18,13 +18,6 @@ keywords = ["undo", "redo", "no_std"]
 categories = ["data-structures", "gui", "no-std", "rust-patterns"]
 edition = "2024"
 
-# README version snippets apply only to this crate; workspace `release.toml` is inherited by
-# `undoredo_derive`, which does not contain the same dependency lines (see cargo-release FAQ).
-[package.metadata.release]
-pre-release-replacements = [
-  { file = "README.md", search = 'undoredo = \{ version = "[^"]+"([^}]*)\}', replace = '{{crate_name}} = { version = "{{version}}"$1}' },
-]
-
 [badges]
 maintenance = { status = "actively-developed" }
 
@@ -50,8 +43,19 @@ stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
 rstared = "0.9"
-undoredo_derive = { path = "undoredo_derive" }
+undoredo_derive = { version = "0.9", path = "undoredo_derive" }
 
+# Version replacements apply only to this crate. We have to keep this here
+# and not in `release.toml` because the replacements are applied to each
+# workspace member crate separately, and since there is nothing to replace in
+# `undoredo_derive`, there will be an error due to no replacement. This solution
+# is recommended by `cargo-release`'s FAQ.
+[package.metadata.release]
+pre-release-replacements = [
+  { file = "README.md", search = 'undoredo = \{ version = "[^"]+"([^}]*)\}', replace = '{{crate_name}} = { version = "{{version}}"$1}' },
+]
+
+# Use scraped examples.
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]
 

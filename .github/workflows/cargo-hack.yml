@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2026 undoredo contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+name: cargo-hack
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  feature-powerset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
+
+      - name: Test each feature
+        run: cargo hack test --each-feature

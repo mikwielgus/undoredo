@@ -15,23 +15,23 @@ arbitrary data structures by automatically recording sparse *deltas* (aka.
 *diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
 pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
 
-This approach is much easier than the commonly used ([Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern)), which is the principle
-of operations of other Undo/Redo crates, as having to implement commands
-requires maintenance of additional application logic, which is often complicated
-and can lead to elusive bugs. Nevertheless, `undoredo` can also store a command
-or other metadata along with every edit, allowing easy use of the Command
-pattern as well.
+This approach is much easier than the commonly used [Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
+of operation of other Undo/Redo crates, as having to implement commands requires
+maintenance of additional application logic, which is often complicated and
+can lead to elusive bugs. Nevertheless, `undoredo` can also store a command or
+other metadata along with every edit, allowing easy use of the Command pattern
+as well.
 
 Delta-recording undo-redo requires creating a separate delta edit type
 for each data structure. For ease of use, `undoredo` has derive macros
 (`#[derive(Delta)]`) to automatically generate these types on arbitrary custom
 `struct`s and `enum`s, as well as convenience implementations for standard
 library collections:
-[`HashMap`](https://doc.rust-lang.org/std/containers/struct.HashMap.html),
-[`HashSet`](https://doc.rust-lang.org/stable/std/containers/struct.HashSet.html),
-[`BTreeMap`](https://doc.rust-lang.org/std/containers/struct.BTreeMap.html),
-[`BTreeSet`](https://doc.rust-lang.org/stable/std/containers/struct.BTreeSet.html),
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
+[`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html),
+[`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
+[`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html),
 and for some third-party feature-gated types:
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
@@ -63,7 +63,7 @@ commands work without any derives.
 
 Following is a basic usage example of delta-recording undo-redo over `HashMap`.
 You can find more examples in the
-[examples/](https://github.com/mikwielgus/undoredo/src/branch/develop/examples)
+[examples/](https://github.com/mikwielgus/undoredo/tree/develop/examples)
 directory.
 
 ```rust,ignore
@@ -119,7 +119,7 @@ method.
 
 The bistack of done and undone committed edits, together with their command
 metadatas ("cmd") if present, can be accessed as slices from the
-[`.done()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
+[`.done()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.done)
 and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 accessor methods.
@@ -161,7 +161,7 @@ fn main() {
 
 You can also give up edits altogether and only store commands in the metadata
 field, thereby implementing the Command pattern. See
-[examples/command.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/command.rs)
+[examples/command.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/command.rs)
 for an example.
 
 ### Undo-redo on maps with pushing
@@ -182,9 +182,9 @@ recorder.push('A');
 
 `StableVec` and `thunderdome::Arena` are instances of supported pushable maps.
 See
-[examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/stable_vec.rs)
+[examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs)
 and
-[examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/thunderdome.rs)
+[examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs)
 for complete examples of their usage.
 
 ### Undo-redo on sets
@@ -195,7 +195,7 @@ functionality to such a set by treating it as a `()`-valued map whose keys are
 the set's values. This is actually also how Rust's standard library internally
 [represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115) its
 two set types, `HashSet`
-[and](https://doc.rust-lang.org/stable/src/alloc/containers/btree/set.rs.html#82)
+[and](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html)
 `BTreeSet`.
 
 As an example, the following code will construct a recorder and an undo-redo
@@ -208,12 +208,12 @@ let mut undoredo: UndoRedo<Delta<BTreeSet<char>>> = UndoRedo::new();
 
 Keeping in mind to pass values as keys, `recorder` and
 `undoredo` can then be used the same way as with maps above. See
-[examples/btreeset.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/btreeset.rs)
+[examples/btreeset.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/btreeset.rs)
 for a complete example.
 
 Among the supported third-party types, `rstar::RTree` is one data structure for
 which `undoredo` has a convenience implementation over set semantics. See
-[examples/rstar.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstar.rs)
+[examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs)
 for an example of its usage.
 
 **NOTE:** Some set-like data structures are actually multisets: they allow
@@ -242,10 +242,10 @@ own afterwards (no need to open more than one pull request).
 Rust's standard library maps and sets are supported via built-in convenience
 implementations:
 
-- [`HashMap`](https://doc.rust-lang.org/std/containers/struct.HashMap.html), gated by the `std` feature (enabled by default);
-- [`HashSet`](https://doc.rust-lang.org/stable/std/containers/struct.HashSet.html), gated by the `std` feature (enabled by default);
-- [`BTreeMap`](https://doc.rust-lang.org/std/containers/struct.BTreeMap.html), not feature-gated;
-- [`BTreeSet`](https://doc.rust-lang.org/stable/std/containers/struct.BTreeSet.html), not feature-gated.
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
+- [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
+- [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
+- [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated.
 
 ### Third-party types
 
@@ -254,14 +254,14 @@ convenience implementations for data structures from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature (example usage:
-  [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/stable_vec.rs)),
+  [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs)),
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
   gated by the `thunderdome` feature (example usage:
-  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/thunderdome.rs));
+  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs));
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstar.rs));
+  `rstar` feature (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/src/branch/develop/examples/rstared.rs)).
+  `rstared` feature (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
 
 To use these, enable their corresponding features next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type

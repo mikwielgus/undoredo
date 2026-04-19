@@ -25,5 +25,5 @@ jobs:
         with:
           tool: cargo-hack
 
-      - name: Test each feature
+      - name: Test feature flags
         run: cargo hack test --each-feature

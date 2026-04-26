@@ -22,7 +22,7 @@ fn command(s: &mut String, undoredo: &mut UndoRedo<(), Command>, cmd: Command) {
         Command::PushChar(c) => s.push(*c),
     }
 
-    // Same as `.cmd_commit(command, ())`.
+    // Same as `.cmd_commit(cmd, ())`.
     undoredo.command(cmd);
 }
 

@@ -18,8 +18,8 @@ pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
 This approach is much easier than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
 of operation of other Undo/Redo crates, as having to implement commands requires
-maintenance of additional application logic, which is often complicated and
-can lead to elusive bugs. Nevertheless, `undoredo` can also store a command or
+maintenance of additional application logic that is often complicated and can
+lead to elusive bugs. Nevertheless, `undoredo` can also store a command or
 other metadata along with every edit, allowing easy use of the Command pattern
 as well.
 
@@ -41,6 +41,18 @@ and for some third-party feature-gated types:
 
 This library is `no_std`-compatible and has no mandatory third-party dependencies except
 for [`alloc`](https://doc.rust-lang.org/alloc/).
+
+## Demo
+
+![Animation showing polygons being added and subtracted in the demo stored in
+`demos/polygon_set/` directory of the repository of the polygon_unionfind crate
+](polygon_set_demo.gif)
+
+Source code with instructions for the above interactive
+visualization can be found in the repository of the
+[polygon_unionfind](https://github.com/mikwielgus/polygon_unionfind)
+crate (see its README for details). In this demo no snapshot or command is
+stored, all edits are deltas.
 
 ## Usage
 

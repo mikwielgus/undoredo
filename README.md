@@ -66,7 +66,7 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = { version = "0.9.12", features = ["derive"] }
+undoredo = { version = "0.9.13", features = ["derive"] }
 ```
 
 The `derive` feature flag is only required when using delta-recording undo-redo
@@ -287,7 +287,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.9.12", features = ["rstar", "rstared", "stable-vec", "thunderdome"] }
+undoredo = { version = "0.9.13", features = ["rstar", "rstared", "stable-vec", "thunderdome"] }
 ```
 
 ## Unsupported containers

@@ -7,7 +7,7 @@ members = [".", "undoredo_derive"]
 
 [package]
 name = "undoredo"
-version = "0.9.12"
+version = "0.9.13"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Undo-redo for Rust using deltas, snapshots, or commands."
 repository = "https://github.com/mikwielgus/undoredo"

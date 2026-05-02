@@ -27,5 +27,5 @@ pub use maplike::{
     Container, Get, Insert, IntoIter, Maplike, Push, Remove, Scalarlike, Setlike, Veclike,
 };
 
-//#[cfg(feature = "derive")]
-//pub use undoredo_derive::{ApplyDelta, CompositeDelta, FlushDelta};
+#[cfg(feature = "derive")]
+pub use undoredo_derive::{ApplyDelta, Delta, FlushDelta, HalfDelta};

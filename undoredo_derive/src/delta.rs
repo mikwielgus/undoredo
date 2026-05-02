@@ -26,6 +26,7 @@ fn resolve_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
 pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+    let generics = input.generics.clone();
 
     let output = match &input.data {
         Data::Struct(_) => {
@@ -34,7 +35,7 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
             let vis = &input.vis;
             let half_delta = TokenStream2::from(half_delta::expand_half_delta(input.clone())?);
             let delta_alias = quote! {
-                #vis type #delta_alias_ident = ::undoredo::Delta<#half_id> #where_clause;
+                #vis type #delta_alias_ident #generics = ::undoredo::Delta<#half_id #ty_generics>;
             };
             let apply_delta = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
             let flush_delta = TokenStream2::from(flush_delta::expand_flush_delta(input)?);

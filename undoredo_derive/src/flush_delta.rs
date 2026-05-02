@@ -79,10 +79,10 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     let output = quote! {
-        impl #impl_generics ::undoredo::FlushDelta<#half_delta_name> for #name #ty_generics
+        impl #impl_generics ::undoredo::FlushDelta<#half_delta_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn flush_delta(&mut self) -> ::undoredo::Delta<#half_delta_name> {
+            fn flush_delta(&mut self) -> ::undoredo::Delta<#half_delta_name #ty_generics> {
                 #(#flush_stmts)*
                 ::undoredo::Delta::with_removed_inserted(
                     #removed_ctor,

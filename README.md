@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements Undo/Redo functionality on
+`undoredo` is a Rust library that implements the Undo/Redo pattern on
 arbitrary data structures by automatically recording sparse *deltas* (aka.
 *diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
 pattern](https://en.wikipedia.org/wiki/Memento_pattern)).

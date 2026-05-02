@@ -24,6 +24,7 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
 pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let vis = &input.vis;
     let half_delta_name = resolve_half_delta_ident(&input)?;
+    let generics = &input.generics;
 
     let output = match &input.data {
         Data::Struct(data) => match &data.fields {
@@ -37,7 +38,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 });
                 quote! {
                     #[derive(Clone, Debug)]
-                    #vis struct #half_delta_name {
+                    #vis struct #half_delta_name #generics {
                         #( #transformed_fields )*
                     }
                 }
@@ -49,12 +50,12 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 });
                 quote! {
                     #[derive(Clone, Debug)]
-                    #vis struct #half_delta_name ( #( #transformed_fields ),* );
+                    #vis struct #half_delta_name #generics ( #( #transformed_fields ),* );
                 }
             }
             Fields::Unit => quote! {
                 #[derive(Clone, Debug)]
-                #vis struct #half_delta_name;
+                #vis struct #half_delta_name #generics;
             },
         },
         Data::Enum(_) => panic!("derive(HalfDelta) does not support enums"),
@@ -64,7 +65,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
     Ok(output.into())
 }
 
-fn transform_field_type(ty: &Type) -> TokenStream2 {
+pub(crate) fn transform_field_type(ty: &Type) -> TokenStream2 {
     let Type::Path(type_path) = ty else {
         return ty.to_token_stream();
     };

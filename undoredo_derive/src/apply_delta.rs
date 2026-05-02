@@ -70,10 +70,10 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
     };
 
     let output = quote! {
-        impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name> for #name #ty_generics
+        impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name #ty_generics> for #name #ty_generics
         #where_clause
         {
-            fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta_name>) {
+            fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta_name #ty_generics>) {
                 let (removed, inserted) = delta.dissolve();
                 #(#apply_stmts)*
             }

@@ -32,6 +32,7 @@ library collections:
 [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
 [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html),
+[`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html),
 and for some third-party feature-gated types:
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
@@ -257,10 +258,12 @@ own afterwards (no need to open more than one pull request).
 Rust's standard library maps and sets are supported via built-in convenience
 implementations:
 
+
 - [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
 - [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
-- [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated.
+- [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated;
+- [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html), not feature-gated.
 
 ### Third-party types
 

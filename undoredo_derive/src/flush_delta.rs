@@ -12,6 +12,10 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
 
     let mut flush_stmts = Vec::new();
 
+    // Besides inheriting the trait bounds from the input type, we also need to
+    // also require having `FlushDelta` implemented for all fields.
+    let mut extra_where_predicates = Vec::new();
+
     let (removed_ctor, inserted_ctor) = match &input.data {
         Data::Struct(data) => match &data.fields {
             Fields::Named(fields_named) => {
@@ -20,8 +24,16 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
 
                 for field in &fields_named.named {
                     let field_ident = field.ident.as_ref().expect("named field must have ident");
+                    let field_ty = &field.ty;
+                    let field_half_delta_ty =
+                        crate::half_delta::field_to_half_delta_container(field_ty);
+
                     let removed_ident = format_ident!("removed_{}", field_ident);
                     let inserted_ident = format_ident!("inserted_{}", field_ident);
+
+                    extra_where_predicates.push(quote! {
+                        #field_ty: ::undoredo::FlushDelta<#field_half_delta_ty>
+                    });
 
                     flush_stmts.push(quote! {
                         let (#removed_ident, #inserted_ident) =
@@ -41,10 +53,18 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 let mut removed_fields = Vec::new();
                 let mut inserted_fields = Vec::new();
 
-                for (index, _field) in fields_unnamed.unnamed.iter().enumerate() {
+                for (index, field) in fields_unnamed.unnamed.iter().enumerate() {
                     let field_index = Index::from(index);
+                    let field_ty = &field.ty;
+                    let field_half_delta_ty =
+                        crate::half_delta::field_to_half_delta_container(field_ty);
+
                     let removed_ident = format_ident!("removed_{}", index);
                     let inserted_ident = format_ident!("inserted_{}", index);
+
+                    extra_where_predicates.push(quote! {
+                        #field_ty: ::undoredo::FlushDelta<#field_half_delta_ty>
+                    });
 
                     flush_stmts.push(quote! {
                         let (#removed_ident, #inserted_ident) =
@@ -77,10 +97,29 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
     };
 
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+    let mut where_predicates: Vec<proc_macro2::TokenStream> = where_clause
+        .map(|clause| {
+            clause
+                .predicates
+                .iter()
+                .map(|pred| quote! { #pred })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    // Add the additional `ApplyDelta` trait bounds for every field.
+    where_predicates.extend(extra_where_predicates);
+
+    // We don't want to emit any tokens if there is no predicates.
+    let where_tokens = if where_predicates.is_empty() {
+        quote! {}
+    } else {
+        quote! { where #(#where_predicates,)* }
+    };
 
     let output = quote! {
         impl #impl_generics ::undoredo::FlushDelta<#half_delta_name #ty_generics> for #name #ty_generics
-        #where_clause
+        #where_tokens
         {
             fn flush_delta(&mut self) -> ::undoredo::Delta<#half_delta_name #ty_generics> {
                 #(#flush_stmts)*

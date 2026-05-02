@@ -31,7 +31,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
             Fields::Named(fields_named) => {
                 let transformed_fields = fields_named.named.iter().map(|field| {
                     let field_name = &field.ident;
-                    let ty = transform_field_type(&field.ty);
+                    let ty = field_to_half_delta_container(&field.ty);
                     quote! {
                         #field_name: #ty,
                     }
@@ -45,7 +45,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
             }
             Fields::Unnamed(fields_unnamed) => {
                 let transformed_fields = fields_unnamed.unnamed.iter().map(|field| {
-                    let ty = transform_field_type(&field.ty);
+                    let ty = field_to_half_delta_container(&field.ty);
                     quote! { #ty }
                 });
                 quote! {
@@ -65,7 +65,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
     Ok(output.into())
 }
 
-pub(crate) fn transform_field_type(ty: &Type) -> TokenStream2 {
+pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
     let Type::Path(type_path) = ty else {
         return ty.to_token_stream();
     };

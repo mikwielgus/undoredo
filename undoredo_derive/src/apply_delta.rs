@@ -11,14 +11,27 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
     let half_delta_name = crate::half_delta::resolve_half_delta_ident(&input)?;
 
     let mut apply_stmts = Vec::new();
+
+    // Besides inheriting the trait bounds from the input type, we also need to
+    // also require having `ApplyDelta` implemented for all fields.
+    let mut extra_where_predicates = Vec::new();
+
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     match &input.data {
         Data::Struct(data) => match &data.fields {
             Fields::Named(fields_named) => {
                 for field in &fields_named.named {
+                    let field_ty = &field.ty;
+                    let field_half_delta_ty =
+                        crate::half_delta::field_to_half_delta_container(field_ty);
                     let field_member =
                         Member::Named(field.ident.clone().expect("named field must have ident"));
+
+                    extra_where_predicates.push(quote! {
+                        #field_ty: ::undoredo::ApplyDelta<#field_half_delta_ty>
+                    });
+
                     apply_stmts.push(quote! {
                         let field_delta = ::undoredo::Delta::with_removed_inserted(
                             removed.#field_member,
@@ -29,8 +42,16 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 }
             }
             Fields::Unnamed(fields_unnamed) => {
-                for (i, _field) in fields_unnamed.unnamed.iter().enumerate() {
+                for (i, field) in fields_unnamed.unnamed.iter().enumerate() {
+                    let field_ty = &field.ty;
+                    let field_half_delta_ty =
+                        crate::half_delta::field_to_half_delta_container(field_ty);
                     let field_member = Member::Unnamed(Index::from(i));
+
+                    extra_where_predicates.push(quote! {
+                        #field_ty: ::undoredo::ApplyDelta<#field_half_delta_ty>
+                    });
+
                     apply_stmts.push(quote! {
                         let field_delta = ::undoredo::Delta::with_removed_inserted(
                             removed.#field_member,
@@ -69,9 +90,29 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
         }
     };
 
+    let mut where_predicates: Vec<proc_macro2::TokenStream> = where_clause
+        .map(|clause| {
+            clause
+                .predicates
+                .iter()
+                .map(|pred| quote! { #pred })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    // Add the additional `ApplyDelta` trait bounds for every field.
+    where_predicates.extend(extra_where_predicates);
+
+    // We don't want to emit any tokens if there is no predicates.
+    let where_tokens = if where_predicates.is_empty() {
+        quote! {}
+    } else {
+        quote! { where #(#where_predicates,)* }
+    };
+
     let output = quote! {
         impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name #ty_generics> for #name #ty_generics
-        #where_clause
+        #where_tokens
         {
             fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta_name #ty_generics>) {
                 let (removed, inserted) = delta.dissolve();

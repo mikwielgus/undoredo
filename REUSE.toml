@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 undoredo contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+version = 1
+
+[[annotations]]
+path = "polygon_set_demo.gif"
+SPDX-FileCopyrightText = "2026 undoredo contributors"
+SPDX-License-Identifier = "MIT OR Apache-2.0"

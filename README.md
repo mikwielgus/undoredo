@@ -176,7 +176,7 @@ fn main() {
 
 You can also give up edits altogether and only store commands in the metadata
 field, thereby implementing the Command pattern. See
-[examples/command.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/command.rs)
+[examples/commands.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/commands.rs)
 for an example.
 
 ### Undo-redo on maps with pushing

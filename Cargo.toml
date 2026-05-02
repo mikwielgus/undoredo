@@ -70,7 +70,7 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
-name = "command"
+name = "commands"
 required-features = ["std"]
 doc-scrape-examples = true
 

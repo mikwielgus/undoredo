@@ -44,15 +44,18 @@ for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 
+The following demo animation shows Undo/Redo operation over dynamically added
+and subtracted polygons with R-tree spatial indexing. Neither commands nor
+entire snapshots are stored, but all edits in history are sparse deltas:
+
 ![Animation showing polygons being added and subtracted in the demo stored in
 `demos/polygon_set/` directory of the repository of the polygon_unionfind crate
 ](polygon_set_demo.gif)
 
-Source code with instructions for the above interactive
-visualization can be found in the repository of the
-[polygon_unionfind](https://github.com/mikwielgus/polygon_unionfind)
-crate (see its README for details). In this demo no snapshot or command is
-stored, all edits are deltas.
+Source code with instructions for running the above interactive visualization
+can be found in the repository of the
+[polygon_unionfind](https://github.com/mikwielgus/polygon_unionfind) crate (see
+its README for details).
 
 ## Usage
 

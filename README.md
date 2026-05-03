@@ -45,9 +45,10 @@ for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 
-The following demo animation shows Undo/Redo operation over dynamically added
-and subtracted polygons with R-tree spatial indexing. Neither commands nor
-entire snapshots are stored, but all edits in history are sparse deltas:
+The following demo animation shows Undo/Redo action over dynamically added and
+subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots
+are stored, but all edits in history are made of sparse deltas of the polygon
+container and the associated R-tree:
 
 ![Animation showing polygons being added and subtracted in the demo stored in
 `demos/polygon_set/` directory of the repository of the polygon_unionfind crate
@@ -94,7 +95,7 @@ fn main() {
     // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
 
-    // Push elements while recording the changes in an delta.
+    // Push elements while recording the changes in a delta.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
@@ -180,7 +181,7 @@ field, thereby implementing the Command pattern. See
 [examples/commands.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/commands.rs)
 for an example.
 
-### Undo-redo on maps with pushing
+#### Delta recording on maps with pushing
 
 Some data structures with map semantics also provide a special type of insertion
 where a value is inserted without specifying a key, which the structure instead
@@ -203,14 +204,15 @@ and
 [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs)
 for complete examples of their usage.
 
-### Undo-redo on sets
+#### Delta recording on sets
 
 Some data structures have set semantics: they operate only on values, without
-exposing any usable notion of key or index. `undoredo` can provide its
-functionality to such a set by treating it as a `()`-valued map whose keys are
-the set's values. This is actually also how Rust's standard library internally
-[represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115) its
-two set types, `HashSet`
+exposing any usable notion of key or index. `undoredo` can provide delta-based
+undo-redo functionality to such a set by treating it as a `()`-valued map whose
+keys are the set's values. This is actually also how Rust's standard library
+internally
+[represents](https://docs.rs/hashbrown/latest/src/hashbrown/set.rs.html#115)
+its two set types, `HashSet`
 [and](https://doc.rust-lang.org/stable/src/alloc/collections/btree/set.rs.html)
 `BTreeSet`.
 
@@ -236,52 +238,61 @@ for an example of its usage.
 to insert the same value multiple times without overriding the first one. In
 fact, `rstar::RTree` is a multiset. `undoredo` will work correctly with such
 data structures, seeing them as sets, but only if you never make use of their
-multiset property: you must never insert a key that is already present in
-a multiset.
-
-### Undo-redo on custom types
-
-To make `undoredo` work with a map-like data structure for which there is no
-convenience implementation, you can create one on your own by implementing the
-traits from the [maplike](https://crates.io/crates/maplike) crate. Refer to
-that crate's documentation for details. These traits are also re-exported by
-`undoredo`, so it is not necessary to add another dependency.
-
-If you believe that other people could benefit from your implementation,
-consider contributing it to `maplike`. We will integrate it in `undoredo` on our
-own afterwards (no need to open more than one pull request).
+multiset property: you must never insert a key again when it is already present
+in a multiset.
 
 ## Supported containers
 
-### Standard library
+### When using snapshots and commands
 
-Rust's standard library maps and sets are supported via built-in convenience
-implementations:
+All data structures that implement the
+[`Clone`](https://doc.rust-lang.org/std/clone/trait.Clone.html) trait are
+supported for snapshot-based undo-redo. As for commands, obviously all data
+structures are supported as long as the library user implements commands for
+them.
 
+### When using deltas
 
-- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature (enabled by default);
-- [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html), gated by the `std` feature (enabled by default);
+To be able to use delta-based undo-redo on a data structure, it is necessary
+to have a delta type as well as two operations, *apply delta* and *flush
+delta*. For ease of use, `undoredo` supplies a number of built-in convenience
+implementations of all these for various commonly-used container types.
+
+`undoredo` also provides a derive macro (`#[derive(Delta)]`) that can be used
+to generate a delta type and operations on it for many custom data structures.
+
+If the above is not satisfactory, it is also possible to implement delta-editing
+capabilities manually.
+
+#### Standard library
+
+Rust's standard library maps and sets have built-in convenience implementations
+of delta-editing:
+
+- [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), gated by the `std` feature flag (enabled by default);
+- [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html), gated by the `std` feature flag (enabled by default);
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
 - [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated;
 - [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html), not feature-gated.
 
-### Third-party types
+#### Third-party types
 
-In addition to the standard library, `undoredo` has built-in feature-gated
-convenience implementations for data structures from certain external crates:
+In addition to the standard library, `undoredo` has also has built-in
+feature-gated convenience implementations of delta-editing for data structures
+from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
-  gated by the `stable-vec` feature (example usage:
-  [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs)),
+  gated by the `stable-vec` feature flag (example usage:
+  [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
-  gated by the `thunderdome` feature (example usage:
+  gated by the `thunderdome` feature flag (example usage:
   [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs));
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
+  `rstar` feature flag (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
+  `rstared` feature flag (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
 
-To use these, enable their corresponding features next to your `undoredo`
+To use these, enable their corresponding feature flags next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type
 implementations, write
 
@@ -290,10 +301,24 @@ implementations, write
 undoredo = { version = "0.9.13", features = ["rstar", "rstared", "stable-vec", "thunderdome"] }
 ```
 
-## Unsupported containers
+#### Custom types
 
-Some containers cannot be supported because they lack an interface
-on which `maplike`'s traits could be implemented. See the [Unsupported
+To make delta-based undo-redo work with a map-like non-composite
+container data structure for which there is no convenience implementation,
+you can create one on your own by implementing the traits from the
+[maplike](https://crates.io/crates/maplike) crate. Refer to that crate's
+documentation for details. These traits are also re-exported by `undoredo`, so
+it is not necessary to add another dependency.
+
+If you believe that other people could benefit from your implementation,
+consider contributing it to `maplike`. We will integrate it in `undoredo` on our
+own afterwards (no need to open more than one pull request).
+
+#### Unsupported containers
+
+Some containers cannot be supported for delta-based
+undo-redo because they lack an interface on which
+`maplike`'s traits could be implemented. See the [Unsupported
 containers](https://docs.rs/maplike/latest/maplike/#unsupported-containers)
 section in `maplike`'s documentation for details.
 

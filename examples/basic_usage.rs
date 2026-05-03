@@ -15,7 +15,7 @@ fn main() {
     // The undo-redo struct maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<VecDelta<char>> = UndoRedo::new();
 
-    // Push elements while recording the changes in an delta.
+    // Push elements while recording the changes in a delta.
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');

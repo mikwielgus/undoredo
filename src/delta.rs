@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-//! Named [`Delta`] container aliases (`…HalfDelta`, `…Delta`) for built-in types.
-
 #![allow(missing_docs)]
 
 use alloc::{
@@ -96,12 +94,12 @@ impl<DC, T: FlushDelta<DC>> Extract<T> for Delta<DC> {
     }
 }
 
-/// Apply the changes in an delta to a container.
+/// Apply the changes in a delta to a container.
 ///
 /// This can be used to revert a previously recorded delta if you reverse it
 /// with [`Delta::reverse()`].
 pub trait ApplyDelta<DC> {
-    /// Apply the changes in an delta to a container.
+    /// Apply the changes in a delta to a container.
     ///
     /// This can be used to revert a previously recorded delta. The delta has to
     /// be reversed first with [`Delta::reverse()`].

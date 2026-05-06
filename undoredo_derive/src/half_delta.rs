@@ -107,17 +107,17 @@ pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
             };
 
             if container_name == "Vec" || container_name == "StableVec" {
-                quote! { ::std::collections::BTreeMap<usize, #t> }
+                quote! { ::undoredo::alloc::collections::BTreeMap<usize, #t> }
             } else if container_name == "Arena" {
-                quote! { ::std::collections::BTreeMap<::thunderdome::Index, #t> }
+                quote! { ::undoredo::alloc::collections::BTreeMap<::thunderdome::Index, #t> }
             } else if container_name == "RTree" {
-                quote! { ::std::collections::BTreeSet<#t> }
+                quote! { ::undoredo::alloc::collections::BTreeSet<#t> }
             } else {
                 // Scalars and enums use a `BTreeMap` with a single element that
                 // is a recorded version of the container itself.
-                quote! { ::std::collections::BTreeMap<usize, #container_ty> }
+                quote! { ::undoredo::alloc::collections::BTreeMap<usize, #container_ty> }
             }
         }
-        _ => quote! { ::std::collections::BTreeMap<usize, #container_ty> },
+        _ => quote! { ::undoredo::alloc::collections::BTreeMap<usize, #container_ty> },
     }
 }

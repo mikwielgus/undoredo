@@ -65,13 +65,13 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
         },
         Data::Enum(_) => {
             let output = quote! {
-                impl #impl_generics ::undoredo::ApplyDelta<::std::collections::BTreeMap<usize, #name #ty_generics>>
+                impl #impl_generics ::undoredo::ApplyDelta<::undoredo::alloc::collections::BTreeMap<usize, #name #ty_generics>>
                     for #name #ty_generics
                 #where_clause
                 {
                     fn apply_delta(
                         &mut self,
-                        delta: ::undoredo::Delta<::std::collections::BTreeMap<usize, #name #ty_generics>>,
+                        delta: ::undoredo::Delta<::undoredo::alloc::collections::BTreeMap<usize, #name #ty_generics>>,
                     ) {
                         let (_removed, mut inserted) = delta.dissolve();
                         if let Some(value) = inserted.remove(&0) {

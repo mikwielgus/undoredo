@@ -12,7 +12,7 @@
 extern crate std;
 
 // No feature for `alloc` because it would be always enabled anyway.
-extern crate alloc;
+pub extern crate alloc;
 
 pub mod delta;
 mod recorder;

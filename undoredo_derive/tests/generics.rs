@@ -4,7 +4,7 @@
 
 #![allow(dead_code)]
 
-use std::collections::BTreeMap;
+use alloc::collections::BTreeMap;
 
 use undoredo::{ApplyDelta, FlushDelta, Recorder};
 use undoredo_derive::Delta;

@@ -8,17 +8,34 @@ use quote::{ToTokens, format_ident, quote};
 use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type};
 
 pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
-    let mut half_delta_name = format_ident!("{}HalfDelta", input.ident);
+    let default = format_ident!("{}HalfDelta", input.ident);
+    let mut name_from_attr: Option<syn::Ident> = None;
 
     for attr in &input.attrs {
-        if attr.path().is_ident("half_delta") {
-            half_delta_name = attr
-                .parse_args::<syn::Ident>()
-                .map_err(|_| syn::Error::new_spanned(attr, "expected #[half_delta(Name)]"))?;
+        if attr.path().is_ident("undoredo") {
+            attr.parse_nested_meta(|meta| {
+                if meta.path.is_ident("half_delta_name") {
+                    if name_from_attr.is_some() {
+                        return Err(meta.error("duplicate `half_delta_name` in #[undoredo(...)]"));
+                    }
+
+                    let ident: syn::Ident = meta.value()?.parse()?;
+                    name_from_attr = Some(ident);
+
+                    return Ok(());
+                }
+
+                if meta.path.is_ident("delta_name") {
+                    let _: syn::Ident = meta.value()?.parse()?;
+                    return Ok(());
+                }
+
+                Err(meta.error("unrecognized undoredo attribute key"))
+            })?;
         }
     }
 
-    Ok(half_delta_name)
+    Ok(name_from_attr.unwrap_or(default))
 }
 
 pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {

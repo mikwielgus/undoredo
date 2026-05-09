@@ -158,11 +158,11 @@ pub struct Vector2<T> {
 // `#[derive(Delta)]` generates the `EntitiesDelta` type, which is needed to
 // store deltas as edits in an `UndoRedo` bistack.
 #[derive(Delta)]
-// You can choose the name for the generated delta edit type by passing it
-// through the `delta` attribute. This attribute is optional. If you omit it,
-// the default is the name of the input type followed by the word `Delta`. The
-// name chosen here, `EntitiesDelta` is the same as the default.
-#[delta(EntitiesDelta)]
+// You can choose the name for the generated delta edit type through the
+// `undoredo` attribute with key `delta_name`. If you omit this, the default is
+// the name of the input type followed by the word `Delta`. The name chosen in
+// this example, `EntitiesDelta`, happens to be the same as the default.
+#[undoredo(delta_name = EntitiesDelta)]
 pub struct Entities<T> {
     positions: Vec<Vector2<T>>,
     velocities: Vec<Vector2<T>>,

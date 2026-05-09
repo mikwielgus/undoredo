@@ -4,12 +4,12 @@
 
 #![allow(dead_code)]
 
-use undoredo::delta::VecHalfDelta;
-use undoredo::{ApplyDelta, Delta, Recorder};
+use undoredo::delta::{Delta, VecHalfDelta};
+use undoredo::{ApplyDelta, Recorder};
 use undoredo_derive::{ApplyDelta, HalfDelta};
 
 #[derive(HalfDelta, ApplyDelta)]
-#[half_delta(TestStructHalfDelta)]
+#[undoredo(half_delta_name = TestStructHalfDelta)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }

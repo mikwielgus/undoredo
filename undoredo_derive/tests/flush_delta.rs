@@ -4,13 +4,13 @@
 
 #![allow(dead_code)]
 
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 use undoredo::{FlushDelta, Recorder};
 use undoredo_derive::{FlushDelta, HalfDelta};
 
 #[derive(Debug, PartialEq, HalfDelta, FlushDelta)]
-#[half_delta(TestStructHalfDelta)]
+#[undoredo(half_delta_name = TestStructHalfDelta, delta_name = TestStructDelta)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }

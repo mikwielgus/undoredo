@@ -150,17 +150,22 @@ coordinate type `K` that could be used for a simple
 // No need for `#[derive(Delta)]` for types stored in containers, only the
 // containers themselves need this.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Vector2<K> {
-    x: K,
-    y: K,
+pub struct Vector2<T> {
+    x: T,
+    y: T,
 }
 
-// `#[derive(Delta)]` will generate the `EntitiesDelta` type, which we store in
-// as an edit in the `UndoRedo` bistack.
+// `#[derive(Delta)]` generates the `EntitiesDelta` type, which is needed to
+// store deltas as edits in an `UndoRedo` bistack.
 #[derive(Delta)]
-pub struct Entities<K> {
-    positions: Vec<Vector2<K>>,
-    velocities: Vec<Vector2<K>>,
+// You can choose the name for the generated delta edit type by passing it
+// through the `delta` attribute. This attribute is optional. If you omit it,
+// the default is the name of the input type followed by the word `Delta`. The
+// name chosen here, `EntitiesDelta` is the same as the default.
+#[delta(EntitiesDelta)]
+pub struct Entities<T> {
+    positions: Vec<Vector2<T>>,
+    velocities: Vec<Vector2<T>>,
     healths: Vec<i64>,
 }
 ```

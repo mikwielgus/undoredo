@@ -314,11 +314,18 @@ available as traits. For ease of use, `undoredo` supplies a number of built-in
 convenience implementations of all these for various commonly-used container
 types.
 
-`undoredo` also provides a derive macro (`#[derive(Delta)]`) that can be used to
-generate a delta structure and operations on it for many custom data structures.
+There is also a derive macro (`#[derive(Delta)]`) that can be used to generate a
+delta structure and operations on it for many custom data structures.
 
-If the above is not satisfactory, it is also possible to create the delta
+Though we try our best, this derive macro may not work on some highly-generic
+data types. And in some cases, it may be desirable to add some additional logic
+to the operations. In these situations, it is necessary to implement the delta
 structure and operations on it manually.
+
+For an example of a manual implementation, take a look at
+[mikwielgus/polygon_unionfind/src/unionfind.rs](https://github.com/mikwielgus/polygon_unionfind/blob/develop/src/unionfind.rs#L141).
+This is a delta-undoredoable union-find where every field's type is a generic
+parameter.
 
 #### Standard library
 

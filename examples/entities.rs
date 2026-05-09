@@ -47,7 +47,7 @@ impl<T: Add<T, Output = T> + Copy + PartialOrd> Entities<T> {
         self.healths.push(health)
     }
 
-    pub fn update_entities(&mut self) {
+    pub fn update(&mut self) {
         for i in 0..self.positions.container().len() {
             self.update_entity(i);
         }
@@ -94,12 +94,24 @@ fn main() {
 
     assert_eq!(entities.positions.container().len(), 3);
 
-    // Perform three simulation updates.
+    // Perform three simulation updates, committing after each tick.
     for _ in 0..3 {
-        entities.update_entities();
+        entities.update();
         undoredo.commit(&mut entities);
     }
 
+    // Perform five more simulation updates, this time committing only once afterwards.
+    for _ in 0..5 {
+        entities.update();
+    }
+    undoredo.commit(&mut entities);
+
+    assert!(entities.positions.container().len() == 3);
+    assert_entity(&entities, 0, Vector2 { x: 8.0, y: 0.0 }, 92);
+    assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
+    assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
+
+    assert!(undoredo.undo(&mut entities).is_some());
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 3.0, y: 0.0 }, 97);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 6.0 }, 97);
@@ -148,6 +160,12 @@ fn main() {
     assert_entity(&entities, 0, Vector2 { x: 3.0, y: 0.0 }, 97);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 6.0 }, 97);
     assert_entity(&entities, 2, Vector2 { x: 97.0, y: 97.0 }, 47);
+
+    assert!(undoredo.redo(&mut entities).is_some());
+    assert!(entities.positions.container().len() == 3);
+    assert_entity(&entities, 0, Vector2 { x: 8.0, y: 0.0 }, 92);
+    assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
+    assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
 
     assert!(undoredo.redo(&mut entities).is_none());
 }

@@ -46,13 +46,21 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
     let output = match &input.data {
         Data::Struct(data) => match &data.fields {
             Fields::Named(fields_named) => {
-                let transformed_fields = fields_named.named.iter().map(|field| {
+                let mut transformed_fields = Vec::new();
+
+                for field in &fields_named.named {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
                     let field_name = &field.ident;
                     let ty = field_to_half_delta_container(&field.ty);
-                    quote! {
+
+                    transformed_fields.push(quote! {
                         #field_name: #ty,
-                    }
-                });
+                    });
+                }
+
                 quote! {
                     #[derive(Clone, Debug)]
                     #vis struct #half_delta_name #generics {
@@ -61,10 +69,17 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 }
             }
             Fields::Unnamed(fields_unnamed) => {
-                let transformed_fields = fields_unnamed.unnamed.iter().map(|field| {
+                let mut transformed_fields = Vec::new();
+
+                for field in &fields_unnamed.unnamed {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
                     let ty = field_to_half_delta_container(&field.ty);
-                    quote! { #ty }
-                });
+                    transformed_fields.push(quote! { #ty });
+                }
+
                 quote! {
                     #[derive(Clone, Debug)]
                     #vis struct #half_delta_name #generics ( #( #transformed_fields ),* );

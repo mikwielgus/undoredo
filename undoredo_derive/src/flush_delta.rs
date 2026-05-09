@@ -23,6 +23,10 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 let mut inserted_fields = Vec::new();
 
                 for field in &fields_named.named {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
                     let field_ident = field.ident.as_ref().expect("named field must have ident");
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
@@ -53,14 +57,23 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 let mut removed_fields = Vec::new();
                 let mut inserted_fields = Vec::new();
 
-                for (index, field) in fields_unnamed.unnamed.iter().enumerate() {
-                    let field_index = Index::from(index);
+                let mut half_field_index = 0usize;
+
+                for (i, field) in fields_unnamed.unnamed.iter().enumerate() {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
+                    let field_index = Index::from(i);
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
                         crate::half_delta::field_to_half_delta_container(field_ty);
 
-                    let removed_ident = format_ident!("removed_{}", index);
-                    let inserted_ident = format_ident!("inserted_{}", index);
+                    let removed_ident = format_ident!("removed_{}", half_field_index);
+                    let inserted_ident = format_ident!("inserted_{}", half_field_index);
+
+                    // Increment only for non-skipped fields.
+                    half_field_index += 1;
 
                     extra_where_predicates.push(quote! {
                         #field_ty: ::undoredo::FlushDelta<#field_half_delta_ty>

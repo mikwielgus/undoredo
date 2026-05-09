@@ -4,6 +4,7 @@
 
 mod apply_delta;
 mod delta;
+mod field_attrs;
 mod flush_delta;
 mod half_delta;
 

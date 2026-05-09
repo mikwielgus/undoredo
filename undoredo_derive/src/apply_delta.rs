@@ -22,6 +22,10 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
         Data::Struct(data) => match &data.fields {
             Fields::Named(fields_named) => {
                 for field in &fields_named.named {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
                         crate::half_delta::field_to_half_delta_container(field_ty);
@@ -42,11 +46,22 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 }
             }
             Fields::Unnamed(fields_unnamed) => {
+                let mut half_field_index = 0usize;
+
                 for (i, field) in fields_unnamed.unnamed.iter().enumerate() {
+                    if crate::field_attrs::field_has_skip(field)? {
+                        continue;
+                    }
+
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
                         crate::half_delta::field_to_half_delta_container(field_ty);
-                    let field_member = Member::Unnamed(Index::from(i));
+
+                    let field_member_self = Member::Unnamed(Index::from(i));
+                    let field_member_half = Member::Unnamed(Index::from(half_field_index));
+
+                    // Increment only if field is not skipped.
+                    half_field_index += 1;
 
                     extra_where_predicates.push(quote! {
                         #field_ty: ::undoredo::ApplyDelta<#field_half_delta_ty>
@@ -54,10 +69,10 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
 
                     apply_stmts.push(quote! {
                         let field_delta = ::undoredo::Delta::with_removed_inserted(
-                            removed.#field_member,
-                            inserted.#field_member,
+                            removed.#field_member_half,
+                            inserted.#field_member_half,
                         );
-                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member, field_delta);
+                        ::undoredo::ApplyDelta::apply_delta(&mut self.#field_member_self, field_delta);
                     });
                 }
             }

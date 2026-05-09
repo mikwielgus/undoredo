@@ -19,15 +19,15 @@ This approach is much easier than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
 of operation of other Undo/Redo crates, as having to implement commands requires
 maintenance of additional application logic that is often complicated and can
-lead to elusive bugs. Nevertheless, `undoredo` can also store a command or
-other metadata along with every edit, allowing easy use of the Command pattern
+lead to elusive bugs. But if needed, `undoredo` can also store a command or
+other metadata along with every edit, allowing for easy use of the Command pattern
 as well.
 
 Delta-recording undo-redo requires creating a separate delta edit type
 for each data structure. For ease of use, `undoredo` has derive macros
-(`#[derive(Delta)]`) to automatically generate these types on arbitrary custom
-`struct`s and `enum`s, as well as convenience implementations for standard
-library collections:
+[`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
+to automatically generate these types on arbitrary custom `struct`s and `enum`s,
+as well as convenience implementations for standard library collections:
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
@@ -45,14 +45,14 @@ for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 
-The following demo animation shows Undo/Redo action over dynamically added and
-subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots
-are stored, but all edits in history are made of sparse deltas of the polygon
-container and the associated R-tree:
-
 ![Animation showing polygons being added and subtracted in the demo stored in
 `demos/polygon_set/` directory of the repository of the polygon_unionfind crate
 ](polygon_set_demo.gif)
+
+The above demo animation shows Undo/Redo action over dynamically added and
+subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots
+are stored, but all edits in history are made of sparse deltas of the polygon
+container and the associated R-tree:
 
 Source code with instructions for running the above interactive visualization
 can be found in the repository of the
@@ -126,6 +126,49 @@ fn main() {
 }
 ```
 
+#### Delta recorder over custom `struct` or `enum`
+
+A data structure may not be one of the supported containers, but it may be
+a custom `struct` or `enum`, made of multiple containers or other members,
+possibly with additional generics and fields that should not be subject to
+undo-redo. To be able to perform delta recording in such case, you need to
+implement a delta structure for it together with two operations,
+[`.apply_delta()`](https://docs.rs/undoredo/latest/undoredo/delta/trait.ApplyDelta.html#tymethod.apply_delta)
+and
+[`.flush_delta()`](https://docs.rs/undoredo/latest/undoredo/trait.FlushDelta.html#tymethod.flush_delta).
+This can usually be easily done automatically by just applying a provided derive
+macro,
+[`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
+.
+
+Below is an example of an undoredoable [struct of
+arrays](https://en.wikipedia.org/wiki/AoS_and_SoA) storage with generic
+coordinate type `K` that could be used for a simple
+[entity-component-system](https://en.wikipedia.org/wiki/Entity_component_system):
+
+```rust,ignore
+// No need for `#[derive(Delta)]` for types stored in containers, only the
+// containers themselves need this.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Vector2<K> {
+    x: K,
+    y: K,
+}
+
+// `#[derive(Delta)]` will generate the `EntitiesDelta` type, which we store in
+// as an edit in the `UndoRedo` bistack.
+#[derive(Delta)]
+pub struct Entities<K> {
+    positions: Vec<Vector2<K>>,
+    velocities: Vec<Vector2<K>>,
+    healths: Vec<i64>,
+}
+```
+
+See
+[examples/entities.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/entities.rs)
+for the full example.
+
 #### Storing command metadata along with edits
 
 It is often desirable to store some metadata along with every recorded edit,
@@ -183,10 +226,10 @@ for an example.
 
 #### Delta recording on maps with pushing
 
-Some data structures with map semantics also provide a special type of insertion
-where a value is inserted without specifying a key, which the structure instead
+Some containers with map semantics also provide a special type of insertion
+where a value is inserted without specifying a key, which the container instead
 automatically generates and returns by itself. In `undoredo`, this operation is
-called "pushing".
+called *pushing*.
 
 If a supported type has such a push interface, you can record its changes just
 as easily as insertions and removals by calling
@@ -206,7 +249,7 @@ for complete examples of their usage.
 
 #### Delta recording on sets
 
-Some data structures have set semantics: they operate only on values, without
+Some containers have set semantics: they operate only on values, without
 exposing any usable notion of key or index. `undoredo` can provide delta-based
 undo-redo functionality to such a set by treating it as a `()`-valued map whose
 keys are the set's values. This is actually also how Rust's standard library
@@ -243,26 +286,34 @@ in a multiset.
 
 ## Supported containers
 
-### When using snapshots and commands
+### When using snapshots
 
 All data structures that implement the
 [`Clone`](https://doc.rust-lang.org/std/clone/trait.Clone.html) trait are
-supported for snapshot-based undo-redo. As for commands, obviously all data
-structures are supported as long as the library user implements commands for
-them.
+supported for snapshot-based undo-redo.
+
+### When using commands
+
+For command-based undo-redo,
+obviously all data structures are supported as long as the library user
+implements commands for them.
 
 ### When using deltas
 
 To be able to use delta-based undo-redo on a data structure, it is necessary
-to have a delta type as well as two operations, *apply delta* and *flush
-delta*. For ease of use, `undoredo` supplies a number of built-in convenience
-implementations of all these for various commonly-used container types.
+to have a delta structure as well as two operations,
+[`.apply_delta()`](https://docs.rs/undoredo/latest/undoredo/delta/trait.ApplyDelta.html#tymethod.apply_delta)
+and
+[`.flush_delta()`](https://docs.rs/undoredo/latest/undoredo/delta/trait.ApplyDelta.html#tymethod.flush_delta),
+available as traits. For ease of use, `undoredo` supplies a number of built-in
+convenience implementations of all these for various commonly-used container
+types.
 
-`undoredo` also provides a derive macro (`#[derive(Delta)]`) that can be used
-to generate a delta type and operations on it for many custom data structures.
+`undoredo` also provides a derive macro (`#[derive(Delta)]`) that can be used to
+generate a delta structure and operations on it for many custom data structures.
 
-If the above is not satisfactory, it is also possible to implement delta-editing
-capabilities manually.
+If the above is not satisfactory, it is also possible to create the delta
+structure and operations on it manually.
 
 #### Standard library
 
@@ -298,7 +349,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.9.13", features = ["rstar", "rstared", "stable-vec", "thunderdome"] }
+undoredo = { version = "0.9.13", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
 ```
 
 #### Custom types

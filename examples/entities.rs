@@ -26,8 +26,8 @@ impl<K: Add<K, Output = K>> Add for Vector2<K> {
     }
 }
 
-// This will generate the `EntitiesDelta` type, which we store in as an edit in
-// the `UndoRedo` bistack.
+// `#[derive(Delta)]` will generate the `EntitiesDelta` type, which we store in
+// as an edit in the `UndoRedo` bistack.
 #[derive(Delta)]
 pub struct Entities<K> {
     positions: Recorder<Vec<Vector2<K>>>,

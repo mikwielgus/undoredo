@@ -162,7 +162,12 @@ pub struct Vector2<T> {
 // `undoredo` attribute with key `delta_name`. If you omit this, the default is
 // the name of the input type followed by the word `Delta`. The name chosen in
 // this example, `EntitiesDelta`, happens to be the same as the default.
-#[undoredo(delta_name = EntitiesDelta)]
+#[undoredo(delta = EntitiesDelta)]
+// Each delta is made of two collections of elements called half-deltas.
+// `#[derive(Delta)]` generates a type for them as well, named similarly to full
+// deltas. If that name does not suit you, you can analogously use the following
+// attribute to rename them.
+#[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
     positions: Vec<Vector2<T>>,
     velocities: Vec<Vector2<T>>,

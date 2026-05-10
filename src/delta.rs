@@ -38,6 +38,7 @@ use crate::{
 ///
 /// Consists of a container of removed elements and another container of
 /// inserted elements.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Delta<DC> {
     pub(super) removed: DC,

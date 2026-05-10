@@ -5,6 +5,7 @@
 use crate::undoredo::{Extract, Revert};
 
 /// A snapshot of the whole state of a target.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Snapshot<T> {
     state: T,

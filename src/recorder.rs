@@ -11,6 +11,7 @@ use crate::{ApplyDelta, UndoRedo, delta::Delta};
 
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Recorder<
     C: Container,

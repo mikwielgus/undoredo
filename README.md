@@ -40,8 +40,8 @@ and for some third-party feature-gated types:
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
 [Supported containers](#supported-containers) section).
 
-This library is `no_std`-compatible and has no mandatory third-party
-dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
+This library is compatible with `no_std` and `serde` and has no mandatory
+third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 

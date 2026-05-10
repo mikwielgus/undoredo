@@ -39,6 +39,7 @@ impl<T> Extract<T> for () {
 /// The metadata usually somehow represents the command that originated the
 /// edit, but it really can be anything, as it is only for the convenience of
 /// the programmer using the library, without any effect on logic.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct CmdEdit<Cmd, E> {
     /// Command or other metadata associated with this edit.
@@ -51,6 +52,7 @@ pub struct CmdEdit<Cmd, E> {
 ///
 /// `E` is the type of each committed edit (for example, the concrete diff type
 /// your recorder or domain uses).
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct UndoRedo<E, Cmd = ()> {
     done: Vec<CmdEdit<Cmd, E>>,

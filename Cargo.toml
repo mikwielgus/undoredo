@@ -22,25 +22,28 @@ edition = "2024"
 maintenance = { status = "actively-developed" }
 
 [features]
-derive = ["undoredo_derive"]
 default = ["std"]
+derive = ["undoredo_derive"]
+serde = ["dep:serde"]
 std = []
 rstar = ["dep:rstar", "maplike/rstar"]
-rstared = ["rstar", "dep:rstared", "dep:rstar"]
+rstared = ["rstar", "dep:rstared"]
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
 maplike = { version = "0.9", features = ["derive"] }
-stable-vec = { version = "0.4", optional = true }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.9", optional = true }
+serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
+stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
 undoredo_derive = { version = "0.10", optional = true, path = "undoredo_derive" }
 
 [dev-dependencies]
 stable-vec = "0.4"
 thunderdome = "0.6"
+serde = { version = "1.0", features = ["derive"] }
 rstar = "0.12"
 rstared = "0.9"
 # This enables `derive` on the library, which we need for integration tests.

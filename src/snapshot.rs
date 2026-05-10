@@ -6,18 +6,18 @@ use crate::undoredo::{Extract, Revert};
 
 /// A snapshot of the whole state of a target.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Snapshot<S> {
-    state: S,
+pub struct Snapshot<T> {
+    state: T,
 }
 
-impl<S> Snapshot<S> {
+impl<T> Snapshot<T> {
     /// Create a new snapshot from a state of a target.
-    pub fn new(state: S) -> Self {
+    pub fn new(state: T) -> Self {
         Self { state }
     }
 
     /// Dissolve the snapshot, returning the state it was holding.
-    pub fn dissolve(self) -> S {
+    pub fn dissolve(self) -> T {
         self.state
     }
 }

@@ -71,6 +71,11 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
+name = "snapshots"
+required-features = ["std"]
+doc-scrape-examples = true
+
+[[example]]
 name = "commands"
 required-features = ["std"]
 doc-scrape-examples = true

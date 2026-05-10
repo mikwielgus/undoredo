@@ -92,7 +92,7 @@ fn main() {
     let mut recorder: Recorder<HashMap<usize, char>> =
         Recorder::new(HashMap::new());
 
-    // The undo-redo struct maintains the undo-redo bistack.
+    // The undo-redo struct that holds and maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
 
     // Push elements while recording the changes in a delta.
@@ -100,12 +100,12 @@ fn main() {
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
+    // The pushed elements are now present in the container.
+    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+
     // Flush the recorder and commit the recorded delta of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
     undoredo.commit(&mut recorder);
-
-    // The pushed elements are now present in the container.
-    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Now undo the action.
     undoredo.undo(&mut recorder);

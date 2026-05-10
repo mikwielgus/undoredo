@@ -6,13 +6,12 @@ use std::collections::HashMap;
 use undoredo::delta::{VecDelta, VecHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
-#[allow(unused_mut)]
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
     let mut recorder: Recorder<HashMap<usize, char>, VecHalfDelta<char>> =
         Recorder::new(HashMap::new());
 
-    // The undo-redo struct maintains the undo-redo bistack.
+    // The undo-redo struct that holds and maintains the undo-redo bistack.
     let mut undoredo: UndoRedo<VecDelta<char>> = UndoRedo::new();
 
     // Push elements while recording the changes in a delta.
@@ -20,12 +19,12 @@ fn main() {
     recorder.insert(2, 'B');
     recorder.insert(3, 'C');
 
+    // The pushed elements are now present in the container.
+    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+
     // Flush the recorder and commit the recorded delta of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
     undoredo.commit(&mut recorder);
-
-    // The pushed elements are now present in the container.
-    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Now undo the action.
     undoredo.undo(&mut recorder);
@@ -41,7 +40,7 @@ fn main() {
 
     // Once you are done recording, you can dissolve the recorder to regain
     // ownership and mutability over the recorded container.
-    let (mut hashmap, ..) = recorder.dissolve();
+    let (hashmap, ..) = recorder.dissolve();
     assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }
 

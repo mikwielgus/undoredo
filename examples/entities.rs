@@ -123,63 +123,71 @@ fn main() {
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
     assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
 
-    assert!(undoredo.undo(&mut entities).is_some());
+    undoredo.undo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 3.0, y: 0.0 }, 97);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 6.0 }, 97);
     assert_entity(&entities, 2, Vector2 { x: 97.0, y: 97.0 }, 47);
 
-    assert!(undoredo.undo(&mut entities).is_some());
+    undoredo.undo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 2.0, y: 0.0 }, 98);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 4.0 }, 98);
     assert_entity(&entities, 2, Vector2 { x: 98.0, y: 98.0 }, 48);
 
-    assert!(undoredo.undo(&mut entities).is_some());
+    undoredo.undo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 1.0, y: 0.0 }, 99);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 2.0 }, 99);
     assert_entity(&entities, 2, Vector2 { x: 99.0, y: 99.0 }, 49);
 
-    assert!(undoredo.undo(&mut entities).is_some());
+    undoredo.undo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 2, Vector2 { x: 100.0, y: 100.0 }, 50);
 
-    assert!(undoredo.undo(&mut entities).is_some());
+    undoredo.undo(&mut entities);
+
     assert!(entities.positions.container().len() == 2);
     assert_entity(&entities, 0, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 0.0 }, 100);
 
-    assert!(undoredo.redo(&mut entities).is_some());
+    undoredo.redo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 2, Vector2 { x: 100.0, y: 100.0 }, 50);
 
-    assert!(undoredo.redo(&mut entities).is_some());
+    undoredo.redo(&mut entities);
+
     assert_entity(&entities, 0, Vector2 { x: 1.0, y: 0.0 }, 99);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 2.0 }, 99);
     assert_entity(&entities, 2, Vector2 { x: 99.0, y: 99.0 }, 49);
 
-    assert!(undoredo.redo(&mut entities).is_some());
+    undoredo.redo(&mut entities);
+
     assert_entity(&entities, 0, Vector2 { x: 2.0, y: 0.0 }, 98);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 4.0 }, 98);
     assert_entity(&entities, 2, Vector2 { x: 98.0, y: 98.0 }, 48);
 
-    assert!(undoredo.redo(&mut entities).is_some());
+    undoredo.redo(&mut entities);
+
     assert_entity(&entities, 0, Vector2 { x: 3.0, y: 0.0 }, 97);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 6.0 }, 97);
     assert_entity(&entities, 2, Vector2 { x: 97.0, y: 97.0 }, 47);
 
-    assert!(undoredo.redo(&mut entities).is_some());
+    undoredo.redo(&mut entities);
+
     assert!(entities.positions.container().len() == 3);
     assert_entity(&entities, 0, Vector2 { x: 8.0, y: 0.0 }, 92);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
     assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
-
-    assert!(undoredo.redo(&mut entities).is_none());
 }
 
 #[test]

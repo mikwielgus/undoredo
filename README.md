@@ -172,6 +172,13 @@ pub struct Entities<T> {
     positions: Vec<Vector2<T>>,
     velocities: Vec<Vector2<T>>,
     healths: Vec<i64>,
+    // You can make fields not be subject to undo-redo by marking them with
+    // `#[undoredo(skip)]`.
+    // Note that this skipping only works for delta-based undo-redo because
+    // snapshots and commands rely on different mechanisms.
+    #[undoredo(skip)]
+    #[allow(unused)]
+    not_in_delta: String,
 }
 ```
 

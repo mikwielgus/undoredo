@@ -71,12 +71,12 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
-name = "snapshots"
+name = "commands"
 required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
-name = "commands"
+name = "snapshots"
 required-features = ["std"]
 doc-scrape-examples = true
 

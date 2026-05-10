@@ -241,6 +241,37 @@ field, thereby implementing the Command pattern. See
 [examples/commands.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/commands.rs)
 for an example.
 
+#### Snapshot-based undo-redo
+
+You can easily perform undo-redo using snapshots (that is, by storing whole past
+states instead of only diffs between them) instead of deltas or commands. If you
+were using deltas, you need to remove the
+[`Recorder`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html)
+wrapper over your container and instead use the
+[`Snapshot`](https://docs.rs/undoredo/latest/undoredo/struct.Snapshot.html)
+wrapper in place of the delta type.
+
+For instance, if your container is `HashMap<usize, char>`, it will look like
+this:
+
+```rust,ignore
+let mut container: HashMap<usize, char> = HashMap::new();
+let mut undoredo: UndoRedo<Snapshot<HashMap<usize, char>>> = UndoRedo::new();
+```
+
+This will work for all container types that implement `Clone`, without need
+for any derive macro invocations or additional trait implementations as is with
+deltas.
+
+However, there are two caveats not present with deltas: if you want to be able
+to restore the container to its initial (often empty) state, you need to commit
+it first. And if you end up committing your latest changes, to revert them you
+will need to invoke undo twice, since the first undo just restores the state to
+the top of the *undone* stack.
+
+For an usage example, see
+[examples/snapshots.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/snapshots.rs).
+
 #### Delta recording on maps with pushing
 
 Some containers with map semantics also provide a special type of insertion
@@ -311,9 +342,8 @@ supported for snapshot-based undo-redo.
 
 ### When using commands
 
-For command-based undo-redo,
-obviously all data structures are supported as long as the library user
-implements commands for them.
+For command-based undo-redo, obviously all data structures are supported as long
+as the library user implements commands for them.
 
 ### When using deltas
 
@@ -357,15 +387,15 @@ feature-gated convenience implementations of delta-editing for data structures
 from certain external crates:
 
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
-  gated by the `stable-vec` feature flag (example usage:
+  gated by the `stable-vec` feature flag (usage example:
   [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
-  gated by the `thunderdome` feature flag (example usage:
+  gated by the `thunderdome` feature flag (usage example:
   [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs));
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature flag (example usage: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
+  `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature flag (example usage: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
+  `rstared` feature flag (usage example: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
 
 To use these, enable their corresponding feature flags next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type

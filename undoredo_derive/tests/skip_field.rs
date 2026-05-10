@@ -7,10 +7,7 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
 
-use undoredo::Delta;
-use undoredo::VecHalfDelta;
-use undoredo::{ApplyDelta, FlushDelta as FlushDeltaTrait, Recorder};
-use undoredo_derive::{ApplyDelta, FlushDelta, HalfDelta};
+use undoredo::{ApplyDelta, Delta, FlushDelta, HalfDelta, Recorder, VecHalfDelta};
 
 #[derive(Clone, HalfDelta, ApplyDelta, FlushDelta)]
 struct TestNamedFieldStruct {
@@ -51,7 +48,7 @@ fn named_skip_flush_half_delta_has_no_skipped_field() {
         v: Recorder::new(vec![1, 2, 3]),
         _tag: 42,
     };
-    let d = FlushDeltaTrait::flush_delta(&mut s);
+    let d = FlushDelta::flush_delta(&mut s);
     let (removed, inserted) = d.dissolve();
     assert_eq!(removed.v, BTreeMap::new());
     assert_eq!(inserted.v, BTreeMap::new());

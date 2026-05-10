@@ -7,9 +7,9 @@
 use std::collections::BTreeMap;
 use std::vec::Vec;
 
-use undoredo::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::{
-    ApplyDelta, Container, Delta, Get, Insert, IntoIter, Push, Recorder, Remove, Snapshot, UndoRedo,
+    ApplyDelta, BTreeMapHalfDelta, BTreeSetHalfDelta, Container, Delta, Get, Insert, IntoIter,
+    Push, Recorder, Remove, Snapshot, UndoRedo,
 };
 
 pub(crate) trait Keyed<K>: Container<Key = K> {}

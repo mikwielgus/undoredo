@@ -4,9 +4,7 @@
 
 #![allow(dead_code)]
 
-use undoredo::{Delta, VecHalfDelta};
-use undoredo::{ApplyDelta, Recorder};
-use undoredo_derive::{ApplyDelta, HalfDelta};
+use undoredo::{ApplyDelta, Delta, HalfDelta, Recorder, VecHalfDelta};
 
 #[derive(HalfDelta, ApplyDelta)]
 #[undoredo(half_delta = TestStructHalfDelta)]

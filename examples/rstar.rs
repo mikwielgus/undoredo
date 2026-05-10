@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use rstar::RTree;
-use undoredo::{RTreeDelta, RTreeHalfDelta};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{RTreeDelta, RTreeHalfDelta, Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<RTree<(i32, i32)>, RTreeHalfDelta<(i32, i32)>> =

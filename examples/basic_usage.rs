@@ -7,6 +7,11 @@ use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
+    //
+    // For some containers such as `HashMap` and `HashSet`, you need
+    // to explicitly pass a half-delta type to the `Recorder` (here
+    // `HashMapHalfDelta`). For most containers, however, you don't need to do
+    // that because their half-delta is already the default, `BTreeMap`.
     let mut recorder: Recorder<HashMap<usize, char>, HashMapHalfDelta<usize, char>> =
         Recorder::new(HashMap::new());
 

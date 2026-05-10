@@ -40,8 +40,8 @@ and for some third-party feature-gated types:
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
 [Supported containers](#supported-containers) section).
 
-This library is `no_std`-compatible and has no mandatory third-party dependencies except
-for [`alloc`](https://doc.rust-lang.org/alloc/).
+This library is `no_std`-compatible and has no mandatory third-party
+dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 
@@ -76,24 +76,24 @@ commands work without any derives.
 
 ### Usage examples
 
-#### Delta recorder over `HashMap`
+#### Delta recorder over `BTreeMap`
 
-Following is a basic usage example of delta-recording undo-redo over `HashMap`.
+Following is a basic usage example of delta-recording undo-redo over `BTreeMap`.
 You can find more examples in the
 [examples/](https://github.com/mikwielgus/undoredo/tree/develop/examples)
 directory.
 
 ```rust
-use std::collections::HashMap;
-use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
+use std::collections::BTreeMap;
+use undoredo::{BTreeMapDelta, Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
-    let mut recorder: Recorder<HashMap<usize, char>, HashMapHalfDelta<usize, char>> =
-        Recorder::new(HashMap::new());
+    let mut recorder: Recorder<BTreeMap<usize, char>> =
+        Recorder::new(BTreeMap::new());
 
     // The undo-redo struct that holds and maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<HashMapDelta<usize, char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BTreeMapDelta<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in a delta.
     recorder.insert(1, 'A');
@@ -101,7 +101,7 @@ fn main() {
     recorder.insert(3, 'C');
 
     // The pushed elements are now present in the container.
-    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    assert!(*recorder.container() == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Flush the recorder and commit the recorded delta of pushing 'A', 'B', 'C'
     // into the undo-redo bistack.
@@ -111,18 +111,18 @@ fn main() {
     undoredo.undo(&mut recorder);
 
     // The container is now empty; the action of pushing elements has been undone.
-    assert!(*recorder.container() == HashMap::from([]));
+    assert!(*recorder.container() == BTreeMap::from([]));
 
     // Now redo the action.
     undoredo.redo(&mut recorder);
 
     // The elements are back in the container; the action has been redone.
-    assert!(*recorder.container() == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    assert!(*recorder.container() == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 
     // Once you are done recording, you can dissolve the recorder to regain
     // ownership and mutability over the recorded container.
-    let (mut hashmap, ..) = recorder.dissolve();
-    assert!(hashmap == HashMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    let (map, ..) = recorder.dissolve();
+    assert!(map == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }
 ```
 
@@ -177,7 +177,6 @@ pub struct Entities<T> {
     // Note that this skipping only works for delta-based undo-redo because
     // snapshots and commands rely on different mechanisms.
     #[undoredo(skip)]
-    #[allow(unused)]
     not_in_delta: String,
 }
 ```
@@ -202,8 +201,8 @@ and
 accessor methods.
 
 ```rust
-use std::collections::{BTreeMap, HashMap};
-use undoredo::{Delta, Insert, Recorder, UndoRedo};
+use std::collections::BTreeMap;
+use undoredo::{BTreeMapDelta, Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
@@ -212,9 +211,9 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<HashMap<usize, char>> =
-        Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>, Command> = UndoRedo::new();
+    let mut recorder: Recorder<BTreeMap<usize, char>> =
+        Recorder::new(BTreeMap::new());
+    let mut undoredo: UndoRedo<BTreeMapDelta<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
     recorder.insert(2, 'B');
@@ -351,7 +350,7 @@ To be able to use delta-based undo-redo on a data structure, it is necessary
 to have a delta structure as well as two operations,
 [`.apply_delta()`](https://docs.rs/undoredo/latest/undoredo/delta/trait.ApplyDelta.html#tymethod.apply_delta)
 and
-[`.flush_delta()`](https://docs.rs/undoredo/latest/undoredo/delta/trait.ApplyDelta.html#tymethod.flush_delta),
+[`.flush_delta()`](https://docs.rs/undoredo/latest/undoredo/trait.FlushDelta.html#tymethod.flush_delta),
 available as traits. For ease of use, `undoredo` supplies a number of built-in
 convenience implementations of all these for various commonly-used container
 types.

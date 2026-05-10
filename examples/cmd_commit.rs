@@ -5,8 +5,7 @@
 //! Example showing how to store metadata ("cmd") along with each edit.
 
 use std::collections::HashMap;
-use undoredo::{VecDelta, VecHalfDelta};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
 
 /// Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]
@@ -15,9 +14,9 @@ enum Command {
 }
 
 fn main() {
-    let mut recorder: Recorder<HashMap<usize, char>, VecHalfDelta<char>> =
+    let mut recorder: Recorder<HashMap<usize, char>, HashMapHalfDelta<usize, char>> =
         Recorder::new(HashMap::new());
-    let mut undoredo: UndoRedo<VecDelta<char>, Command> = UndoRedo::new();
+    let mut undoredo: UndoRedo<HashMapDelta<usize, char>, Command> = UndoRedo::new();
 
     recorder.insert(1, 'A');
 

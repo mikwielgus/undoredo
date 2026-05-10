@@ -24,5 +24,7 @@ quote = "1"
 syn = { version = "2", features = ["full"] }
 
 [dev-dependencies]
-undoredo = { path = "..", default-features = true, features = ["std"] }
+# This enables `derive` and `std` on the library, which we need for integration
+# tests.
+undoredo = { path = "..", default-features = true, features = ["derive", "std"] }
 maplike = "0.9"

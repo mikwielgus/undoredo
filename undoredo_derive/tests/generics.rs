@@ -6,8 +6,7 @@
 
 use std::collections::BTreeMap;
 
-use undoredo::{ApplyDelta, FlushDelta, Recorder};
-use undoredo_derive::Delta;
+use undoredo::{ApplyDelta, Delta, FlushDelta, Recorder};
 
 #[derive(Clone, Debug, Delta)]
 struct TestGenericStruct<C1 = Recorder<Vec<usize>>, C2 = C1, C3 = C1> {

@@ -9,8 +9,7 @@ mod common;
 
 use std::collections::HashSet;
 
-use undoredo::HashSetHalfDelta;
-use undoredo::Recorder;
+use undoredo::{HashSetHalfDelta, Recorder};
 
 #[test]
 fn test_recorder_apply_delta_on_set() {

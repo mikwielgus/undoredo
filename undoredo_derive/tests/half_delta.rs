@@ -6,8 +6,7 @@
 
 use std::collections::BTreeMap;
 
-use undoredo::Recorder;
-use undoredo_derive::HalfDelta;
+use undoredo::{HalfDelta, Recorder};
 
 #[derive(HalfDelta)]
 #[undoredo(half_delta = TestStructHalfDelta)]

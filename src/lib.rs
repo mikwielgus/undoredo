@@ -4,6 +4,8 @@
 
 #![doc(html_root_url = "https://docs.rs/undoredo")]
 #![doc = include_str!("../README.md")]
+#![doc = "\n## Feature flags\n"]
+#![doc = document_features::document_features!()]
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]
 #![no_std]

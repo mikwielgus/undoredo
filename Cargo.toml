@@ -23,15 +23,31 @@ maintenance = { status = "actively-developed" }
 
 [features]
 default = ["std"]
+
+## Enables the `Delta` derive macro (and also its constituent macros,
+## `HalfDelta`, `ApplyDelta` `FlushDelta`).
 derive = ["undoredo_derive"]
+
+## Enables `serde` support (derives `Serialize` and `Deserialize` traits).
 serde = ["dep:serde"]
+
+## Disable for `no_std` compatibility.
 std = []
+
+## Enables support of delta-recording for `rstar::RTree` type.
 rstar = ["dep:rstar", "maplike/rstar"]
+
+## Enables support of delta-recording for `rstared::RTreed` type.
 rstared = ["rstar", "dep:rstared"]
+
+## Enables support of delta-recording for `stable_vec::StableVec` type.
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
+
+## Enables support of delta-recording for `thunderdome::Arena` type.
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
+document-features = "0.2"
 maplike = { version = "0.9", features = ["derive"] }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.9", optional = true }

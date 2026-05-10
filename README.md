@@ -47,8 +47,8 @@ third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/)
 ## Demo
 
 ![Animation showing polygons being added and subtracted in the demo stored in
-`demos/polygon_set/` directory of the repository of the polygon_unionfind crate
-](https://github.com/mikwielgus/undoredo/blob/develop/polygon_set_demo.gif)
+`demos/polygon_set/` directory of the repository of the polygon_unionfind crate.
+](./polygon_set_demo.gif)
 
 The above demo animation shows Undo/Redo action over dynamically added and
 subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots

@@ -6,6 +6,7 @@
 #![doc = include_str!("../README.md")]
 #![doc = "\n## Feature flags\n"]
 #![doc = document_features::document_features!()]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]
 #![no_std]
@@ -30,4 +31,14 @@ pub use maplike::{
 };
 
 #[cfg(feature = "derive")]
-pub use undoredo_derive::{ApplyDelta, Delta, FlushDelta, HalfDelta};
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::ApplyDelta;
+#[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::Delta;
+#[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::FlushDelta;
+#[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::HalfDelta;

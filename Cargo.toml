@@ -25,7 +25,7 @@ maintenance = { status = "actively-developed" }
 default = ["std"]
 
 ## Enables the `Delta` derive macro (and also its constituent macros,
-## `HalfDelta`, `ApplyDelta` `FlushDelta`).
+## `ApplyDelta`, `FlushDelta`, `HalfDelta`).
 derive = ["undoredo_derive"]
 
 ## Enables `serde` support (derives `Serialize` and `Deserialize` traits).
@@ -78,6 +78,7 @@ pre-release-replacements = [
 # Use scraped examples.
 [package.metadata.docs.rs]
 cargo-args = ["--all-features", "-Zunstable-options", "-Zrustdoc-scrape-examples"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [[example]]
 name = "basic_usage"

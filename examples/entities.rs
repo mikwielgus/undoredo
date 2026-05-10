@@ -30,10 +30,10 @@ impl<T: Add<T, Output = T>> Add for Vector2<T> {
 // store deltas as edits in an `UndoRedo` bistack.
 #[derive(Delta)]
 // You can choose the name for the generated delta edit type through the
-// `undoredo` attribute with key `delta_name`. If you omit this, the default is
+// `undoredo` attribute with key `delta`. If you omit this, the default is
 // the name of the input type followed by the word `Delta`. The name chosen in
 // this example, `EntitiesDelta`, happens to be the same as the default.
-#[undoredo(delta_name = EntitiesDelta)]
+#[undoredo(delta = EntitiesDelta)]
 pub struct Entities<T> {
     positions: Recorder<Vec<Vector2<T>>>,
     velocities: Recorder<Vec<Vector2<T>>>,

@@ -10,7 +10,7 @@ use undoredo::{FlushDelta, Recorder};
 use undoredo_derive::{FlushDelta, HalfDelta};
 
 #[derive(Debug, PartialEq, HalfDelta, FlushDelta)]
-#[undoredo(half_delta_name = TestStructHalfDelta, delta_name = TestStructDelta)]
+#[undoredo(half_delta = TestStructHalfDelta, delta = TestStructDelta)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }

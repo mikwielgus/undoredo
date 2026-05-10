@@ -14,9 +14,9 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
     for attr in &input.attrs {
         if attr.path().is_ident("undoredo") {
             attr.parse_nested_meta(|meta| {
-                if meta.path.is_ident("half_delta_name") {
+                if meta.path.is_ident("half_delta") {
                     if name_from_attr.is_some() {
-                        return Err(meta.error("duplicate `half_delta_name` in #[undoredo(...)]"));
+                        return Err(meta.error("duplicate `half_delta` in #[undoredo(...)]"));
                     }
 
                     let ident: syn::Ident = meta.value()?.parse()?;
@@ -25,7 +25,7 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
                     return Ok(());
                 }
 
-                if meta.path.is_ident("delta_name") {
+                if meta.path.is_ident("delta") {
                     let _: syn::Ident = meta.value()?.parse()?;
                     return Ok(());
                 }
@@ -40,7 +40,7 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
 
 pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let vis = &input.vis;
-    let half_delta_name = resolve_half_delta_ident(&input)?;
+    let half_delta = resolve_half_delta_ident(&input)?;
     let generics = &input.generics;
 
     let output = match &input.data {
@@ -63,7 +63,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
 
                 quote! {
                     #[derive(Clone, Debug)]
-                    #vis struct #half_delta_name #generics {
+                    #vis struct #half_delta #generics {
                         #( #transformed_fields )*
                     }
                 }
@@ -82,12 +82,12 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
 
                 quote! {
                     #[derive(Clone, Debug)]
-                    #vis struct #half_delta_name #generics ( #( #transformed_fields ),* );
+                    #vis struct #half_delta #generics ( #( #transformed_fields ),* );
                 }
             }
             Fields::Unit => quote! {
                 #[derive(Clone, Debug)]
-                #vis struct #half_delta_name #generics;
+                #vis struct #half_delta #generics;
             },
         },
         Data::Enum(_) => panic!("derive(HalfDelta) does not support enums"),

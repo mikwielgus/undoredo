@@ -8,7 +8,7 @@ use syn::{Data, DeriveInput, Fields, Index};
 
 pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
-    let half_delta_name = crate::half_delta::resolve_half_delta_ident(&input)?;
+    let half_delta = crate::half_delta::resolve_half_delta_ident(&input)?;
 
     let mut flush_stmts = Vec::new();
 
@@ -49,8 +49,8 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 }
 
                 (
-                    quote! { #half_delta_name { #(#removed_fields),* } },
-                    quote! { #half_delta_name { #(#inserted_fields),* } },
+                    quote! { #half_delta { #(#removed_fields),* } },
+                    quote! { #half_delta { #(#inserted_fields),* } },
                 )
             }
             Fields::Unnamed(fields_unnamed) => {
@@ -89,11 +89,11 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                 }
 
                 (
-                    quote! { #half_delta_name( #(#removed_fields),* ) },
-                    quote! { #half_delta_name( #(#inserted_fields),* ) },
+                    quote! { #half_delta( #(#removed_fields),* ) },
+                    quote! { #half_delta( #(#inserted_fields),* ) },
                 )
             }
-            Fields::Unit => (quote! { #half_delta_name }, quote! { #half_delta_name }),
+            Fields::Unit => (quote! { #half_delta }, quote! { #half_delta }),
         },
         Data::Enum(_) => {
             return Err(syn::Error::new_spanned(
@@ -131,10 +131,10 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
     };
 
     let output = quote! {
-        impl #impl_generics ::undoredo::FlushDelta<#half_delta_name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::FlushDelta<#half_delta #ty_generics> for #name #ty_generics
         #where_tokens
         {
-            fn flush_delta(&mut self) -> ::undoredo::Delta<#half_delta_name #ty_generics> {
+            fn flush_delta(&mut self) -> ::undoredo::Delta<#half_delta #ty_generics> {
                 #(#flush_stmts)*
                 ::undoredo::Delta::with_removed_inserted(
                     #removed_ctor,

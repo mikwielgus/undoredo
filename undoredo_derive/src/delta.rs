@@ -16,14 +16,14 @@ fn resolve_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
     for attr in &input.attrs {
         if attr.path().is_ident("undoredo") {
             attr.parse_nested_meta(|meta| {
-                if meta.path.is_ident("half_delta_name") {
+                if meta.path.is_ident("half_delta") {
                     let _: syn::Ident = meta.value()?.parse()?;
                     return Ok(());
                 }
 
-                if meta.path.is_ident("delta_name") {
+                if meta.path.is_ident("delta") {
                     if name_from_attr.is_some() {
-                        return Err(meta.error("duplicate `delta_name` in #[undoredo(...)]"));
+                        return Err(meta.error("duplicate `delta` in #[undoredo(...)]"));
                     }
 
                     let ident: syn::Ident = meta.value()?.parse()?;

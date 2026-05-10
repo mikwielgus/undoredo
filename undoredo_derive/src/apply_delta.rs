@@ -8,7 +8,7 @@ use syn::{Data, DeriveInput, Fields, Index, Member};
 
 pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
-    let half_delta_name = crate::half_delta::resolve_half_delta_ident(&input)?;
+    let half_delta = crate::half_delta::resolve_half_delta_ident(&input)?;
 
     let mut apply_stmts = Vec::new();
 
@@ -126,10 +126,10 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
     };
 
     let output = quote! {
-        impl #impl_generics ::undoredo::ApplyDelta<#half_delta_name #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::ApplyDelta<#half_delta #ty_generics> for #name #ty_generics
         #where_tokens
         {
-            fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta_name #ty_generics>) {
+            fn apply_delta(&mut self, delta: ::undoredo::Delta<#half_delta #ty_generics>) {
                 let (removed, inserted) = delta.dissolve();
                 #(#apply_stmts)*
             }

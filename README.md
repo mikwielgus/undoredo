@@ -121,8 +121,8 @@ fn main() {
 
     // Once you are done recording, you can dissolve the recorder to regain
     // ownership and mutability over the recorded container.
-    let (map, ..) = recorder.dissolve();
-    assert!(map == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
+    let (btreemap, ..) = recorder.dissolve();
+    assert!(btreemap == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }
 ```
 
@@ -268,7 +268,7 @@ it first. And if you end up committing your latest changes, to revert them you
 will need to invoke undo twice, since the first undo just restores the state to
 the top of the *undone* stack.
 
-For an usage example, see
+For a full usage example, see
 [examples/snapshots.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/snapshots.rs).
 
 #### Delta recording on maps with pushing

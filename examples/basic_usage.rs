@@ -3,16 +3,15 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::HashMap;
-use undoredo::{VecDelta, VecHalfDelta};
-use undoredo::{Recorder, UndoRedo};
+use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
-    let mut recorder: Recorder<HashMap<usize, char>, VecHalfDelta<char>> =
+    let mut recorder: Recorder<HashMap<usize, char>, HashMapHalfDelta<usize, char>> =
         Recorder::new(HashMap::new());
 
     // The undo-redo struct that holds and maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<VecDelta<char>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<HashMapDelta<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in a delta.
     recorder.insert(1, 'A');

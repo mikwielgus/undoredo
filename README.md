@@ -83,17 +83,17 @@ You can find more examples in the
 [examples/](https://github.com/mikwielgus/undoredo/tree/develop/examples)
 directory.
 
-```rust,ignore
-use std::collections::{BTreeMap, HashMap};
-use undoredo::{Delta, Recorder, UndoRedo};
+```rust
+use std::collections::HashMap;
+use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
-    let mut recorder: Recorder<HashMap<usize, char>> =
+    let mut recorder: Recorder<HashMap<usize, char>, HashMapHalfDelta<usize, char>> =
         Recorder::new(HashMap::new());
 
     // The undo-redo struct that holds and maintains the undo-redo bistack.
-    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, char>>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<HashMapDelta<usize, char>> = UndoRedo::new();
 
     // Push elements while recording the changes in a delta.
     recorder.insert(1, 'A');
@@ -201,7 +201,7 @@ and
 [`.undone()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.undone)
 accessor methods.
 
-```rust,ignore
+```rust
 use std::collections::{BTreeMap, HashMap};
 use undoredo::{Delta, Insert, Recorder, UndoRedo};
 

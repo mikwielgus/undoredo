@@ -43,7 +43,8 @@ stable-vec = "0.4"
 thunderdome = "0.6"
 rstar = "0.12"
 rstared = "0.9"
-undoredo_derive = { version = "0.9", path = "undoredo_derive" }
+# This enables `derive` on the library, which we need for integration tests.
+undoredo = { path = ".", default-features = false, features = ["derive", "std"] }
 
 # Version replacements apply only to this crate. We have to keep this here
 # and not in `release.toml` because the replacements are applied to each
@@ -76,7 +77,7 @@ doc-scrape-examples = true
 
 [[example]]
 name = "entities"
-required-features = ["std"]
+required-features = ["std", "derive"]
 doc-scrape-examples = true
 
 [[example]]

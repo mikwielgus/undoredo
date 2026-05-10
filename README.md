@@ -163,7 +163,7 @@ pub struct Vector2<T> {
 // the name of the input type followed by the word `Delta`. The name chosen in
 // this example, `EntitiesDelta`, happens to be the same as the default.
 #[undoredo(delta = EntitiesDelta)]
-// Each delta is made of two collections of elements called half-deltas.
+// Each delta is made of two collections of elements called "half-deltas".
 // `#[derive(Delta)]` generates a type for them as well, named similarly to full
 // deltas. If that name does not suit you, you can analogously use the following
 // attribute to rename them.

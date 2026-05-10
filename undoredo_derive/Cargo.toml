@@ -4,7 +4,7 @@
 
 [package]
 name = "undoredo_derive"
-version = "0.10.3"
+version = "0.10.4"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Derive macros for undoredo."
 repository = "https://github.com/mikwielgus/undoredo"

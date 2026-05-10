@@ -338,13 +338,16 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Alias for `HashMap<K, V>`.
 pub type HashMapHalfDelta<K, V> = HashMap<K, V>;
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Alias for `Delta<HashMapHalfDelta<K, V>>`.
 pub type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for HashMap<K, V>
 {
@@ -354,13 +357,16 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Alias for `HashMap<K, ()>`.
 pub type HashSetHalfDelta<K> = HashMap<K, ()>;
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Alias for `Delta<HashSetHalfDelta<K>>`.
 pub type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -368,13 +374,16 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "stable-vec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Alias for `BTreeMap<usize, V>`.
 pub type StableVecHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg(feature = "stable-vec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Alias for `Delta<StableVecHalfDelta<V>>`.
 pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 
 #[cfg(feature = "stable-vec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
     ApplyDelta<DC> for StableVecFacade<V, C>
 {
@@ -384,13 +393,16 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
+#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 /// Alias for `BTreeMap<Index, V>`.
 pub type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
 #[cfg(feature = "thunderdome")]
+#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 /// Alias for `Delta<ThunderdomeHalfDelta<V>>`.
 pub type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
 
 #[cfg(feature = "thunderdome")]
+#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -398,14 +410,17 @@ impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "rstar")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 /// Alias for `BTreeMap<K, ()>`.
 pub type RTreeHalfDelta<K> = BTreeMap<K, ()>;
 
 #[cfg(feature = "rstar")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 /// Alias for `Delta<RTreeHalfDelta<K>>`.
 pub type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for RTree<K>
 {
@@ -415,14 +430,17 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 }
 
 #[cfg(feature = "rstared")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
 /// Alias for `BTreeMap<K, V>`.
 pub type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
 
 #[cfg(feature = "rstared")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
 /// Alias for `Delta<RTreedHalfDelta<K, V>>`.
 pub type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
 
 #[cfg(feature = "rstared")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
 impl<
     K: Clone + PartialEq,
     V: Clone + PartialEq + RTreeObject,

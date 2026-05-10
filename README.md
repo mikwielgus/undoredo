@@ -47,7 +47,7 @@ for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ![Animation showing polygons being added and subtracted in the demo stored in
 `demos/polygon_set/` directory of the repository of the polygon_unionfind crate
-](polygon_set_demo.gif)
+](https://github.com/mikwielgus/undoredo/blob/develop/polygon_set_demo.gif)
 
 The above demo animation shows Undo/Redo action over dynamically added and
 subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots
@@ -141,9 +141,9 @@ macro,
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
 .
 
-Below is an example of an undoredoable [struct of
-arrays](https://en.wikipedia.org/wiki/AoS_and_SoA) storage with generic
-coordinate type `K` that could be used for a simple
+Below is an example of an undoredoable
+[struct-of-arrays](https://en.wikipedia.org/wiki/AoS_and_SoA)
+storage with generic coordinate type `K` that could be used for a simple
 [entity-component-system](https://en.wikipedia.org/wiki/Entity_component_system):
 
 ```rust,ignore

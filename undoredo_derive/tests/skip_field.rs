@@ -7,8 +7,8 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
 
-use undoredo::delta::Delta;
-use undoredo::delta::VecHalfDelta;
+use undoredo::Delta;
+use undoredo::VecHalfDelta;
 use undoredo::{ApplyDelta, FlushDelta as FlushDeltaTrait, Recorder};
 use undoredo_derive::{ApplyDelta, FlushDelta, HalfDelta};
 

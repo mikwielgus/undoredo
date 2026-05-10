@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-#![allow(missing_docs)]
-
 use alloc::{
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
@@ -122,7 +120,9 @@ where
     }
 }
 
+/// Alias for `BTreeMap<usize, V>`.
 pub type VecHalfDelta<V> = BTreeMap<usize, V>;
+/// Alias for `Delta<VecHalfDelta<V>>`.
 pub type VecDelta<V> = Delta<VecHalfDelta<V>>;
 
 impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
@@ -159,7 +159,9 @@ where
     }
 }
 
+/// Alias for `BTreeMap<K, V>`.
 pub type BTreeMapHalfDelta<K, V> = BTreeMap<K, V>;
+/// Alias for `Delta<BTreeMapHalfDelta<K, V>>`.
 pub type BTreeMapDelta<K, V> = Delta<BTreeMapHalfDelta<K, V>>;
 
 impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
@@ -168,7 +170,9 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
     }
 }
 
+/// Alias for `BTreeMap<K, ()>`.
 pub type BTreeSetHalfDelta<K> = BTreeMap<K, ()>;
+/// Alias for `Delta<BTreeSetHalfDelta<K>>`.
 pub type BTreeSetDelta<K> = Delta<BTreeSetHalfDelta<K>>;
 
 impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
@@ -180,7 +184,9 @@ impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> fo
 macro_rules! impl_delta_for_scalar {
     ($($half_delta:ident, $delta:ident, $t:ty);+ $(;)?) => {
         $(
+            #[doc = concat!("Alias for `BTreeMap<usize, ", stringify!($t), ">`.")]
             pub type $half_delta = BTreeMap<usize, $t>;
+            #[doc = concat!("Alias for `Delta<", stringify!($half_delta), ">`.")]
             pub type $delta = Delta<$half_delta>;
 
             impl ApplyDelta<$half_delta> for $t {
@@ -217,7 +223,17 @@ impl_delta_for_scalar! {
 
 macro_rules! impl_delta_for_tuple {
     ($half_delta:ident, $delta:ident, $($idx:tt $typ:ident),+ $(,)?) => {
+        #[doc = concat!(
+            "Alias for `BTreeMap<usize, (",
+            $( stringify!($typ), ", ", )+
+            ")>`."
+        )]
         pub type $half_delta<$($typ),+> = BTreeMap<usize, ($($typ,)+)>;
+        #[doc = concat!(
+            "Alias for `Delta<", stringify!($half_delta), "<",
+            $( stringify!($typ), ", ", )+
+            ">>`.`"
+        )]
         pub type $delta<$($typ),+> = Delta<$half_delta<$($typ),+>>;
 
         impl<$($typ,)+> ApplyDelta<$half_delta<$($typ),+>> for ($($typ,)+) {
@@ -309,7 +325,9 @@ impl_delta_for_tuple!(
     11 T11
 );
 
+/// Alias for `BTreeMap<usize, ()>`.
 pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
+/// Alias for `Delta<PhantomDataHalfDelta>`.
 pub type PhantomDataDelta = Delta<PhantomDataHalfDelta>;
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
@@ -319,8 +337,10 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
+/// Alias for `HashMap<K, V>`.
 pub type HashMapHalfDelta<K, V> = HashMap<K, V>;
 #[cfg(feature = "std")]
+/// Alias for `Delta<HashMapHalfDelta<K, V>>`.
 pub type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
 
 #[cfg(feature = "std")]
@@ -333,8 +353,10 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "std")]
+/// Alias for `HashMap<K, ()>`.
 pub type HashSetHalfDelta<K> = HashMap<K, ()>;
 #[cfg(feature = "std")]
+/// Alias for `Delta<HashSetHalfDelta<K>>`.
 pub type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
 
 #[cfg(feature = "std")]
@@ -345,8 +367,10 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "stable-vec")]
+/// Alias for `BTreeMap<usize, V>`.
 pub type StableVecHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg(feature = "stable-vec")]
+/// Alias for `Delta<StableVecHalfDelta<V>>`.
 pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 
 #[cfg(feature = "stable-vec")]
@@ -359,8 +383,10 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
+/// Alias for `BTreeMap<Index, V>`.
 pub type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
 #[cfg(feature = "thunderdome")]
+/// Alias for `Delta<ThunderdomeHalfDelta<V>>`.
 pub type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
 
 #[cfg(feature = "thunderdome")]
@@ -371,9 +397,11 @@ impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "rstar")]
+/// Alias for `BTreeMap<K, ()>`.
 pub type RTreeHalfDelta<K> = BTreeMap<K, ()>;
 
 #[cfg(feature = "rstar")]
+/// Alias for `Delta<RTreeHalfDelta<K>>`.
 pub type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
@@ -386,9 +414,11 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 }
 
 #[cfg(feature = "rstared")]
+/// Alias for `BTreeMap<K, V>`.
 pub type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
 
 #[cfg(feature = "rstared")]
+/// Alias for `Delta<RTreedHalfDelta<K, V>>`.
 pub type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
 
 #[cfg(feature = "rstared")]

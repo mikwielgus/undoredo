@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use thunderdome::Arena;
-use undoredo::delta::{ThunderdomeDelta, ThunderdomeHalfDelta};
+use undoredo::{ThunderdomeDelta, ThunderdomeHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

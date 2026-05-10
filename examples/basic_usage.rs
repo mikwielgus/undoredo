@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::HashMap;
-use undoredo::delta::{VecDelta, VecHalfDelta};
+use undoredo::{VecDelta, VecHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

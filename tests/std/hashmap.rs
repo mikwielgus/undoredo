@@ -9,7 +9,7 @@ mod common;
 
 use std::collections::HashMap;
 
-use undoredo::delta::HashMapHalfDelta;
+use undoredo::HashMapHalfDelta;
 use undoredo::Recorder;
 
 #[test]

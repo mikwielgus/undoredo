@@ -7,7 +7,7 @@ mod common;
 
 use std::collections::BTreeMap;
 
-use undoredo::delta::BTreeMapDelta;
+use undoredo::BTreeMapDelta;
 use undoredo::{Delta, Recorder, UndoRedo};
 
 #[derive(Delta, Clone, Debug, PartialEq)]

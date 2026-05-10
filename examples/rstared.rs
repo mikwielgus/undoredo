@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use rstar::{AABB, primitives::Rectangle};
 use rstared::RTreed;
-use undoredo::delta::{RTreedDelta, RTreedHalfDelta};
+use undoredo::{RTreedDelta, RTreedHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

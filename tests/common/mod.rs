@@ -7,7 +7,7 @@
 use std::collections::BTreeMap;
 use std::vec::Vec;
 
-use undoredo::delta::{BTreeMapHalfDelta, BTreeSetHalfDelta};
+use undoredo::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::{
     ApplyDelta, Container, Delta, Get, Insert, IntoIter, Push, Recorder, Remove, Snapshot, UndoRedo,
 };

@@ -6,7 +6,7 @@
 mod common;
 
 use alloc::{collections::BTreeMap, vec::Vec};
-use undoredo::delta::{VecDelta, VecHalfDelta};
+use undoredo::{VecDelta, VecHalfDelta};
 use undoredo::{ApplyDelta, Delta, Recorder, UndoRedo};
 
 #[test]

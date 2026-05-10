@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use stable_vec::StableVec;
-use undoredo::delta::{StableVecDelta, StableVecHalfDelta};
+use undoredo::{StableVecDelta, StableVecHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

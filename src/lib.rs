@@ -14,12 +14,12 @@ extern crate std;
 // No feature for `alloc` because it would be always enabled anyway.
 pub extern crate alloc;
 
-pub mod delta;
+mod delta;
 mod recorder;
 mod snapshot;
 mod undoredo;
 
-pub use crate::delta::{ApplyDelta, Delta};
+pub use crate::delta::*;
 pub use crate::recorder::{FlushDelta, Recorder};
 pub use crate::snapshot::Snapshot;
 pub use crate::undoredo::{CmdEdit, Extract, Revert, UndoRedo};

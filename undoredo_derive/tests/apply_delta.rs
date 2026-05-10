@@ -4,7 +4,7 @@
 
 #![allow(dead_code)]
 
-use undoredo::delta::{Delta, VecHalfDelta};
+use undoredo::{Delta, VecHalfDelta};
 use undoredo::{ApplyDelta, Recorder};
 use undoredo_derive::{ApplyDelta, HalfDelta};
 

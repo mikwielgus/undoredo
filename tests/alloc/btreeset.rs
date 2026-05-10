@@ -6,7 +6,7 @@
 mod common;
 
 use alloc::collections::BTreeSet;
-use undoredo::delta::BTreeSetHalfDelta;
+use undoredo::BTreeSetHalfDelta;
 use undoredo::Recorder;
 
 #[test]

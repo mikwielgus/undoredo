@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use rstar::RTree;
-use undoredo::delta::{RTreeDelta, RTreeHalfDelta};
+use undoredo::{RTreeDelta, RTreeHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

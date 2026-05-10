@@ -4,7 +4,7 @@
 
 use std::collections::BTreeSet;
 
-use undoredo::delta::{BTreeSetDelta, BTreeSetHalfDelta};
+use undoredo::{BTreeSetDelta, BTreeSetHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {

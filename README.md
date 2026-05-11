@@ -356,8 +356,8 @@ available as traits. For ease of use, `undoredo` supplies a number of built-in
 convenience implementations of all these for various commonly-used container
 types.
 
-There is also a derive macro (`#[derive(Delta)]`) that can be used to generate a
-delta structure and operations on it for many custom data structures.
+For custom data structures, there is a derive macro, `#[derive(Delta)]`, that
+will generate all the necessary code.
 
 Though we try our best, this derive macro may not work on some highly-generic
 data types. And in some cases, it may be desirable to add some additional logic

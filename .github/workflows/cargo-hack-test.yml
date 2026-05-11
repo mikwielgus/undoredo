@@ -26,4 +26,4 @@ jobs:
           tool: cargo-hack
 
       - name: Test examples, tests, docs for each feature flag
-        run: cargo hack test --each-feature --examples --tests && cargo hack test --all-features --doc
+        run: cargo hack test --workspace --each-feature --examples --tests && cargo hack test --workspace --all-features --doc

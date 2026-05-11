@@ -23,8 +23,8 @@ lead to elusive bugs. But if needed, `undoredo` can also store a command or
 other metadata along with every edit, allowing for easy use of the Command pattern
 as well.
 
-Delta-recording undo-redo requires creating a separate delta edit type
-for each data structure. For ease of use, `undoredo` has derive macros
+Delta-recording undo-redo requires creating a separate delta edit type for each
+data structure. For ease of use, `undoredo` has derive macro
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
 to automatically generate these types on arbitrary custom `struct`s and `enum`s,
 as well as convenience implementations for standard library collections:
@@ -41,8 +41,7 @@ and for some third-party feature-gated types:
 [Supported containers](#supported-containers) section).
 
 This library is compatible with `no_std` and `serde` and has no mandatory
-third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/)
-(read more in the [Feature flags](#feature-flags) section).
+third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 
@@ -161,13 +160,13 @@ pub struct Vector2<T> {
 #[derive(Delta)]
 // You can choose the name for the generated delta edit type through the
 // `undoredo` attribute with key `delta_name`. If you omit this, the default is
-// the name of the input type followed by the word `Delta`. The name chosen in
+// the name of the input type followed by the word "Delta". The name chosen in
 // this example, `EntitiesDelta`, happens to be the same as the default.
 #[undoredo(delta = EntitiesDelta)]
 // Each delta is made of two collections of elements called "half-deltas".
-// `#[derive(Delta)]` generates a type for them as well, named similarly to full
-// deltas. If that name does not suit you, you can analogously use the following
-// attribute to rename them.
+// `#[derive(Delta)]` generates a type for them as well, named by appending "HalfDelta"
+// to the input type. If that name does not suit you, you can analogously use
+// the following attribute to rename them.
 #[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
     positions: Vec<Vector2<T>>,
@@ -246,10 +245,10 @@ for an example.
 You can easily perform undo-redo using snapshots (that is, by storing whole past
 states instead of only diffs between them) instead of deltas or commands. If you
 were using deltas, you need to remove the
-[`Recorder`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html)
+[`Recorder<...>`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html)
 wrapper over your container and instead use the
-[`Snapshot`](https://docs.rs/undoredo/latest/undoredo/struct.Snapshot.html)
-wrapper in place of the delta type.
+[`Snapshot<...>`](https://docs.rs/undoredo/latest/undoredo/struct.Snapshot.html)
+wrapper in place of the `Delta<...>` type.
 
 For instance, if your container is `HashMap<usize, char>`, it will look like
 this:

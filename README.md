@@ -159,19 +159,21 @@ pub struct Vector2<T> {
 // store deltas as edits in an `UndoRedo` bistack.
 #[derive(Delta)]
 // You can choose the name for the generated delta edit type through the
-// `undoredo` attribute with key `delta_name`. If you omit this, the default is
-// the name of the input type followed by the word "Delta". The name chosen in
+// `undoredo` attribute with key `delta`. If you omit this, the default is
+// the name of the input type followed by the word `Delta`. The name chosen in
 // this example, `EntitiesDelta`, happens to be the same as the default.
 #[undoredo(delta = EntitiesDelta)]
 // Each delta is made of two collections of elements called "half-deltas".
-// `#[derive(Delta)]` generates a type for them as well, named by appending "HalfDelta"
-// to the input type. If that name does not suit you, you can analogously use
-// the following attribute to rename them.
+// `#[derive(Delta)]` generates a type for them as well, named similarly to full
+// deltas. If that name does not suit you, you can analogously use the
+// `undoredo` attribute with key `half_delta` to rename them.,
 #[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
     positions: Vec<Vector2<T>>,
     velocities: Vec<Vector2<T>>,
     healths: Vec<i64>,
+    // You can record changes to primitive types too, not just collections.
+    turn_counter: Recorder<u64>,
     // You can make fields not be subject to undo-redo by marking them with
     // `#[undoredo(skip)]`.
     // Note that this skipping only works for delta-based undo-redo because

@@ -35,13 +35,15 @@ impl<T: Add<T, Output = T>> Add for Vector2<T> {
 #[undoredo(delta = EntitiesDelta)]
 // Each delta is made of two collections of elements called "half-deltas".
 // `#[derive(Delta)]` generates a type for them as well, named similarly to full
-// deltas. If that name does not suit you, you can analogously use the following
-// attribute to rename them.
+// deltas. If that name does not suit you, you can analogously use the
+// `undoredo` attribute with key `half_delta` to rename them.,
 #[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
     positions: Recorder<Vec<Vector2<T>>>,
     velocities: Recorder<Vec<Vector2<T>>>,
     healths: Recorder<Vec<i64>>,
+    // You can record changes to primitive types too, not just collections.
+    turn_counter: Recorder<u64>,
     // You can make fields not be subject to undo-redo by marking them with
     // `#[undoredo(skip)]`.
     // Note that this skipping only works for delta-based undo-redo because
@@ -59,6 +61,8 @@ impl<T: Add<T, Output = T> + Copy + PartialOrd> Entities<T> {
     }
 
     pub fn update(&mut self) {
+        self.turn_counter.assign(*self.turn_counter.container() + 1);
+
         for i in 0..self.positions.container().len() {
             self.update_entity(i);
         }
@@ -87,6 +91,7 @@ fn main() {
         positions: Recorder::new(Vec::new()),
         velocities: Recorder::new(Vec::new()),
         healths: Recorder::new(Vec::new()),
+        turn_counter: Recorder::new(0),
         not_in_delta: "not_in_delta".to_string(),
     };
 
@@ -122,6 +127,7 @@ fn main() {
     assert_entity(&entities, 0, Vector2 { x: 8.0, y: 0.0 }, 92);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
     assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
+    assert_eq!(*entities.turn_counter.container(), 8);
 
     undoredo.undo(&mut entities);
 
@@ -129,6 +135,7 @@ fn main() {
     assert_entity(&entities, 0, Vector2 { x: 3.0, y: 0.0 }, 97);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 6.0 }, 97);
     assert_entity(&entities, 2, Vector2 { x: 97.0, y: 97.0 }, 47);
+    assert_eq!(*entities.turn_counter.container(), 3);
 
     undoredo.undo(&mut entities);
 
@@ -150,6 +157,7 @@ fn main() {
     assert_entity(&entities, 0, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 0.0 }, 100);
     assert_entity(&entities, 2, Vector2 { x: 100.0, y: 100.0 }, 50);
+    assert_eq!(*entities.turn_counter.container(), 0);
 
     undoredo.undo(&mut entities);
 
@@ -188,6 +196,7 @@ fn main() {
     assert_entity(&entities, 0, Vector2 { x: 8.0, y: 0.0 }, 92);
     assert_entity(&entities, 1, Vector2 { x: 0.0, y: 16.0 }, 92);
     assert_entity(&entities, 2, Vector2 { x: 92.0, y: 92.0 }, 42);
+    assert_eq!(*entities.turn_counter.container(), 8);
 }
 
 #[test]

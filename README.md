@@ -70,9 +70,9 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 undoredo = { version = "0.10.12", features = ["derive"] }
 ```
 
-The `derive` feature flag is only required when using delta-recording undo-redo
-on custom `struct` or `enum` types to derive delta edit types. Snapshots and
-commands work without any derives.
+The `derive` feature flag is only required when using deltas on custom `struct`
+or `enum` types to derive delta edit types. Snapshots and commands work without
+any derives.
 
 ### Usage examples
 
@@ -169,9 +169,9 @@ pub struct Vector2<T> {
 // `undoredo` attribute with key `half_delta` to rename them.,
 #[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
-    positions: Vec<Vector2<T>>,
-    velocities: Vec<Vector2<T>>,
-    healths: Vec<i64>,
+    positions: Recorder<Vec<Vector2<T>>>,
+    velocities: Recorder<Vec<Vector2<T>>>,
+    healths: Recorder<Vec<i64>>,
     // You can record changes to primitive types too, not just collections.
     turn_counter: Recorder<u64>,
     // You can make fields not be subject to undo-redo by marking them with

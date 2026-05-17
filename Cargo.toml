@@ -47,9 +47,9 @@ stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
-maplike = { version = "0.9", features = ["derive"] }
+maplike = { version = "0.10", features = ["derive"] }
 rstar = { version = "0.12", optional = true }
-rstared = { version = "0.9", optional = true }
+rstared = { version = "0.10", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
@@ -60,7 +60,7 @@ stable-vec = "0.4"
 thunderdome = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 rstar = "0.12"
-rstared = "0.9"
+rstared = "0.10"
 # This enables `derive` on the library, which we need for integration tests.
 undoredo = { path = ".", default-features = false, features = ["derive", "std"] }
 

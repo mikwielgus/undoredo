@@ -47,7 +47,6 @@ stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
-document-features = "0.2"
 maplike = { version = "0.9", features = ["derive"] }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.9", optional = true }

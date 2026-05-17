@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use std::ops::Add;
+use std::ops::{Add, AddAssign};
 
 use undoredo::{Delta, Recorder, UndoRedo};
 
@@ -22,6 +22,13 @@ impl<T: Add<T, Output = T>> Add for Vector2<T> {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         }
+    }
+}
+
+impl<T: AddAssign<T>> AddAssign for Vector2<T> {
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
     }
 }
 
@@ -53,7 +60,7 @@ pub struct Entities<T> {
     not_in_delta: String,
 }
 
-impl<T: Add<T, Output = T> + Copy + PartialOrd> Entities<T> {
+impl<T: Add<T, Output = T> + AddAssign<T> + Copy + PartialOrd> Entities<T> {
     pub fn new_entity(&mut self, position: Vector2<T>, velocity: Vector2<T>, health: i64) -> usize {
         self.positions.push(position);
         self.velocities.push(velocity);
@@ -69,11 +76,18 @@ impl<T: Add<T, Output = T> + Copy + PartialOrd> Entities<T> {
     }
 
     fn update_entity(&mut self, index: usize) {
-        // Add velocitiey to positions on every update.
-        self.positions.set(
+        // Add velocities to positions on every update.
+
+        let velocity = self.velocities.get(&index).unwrap();
+        self.positions
+            .modify(index, |position| *position += *velocity);
+
+        // Alternatively, you could update them more verbosely this way:
+
+        /*self.positions.set(
             index,
             *self.positions.get(&index).unwrap() + *self.velocities.get(&index).unwrap(),
-        );
+        );*/
 
         // Decrease health by 1 on every update.
         self.healths

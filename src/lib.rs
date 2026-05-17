@@ -25,7 +25,7 @@ pub use crate::recorder::{FlushDelta, Recorder};
 pub use crate::snapshot::Snapshot;
 pub use crate::undoredo::{CmdEdit, Extract, Revert, UndoRedo};
 pub use maplike::{
-    Container, Get, Insert, IntoIter, Maplike, Push, Remove, Scalarlike, Setlike, Veclike,
+    Container, Get, Insert, IntoIter, Maplike, Modify, Push, Remove, Scalarlike, Setlike, Veclike,
 };
 
 #[cfg(feature = "derive")]

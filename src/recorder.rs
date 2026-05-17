@@ -5,7 +5,9 @@
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
 
-use maplike::{Assign, Clear, Container, Get, Insert, IntoIter, Len, Pop, Push, Remove, Set};
+use maplike::{
+    Assign, Clear, Container, Get, Insert, IntoIter, Len, Modify, Pop, Push, Remove, Set,
+};
 
 use crate::{ApplyDelta, UndoRedo, delta::Delta};
 
@@ -55,22 +57,6 @@ impl<C: Container, DC: Container> Recorder<C, DC> {
     #[inline]
     pub fn dissolve(self) -> (C, Delta<DC>) {
         (self.container, self.delta)
-    }
-}
-
-impl<K, V, C, DC> Recorder<C, DC>
-where
-    C: Container<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K> + Remove<K>,
-    K: Clone,
-    V: Clone,
-{
-    /// Remove an element, pass it through a closure, then insert it back.
-    #[inline]
-    pub fn update<F: FnOnce(Option<V>) -> Option<V>>(&mut self, key: K, f: F) {
-        if let Some(value) = f(self.remove(&key)) {
-            self.insert(key, value);
-        }
     }
 }
 
@@ -163,6 +149,51 @@ where
 
         self.delta.inserted.insert(key.clone(), value.clone());
         self.container.set(key, value);
+    }
+}
+
+impl<K, V, C, DC> Modify<K> for Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + Get<K> + Modify<K>,
+    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn modify<F>(&mut self, key: K, f: F)
+    where
+        F: FnOnce(&mut Self::Value),
+    {
+        self.modify(key, f);
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + Get<K> + Modify<K>,
+    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Modify the value under key with a closure.
+    #[inline]
+    pub fn modify<F>(&mut self, key: K, f: F)
+    where
+        F: FnOnce(&mut V),
+    {
+        if self.delta.inserted.get(&key).is_none() {
+            if let Some(value_to_remove) = self.container.get(&key) {
+                self.delta
+                    .removed
+                    .insert(key.clone(), value_to_remove.clone());
+            }
+        }
+
+        self.container.modify(key.clone(), f);
+
+        if let Some(value) = self.container.get(&key) {
+            self.delta.inserted.insert(key, value.clone());
+        }
     }
 }
 

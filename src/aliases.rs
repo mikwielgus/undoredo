@@ -241,11 +241,11 @@ pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 #[cfg(feature = "thunderdome")]
 #[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 /// Half-delta for `Arena<V>`. Alias for `BTreeMap<Index, V>`.
-pub type ThunderdomeHalfDelta<V> = BTreeMap<Index, V>;
+pub type ArenaHalfDelta<V> = BTreeMap<Index, V>;
 #[cfg(feature = "thunderdome")]
 #[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
-/// Delta for `Arena<V>`. Alias for `Delta<ThunderdomeHalfDelta<V>>`.
-pub type ThunderdomeDelta<V> = Delta<ThunderdomeHalfDelta<V>>;
+/// Delta for `Arena<V>`. Alias for `Delta<ArenaHalfDelta<V>>`.
+pub type ArenaDelta<V> = Delta<ArenaHalfDelta<V>>;
 
 #[cfg(feature = "rstar")]
 #[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]

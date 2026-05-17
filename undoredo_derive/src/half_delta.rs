@@ -126,8 +126,6 @@ pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
     let Some(container_last) = container_path.path.segments.last() else {
         return ty.to_token_stream();
     };
-    let container_name = container_last.ident.to_string();
-
     match &container_last.arguments {
         PathArguments::AngleBracketed(container_ab) => {
             if container_ab.args.len() != 1 {
@@ -138,18 +136,9 @@ pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
                 return ty.to_token_stream();
             };
 
-            if container_name == "Vec" || container_name == "StableVec" {
-                quote! { ::undoredo::alloc::collections::BTreeMap<usize, #t> }
-            } else if container_name == "Arena" {
-                quote! { ::undoredo::alloc::collections::BTreeMap<::thunderdome::Index, #t> }
-            } else if container_name == "RTree" {
-                quote! { ::undoredo::alloc::collections::BTreeSet<#t> }
-            } else {
-                // Scalars and enums use a `BTreeMap` with a single element that
-                // is a recorded version of the container itself.
-                quote! { ::undoredo::alloc::collections::BTreeMap<usize, #container_ty> }
-            }
+            let container_half = format_ident!("{}HalfDelta", container_last.ident);
+            quote! { ::undoredo::aliases::#container_half<#t> }
         }
-        _ => quote! { ::undoredo::alloc::collections::BTreeMap<usize, #container_ty> },
+        _ => quote! { ::undoredo::aliases::BTreeMapHalfDelta<usize, #container_ty> },
     }
 }

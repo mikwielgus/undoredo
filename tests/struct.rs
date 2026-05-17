@@ -7,7 +7,8 @@ mod common;
 
 use std::collections::BTreeMap;
 
-use undoredo::{BTreeMapDelta, Delta, Recorder, UndoRedo};
+use undoredo::aliases::BTreeMapDelta;
+use undoredo::{Delta, Recorder, UndoRedo};
 
 #[derive(Delta, Clone, Debug, PartialEq)]
 enum TestEnum {

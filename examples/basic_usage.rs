@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use std::collections::HashMap;
-use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
+use undoredo::aliases::{HashMapDelta, HashMapHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.

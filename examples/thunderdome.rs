@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use thunderdome::Arena;
-use undoredo::{Recorder, ThunderdomeDelta, ThunderdomeHalfDelta, UndoRedo};
+use undoredo::aliases::{ThunderdomeDelta, ThunderdomeHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<Arena<char>, ThunderdomeHalfDelta<char>> =

@@ -5,7 +5,8 @@
 //! Example showing how to store metadata ("cmd") along with each edit.
 
 use std::collections::HashMap;
-use undoredo::{HashMapDelta, HashMapHalfDelta, Recorder, UndoRedo};
+use undoredo::aliases::{HashMapDelta, HashMapHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 /// Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]

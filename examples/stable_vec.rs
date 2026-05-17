@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use stable_vec::StableVec;
-use undoredo::{Recorder, StableVecDelta, StableVecHalfDelta, UndoRedo};
+use undoredo::aliases::{StableVecDelta, StableVecHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<StableVec<char>, StableVecHalfDelta<char>> =

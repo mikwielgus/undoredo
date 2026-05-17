@@ -9,7 +9,8 @@ mod common;
 
 use std::collections::HashMap;
 
-use undoredo::{HashMapHalfDelta, Recorder};
+use undoredo::Recorder;
+use undoredo::aliases::HashMapHalfDelta;
 
 #[test]
 fn test_recorder_apply_delta_at_specified_indices() {

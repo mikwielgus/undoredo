@@ -85,7 +85,8 @@ directory.
 
 ```rust
 use std::collections::BTreeMap;
-use undoredo::{BTreeMapDelta, Recorder, UndoRedo};
+use undoredo::aliases::BTreeMapDelta;
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // The recorder records the ongoing changes to the recorded container.
@@ -204,7 +205,8 @@ accessor methods.
 
 ```rust
 use std::collections::BTreeMap;
-use undoredo::{BTreeMapDelta, Recorder, UndoRedo};
+use undoredo::aliases::BTreeMapDelta;
+use undoredo::{Recorder, UndoRedo};
 
 // Representation of the command that originated the recorded delta.
 #[derive(Debug, Clone, PartialEq)]

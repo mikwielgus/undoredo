@@ -5,7 +5,8 @@
 #![allow(dead_code)]
 
 use maplike::Assign;
-use undoredo::{ApplyDelta, Delta, Recorder, VecHalfDelta};
+use undoredo::aliases::VecHalfDelta;
+use undoredo::{ApplyDelta, Delta, Recorder};
 
 #[derive(Delta)]
 #[undoredo(half_delta = TestStructHalfDelta, delta = TestStructDelta)]

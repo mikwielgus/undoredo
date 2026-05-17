@@ -6,7 +6,8 @@ use std::collections::HashMap;
 
 use rstar::{AABB, primitives::Rectangle};
 use rstared::RTreed;
-use undoredo::{RTreedDelta, RTreedHalfDelta, Recorder, UndoRedo};
+use undoredo::aliases::{RTreedDelta, RTreedHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     // A hashmap of 2D rectangles will be the underlying container.

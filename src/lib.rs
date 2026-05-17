@@ -15,6 +15,9 @@ extern crate std;
 // No feature for `alloc` because it would be always enabled anyway.
 pub extern crate alloc;
 
+/// Type aliases for full and half deltas.
+pub mod aliases;
+
 mod delta;
 mod recorder;
 mod snapshot;

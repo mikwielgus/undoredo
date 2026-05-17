@@ -4,7 +4,8 @@
 
 use std::collections::BTreeSet;
 
-use undoredo::{BTreeSetDelta, BTreeSetHalfDelta, Recorder, UndoRedo};
+use undoredo::aliases::{BTreeSetDelta, BTreeSetHalfDelta};
+use undoredo::{Recorder, UndoRedo};
 
 fn main() {
     let mut recorder: Recorder<BTreeSet<char>, BTreeSetHalfDelta<char>> =

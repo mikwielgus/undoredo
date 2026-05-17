@@ -8,9 +8,9 @@ use std::collections::BTreeMap;
 use std::vec::Vec;
 
 use undoredo::{
-    ApplyDelta, BTreeMapHalfDelta, BTreeSetHalfDelta, Container, Delta, Get, Insert, IntoIter,
-    Push, Recorder, Remove, Snapshot, UndoRedo,
+    ApplyDelta, BTreeMapHalfDelta, BTreeSetHalfDelta, Delta, Recorder, Snapshot, UndoRedo,
 };
+use undoredo::maplike::{Container, Get, Insert, IntoIter, Push, Remove};
 
 pub(crate) trait Keyed<K>: Container<Key = K> {}
 impl<T: Container<Key = K>, K> Keyed<K> for T {}

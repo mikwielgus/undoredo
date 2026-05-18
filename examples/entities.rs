@@ -78,26 +78,23 @@ impl<T: Add<T, Output = T> + AddAssign<T> + Copy + PartialOrd> Entities<T> {
     fn update_entity(&mut self, index: usize) {
         // Add velocities to positions on every update.
 
-        let velocity = self.velocities.get(&index).unwrap();
+        let velocity = self.velocities[index];
         self.positions
-            .modify(index, |position| *position += *velocity);
+            .modify(index, |position| *position += velocity);
 
         // Alternatively, you could update them more verbosely this way:
 
-        /*self.positions.set(
-            index,
-            *self.positions.get(&index).unwrap() + *self.velocities.get(&index).unwrap(),
-        );*/
+        /*self.positions
+            .set(index, self.positions[index] + self.velocities[index]);*/
 
         // Decrease health by 1 on every update.
-        self.healths
-            .set(index, self.healths.get(&index).unwrap() - 1);
+        self.healths.set(index, self.healths[index] - 1);
     }
 }
 
 fn assert_entity(entities: &Entities<f64>, index: usize, pos: Vector2<f64>, health: i64) {
-    assert_eq!(*entities.positions.get(&index).unwrap(), pos);
-    assert_eq!(*entities.healths.get(&index).unwrap(), health);
+    assert_eq!(entities.positions[index], pos);
+    assert_eq!(entities.healths[index], health);
 }
 
 fn main() {

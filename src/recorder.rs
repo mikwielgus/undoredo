@@ -4,6 +4,7 @@
 
 use alloc::collections::BTreeMap;
 use core::marker::PhantomData;
+use core::ops::Index;
 
 use maplike::{
     Assign, Clear, Container, Get, Insert, IntoIter, Len, Modify, Pop, Push, Remove, Set,
@@ -113,6 +114,19 @@ where
     #[inline]
     pub fn get(&self, key: &K) -> Option<&C::Value> {
         self.container.get(key)
+    }
+}
+
+impl<I, C, DC> Index<I> for Recorder<C, DC>
+where
+    C: Container<Key = I> + Index<I, Output = C::Value>,
+    DC: Container,
+{
+    type Output = C::Value;
+
+    #[inline]
+    fn index(&self, index: I) -> &Self::Output {
+        &self.container[index]
     }
 }
 

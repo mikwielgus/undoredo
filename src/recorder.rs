@@ -119,7 +119,7 @@ where
 
 impl<I, C, DC> Index<I> for Recorder<C, DC>
 where
-    C: Container<Key = I> + Index<I, Output = C::Value>,
+    C: Container + Index<I, Output = C::Value>,
     DC: Container,
 {
     type Output = C::Value;

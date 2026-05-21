@@ -4,6 +4,7 @@
 
 mod apply_delta;
 mod delta;
+mod discard_delta;
 mod field_attrs;
 mod flush_delta;
 mod half_delta;
@@ -30,6 +31,13 @@ pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
 pub fn derive_flush_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     flush_delta::expand_flush_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
+}
+
+/// Generates an impl of the trait `DiscardDelta`.
+#[proc_macro_derive(DiscardDelta, attributes(undoredo))]
+pub fn derive_discard_delta(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    discard_delta::expand_discard_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
 /// Generates an impl of the trait `ApplyDelta`.

@@ -6,10 +6,11 @@
 
 use maplike::Assign;
 use undoredo::aliases::VecHalfDelta;
-use undoredo::{ApplyDelta, Delta, Recorder};
+use undoredo::{ApplyDelta, Delta, DiscardDelta, Recorder};
 
 #[derive(Delta)]
-#[undoredo(half_delta = TestStructHalfDelta, delta = TestStructDelta)]
+#[undoredo(half_delta = TestStructHalfDelta)]
+#[undoredo(delta = TestStructDelta)]
 struct TestStruct {
     v: Recorder<Vec<i32>>,
 }
@@ -31,6 +32,18 @@ fn test_delta_derive_struct() {
     s.apply_delta(d);
 
     assert_eq!(s.v.as_ref(), &vec![1, 2, 7]);
+}
+
+#[test]
+fn test_delta_derive_struct_provides_discard_delta() {
+    let mut s = TestStruct {
+        v: Recorder::new(vec![1, 2, 3]),
+    };
+
+    s.v.set(2, 7);
+    s.discard_delta();
+
+    assert_eq!(*s.v.container(), vec![1, 2, 3]);
 }
 
 #[derive(Clone, Debug, PartialEq, Delta)]

@@ -37,6 +37,9 @@ pub use undoredo_derive::ApplyDelta;
 pub use undoredo_derive::Delta;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::DiscardDelta;
+#[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::FlushDelta;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]

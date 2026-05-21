@@ -661,3 +661,10 @@ impl<
         self.apply_delta(delta.reverse());
     }
 }
+
+impl<V, DC: Default> DiscardDelta<DC> for PhantomData<V> {
+    #[inline]
+    fn discard_delta(&mut self) {
+        // Nothing happens, obviously.
+    }
+}

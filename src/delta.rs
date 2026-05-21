@@ -52,6 +52,7 @@ pub struct Delta<DC> {
 
 impl<DC: Default> Delta<DC> {
     /// Create a new empty delta with no recorded changes.
+    #[inline]
     pub fn new() -> Self {
         Self {
             removed: Default::default(),
@@ -62,11 +63,13 @@ impl<DC: Default> Delta<DC> {
 
 impl<DC> Delta<DC> {
     /// Create an new delta from containers of removals and insertions.
+    #[inline]
     pub fn with_removed_inserted(removed: DC, inserted: DC) -> Self {
         Self { removed, inserted }
     }
 
     /// Consume the delta and return removed and inserted containers.
+    #[inline]
     pub fn dissolve(self) -> (DC, DC) {
         (self.removed, self.inserted)
     }
@@ -75,6 +78,7 @@ impl<DC> Delta<DC> {
     ///
     /// This is done by swapping the containers of removed and inserted
     /// elements.
+    #[inline]
     pub fn reverse(self) -> Self {
         Self {
             removed: self.inserted,
@@ -84,6 +88,7 @@ impl<DC> Delta<DC> {
 }
 
 impl<DC: Clone, T: ApplyDelta<DC>> Revert<T> for Delta<DC> {
+    #[inline]
     fn revert(self, target: &mut T) -> Self {
         let reverse = self.reverse();
         target.apply_delta(reverse.clone());
@@ -93,6 +98,7 @@ impl<DC: Clone, T: ApplyDelta<DC>> Revert<T> for Delta<DC> {
 }
 
 impl<DC, T: FlushDelta<DC>> Extract<T> for Delta<DC> {
+    #[inline]
     fn extract(target: &mut T) -> Self {
         target.flush_delta()
     }
@@ -110,6 +116,7 @@ pub trait ApplyDelta<DC> {
     fn apply_delta(&mut self, delta: Delta<DC>);
 }
 
+#[inline]
 fn apply_delta_on_map<K, C, DC>(container: &mut C, delta: Delta<DC>)
 where
     C: Container<Key = K> + Insert<K> + Remove<K>,
@@ -130,6 +137,7 @@ impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
 where
     DC::IntoIter: DoubleEndedIterator,
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (removed, inserted) = delta.dissolve();
         // This implementation is different than the others because stable
@@ -161,6 +169,7 @@ where
 }
 
 impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -171,6 +180,7 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
 impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
     for BiBTreeMap<L, R>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (removed, inserted) = delta.dissolve();
 
@@ -185,6 +195,7 @@ impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta
 }
 
 impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -194,6 +205,7 @@ macro_rules! impl_delta_for_scalar {
     ($($half_delta:ident, $delta:ident, $t:ty);+ $(;)?) => {
         $(
             impl ApplyDelta<BTreeMap<usize, $t>> for $t {
+                #[inline]
                 fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, $t>>) {
                     let (_removed, mut inserted) = delta.dissolve();
                     if let Some(value) = inserted.remove(&0) {
@@ -228,6 +240,7 @@ impl_delta_for_scalar! {
 macro_rules! impl_delta_for_tuple {
     ($half_delta:ident, $delta:ident, $($idx:tt $typ:ident),+ $(,)?) => {
         impl<$($typ,)+> ApplyDelta<BTreeMap<usize, ($($typ,)+)>> for ($($typ,)+) {
+            #[inline]
             fn apply_delta(&mut self, delta: Delta<BTreeMap<usize, ($($typ,)+)>>) {
                 let (_removed, mut inserted) = delta.dissolve();
                 if let Some(value) = inserted.remove(&0) {
@@ -317,6 +330,7 @@ impl_delta_for_tuple!(
 );
 
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
+    #[inline]
     fn apply_delta(&mut self, _delta: Delta<DC>) {
         // Nothing happens here, obviously.
     }
@@ -327,6 +341,7 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for HashMap<K, V>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -337,6 +352,7 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
     for BiHashMap<L, R>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (removed, inserted) = delta.dissolve();
 
@@ -353,6 +369,7 @@ impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -363,6 +380,7 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for RTree<K>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -377,6 +395,7 @@ impl<
     DC: IntoIter<K> + Container<Key = K, Value = V>,
 > ApplyDelta<DC> for RTreed<C>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -387,6 +406,7 @@ impl<
 impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
     ApplyDelta<DC> for StableVecFacade<V, C>
 {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }
@@ -395,6 +415,7 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 #[cfg(feature = "thunderdome")]
 #[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
+    #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
     }

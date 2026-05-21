@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
+use maplike::{Container, Get};
+
+use crate::{Delta, Recorder};
 
 /// Revert an edit and return an edit that reverts the revert.
 pub trait Revert<T> {
@@ -148,5 +151,33 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
         });
 
         Some(cmd)
+    }
+}
+
+impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
+    /// Make and record changes to the recorded container from within a closure,
+    /// automatically committing them once the closure finishes.
+    pub fn edit<
+        K,
+        V,
+        C: Container<Key = K, Value = V> + Get<K>,
+        F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
+    >(
+        &mut self,
+        container: C,
+        f: F,
+    ) -> C
+    where
+        DC: Container<Key = K, Value = V>,
+        K: Clone,
+        V: Clone,
+    {
+        let mut recorder = Recorder::<C, DC>::new(container);
+        let cmd = f(&mut recorder);
+        let (container, delta) = recorder.dissolve();
+
+        self.cmd_commit(cmd, delta);
+
+        container
     }
 }

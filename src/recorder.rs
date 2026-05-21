@@ -7,11 +7,11 @@ use core::marker::PhantomData;
 use core::ops::Index;
 
 use maplike::{
-    Assign, Clear, Container, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop,
-    Push, Remove, RemoveByLeft, RemoveByRight, Set,
+    Assign, Clear, Container, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop, Push,
+    Remove, RemoveByLeft, RemoveByRight, Set,
 };
 
-use crate::{ApplyDelta, UndoRedo, delta::Delta};
+use crate::{ApplyDelta, delta::Delta};
 
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
@@ -584,10 +584,8 @@ impl<C: Container, DC: Container + Default> FlushDelta<DC> for Recorder<C, DC> {
     }
 }
 
-impl<C, DC> FlushDelta<Recorder<C, DC>> for Recorder<C, DC>
-where
-    C: Container + Default + ApplyDelta<DC>,
-    DC: Container + Default,
+impl<C: Container + Default + ApplyDelta<DC>, DC: Container + Default> FlushDelta<Recorder<C, DC>>
+    for Recorder<C, DC>
 {
     #[inline]
     fn flush_delta(&mut self) -> Delta<Recorder<C, DC>> {
@@ -627,30 +625,39 @@ impl<V, DC: Default> FlushDelta<DC> for PhantomData<V> {
     }
 }
 
-impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
-    /// Make and record changes to the recorded container from within a
-    /// closure, automatically committing them once closure finishes.
-    pub fn edit<
-        K,
-        V,
-        C: Container<Key = K, Value = V> + Get<K>,
-        F: FnOnce(&mut Recorder<C, DC>) -> Cmd,
-    >(
-        &mut self,
-        container: C,
-        f: F,
-    ) -> C
-    where
-        DC: Container<Key = K, Value = V>,
-        K: Clone,
-        V: Clone,
-    {
-        let mut recorder = Recorder::<C, DC>::new(container);
-        let cmd = f(&mut recorder);
-        let (container, delta) = recorder.dissolve();
+/// Discard the currently recorded delta by flushing it out of the recorder and
+/// then applying its reverse.
+pub trait DiscardDelta<DC> {
+    /// Discard the currently recorded delta by flushing it out of the recorder and
+    /// then applying its reverse.
+    fn discard_delta(&mut self);
+}
 
-        self.cmd_commit(cmd, delta);
+impl<C: Container + ApplyDelta<DC>, DC: Container + Default> DiscardDelta<DC> for Recorder<C, DC> {
+    #[inline]
+    fn discard_delta(&mut self) {
+        self.discard_delta()
+    }
+}
 
-        container
+impl<C: Container + ApplyDelta<DC>, DC: Container + Default> Recorder<C, DC> {
+    /// Discard the currently recorded delta by flushing it out of the recorder and
+    /// then applying its reverse.
+    #[inline]
+    pub fn discard_delta(&mut self) {
+        let delta = self.flush_delta();
+        self.container.apply_delta(delta.reverse());
+    }
+}
+
+impl<
+    C: Container + Default + ApplyDelta<DC>,
+    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value> + Default,
+> DiscardDelta<Recorder<C, DC>> for Recorder<C, DC>
+{
+    #[inline]
+    fn discard_delta(&mut self) {
+        let delta = self.flush_delta();
+        self.apply_delta(delta.reverse());
     }
 }

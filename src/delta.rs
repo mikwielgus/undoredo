@@ -168,7 +168,9 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
 
 #[cfg(feature = "bidimap")]
 #[cfg_attr(docsrs, doc(cfg(feature = "bidimap")))]
-impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC> for BiBTreeMap<L, R> {
+impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
+    for BiBTreeMap<L, R>
+{
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (removed, inserted) = delta.dissolve();
 
@@ -395,38 +397,5 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
-    }
-}
-
-#[cfg(feature = "bidimap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "bidimap")))]
-impl<L: Clone + Ord, R: Clone + Ord, DC: Container<Key = L, Value = R> + Default + Insert<L>>
-    FlushDelta<DC> for BiBTreeMap<L, R>
-{
-    fn flush_delta(&mut self) -> Delta<DC> {
-        let mut inserted = DC::default();
-        for (key, value) in IntoIterator::into_iter(self.clone()) {
-            inserted.insert(key, value);
-        }
-
-        Delta::with_removed_inserted(Default::default(), inserted)
-    }
-}
-
-#[cfg(all(feature = "bidimap", feature = "std"))]
-#[cfg_attr(docsrs, doc(cfg(all(feature = "bidimap", feature = "std"))))]
-impl<
-    L: Clone + Eq + Hash,
-    R: Clone + Eq + Hash,
-    DC: Container<Key = L, Value = R> + Default + Insert<L>,
-> FlushDelta<DC> for BiHashMap<L, R>
-{
-    fn flush_delta(&mut self) -> Delta<DC> {
-        let mut inserted = DC::default();
-        for (key, value) in IntoIterator::into_iter(self.clone()) {
-            inserted.insert(key, value);
-        }
-
-        Delta::with_removed_inserted(Default::default(), inserted)
     }
 }

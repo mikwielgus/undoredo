@@ -28,7 +28,7 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
 
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
                     let field_member =
                         Member::Named(field.ident.clone().expect("named field must have ident"));
 
@@ -55,7 +55,7 @@ pub(crate) fn expand_apply_delta(input: DeriveInput) -> syn::Result<TokenStream>
 
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     let field_member_self = Member::Unnamed(Index::from(i));
                     let field_member_half = Member::Unnamed(Index::from(half_field_index));

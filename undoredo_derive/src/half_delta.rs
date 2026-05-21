@@ -5,7 +5,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{ToTokens, format_ident, quote};
-use syn::{Data, DeriveInput, Fields, GenericArgument, PathArguments, Type};
+use syn::{Data, DeriveInput, Fields, GenericArgument, Generics, PathArguments, Type};
 
 pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
     let default = format_ident!("{}HalfDelta", input.ident);
@@ -54,7 +54,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                     }
 
                     let field_name = &field.ident;
-                    let ty = field_to_half_delta_container(&field.ty);
+                    let ty = field_to_half_delta_container(&field.ty, &input.generics);
 
                     transformed_fields.push(quote! {
                         #field_name: #ty,
@@ -76,7 +76,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                         continue;
                     }
 
-                    let ty = field_to_half_delta_container(&field.ty);
+                    let ty = field_to_half_delta_container(&field.ty, &input.generics);
                     transformed_fields.push(quote! { #ty });
                 }
 
@@ -97,7 +97,10 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
     Ok(output.into())
 }
 
-pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
+pub(crate) fn field_to_half_delta_container(
+    ty: &Type,
+    generics: &Generics,
+) -> TokenStream2 {
     let Type::Path(type_path) = ty else {
         return ty.to_token_stream();
     };
@@ -108,11 +111,31 @@ pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
 
     let name = last.ident.to_string();
 
+    if name != "Recorder" {
+        if name == "PhantomData" {
+            return ty.to_token_stream();
+        }
+
+        if generics
+            .type_params()
+            .any(|type_param| type_param.ident == last.ident)
+        {
+            return ty.to_token_stream();
+        }
+
+        let mut half_path = type_path.path.clone();
+        if let Some(last_mut) = half_path.segments.last_mut() {
+            last_mut.ident = format_ident!("{}HalfDelta", last_mut.ident);
+        }
+
+        return quote! { #half_path };
+    }
+
     let PathArguments::AngleBracketed(ab) = &last.arguments else {
         return ty.to_token_stream();
     };
 
-    if name != "Recorder" || ab.args.is_empty() {
+    if ab.args.is_empty() {
         return ty.to_token_stream();
     }
 
@@ -123,9 +146,11 @@ pub(crate) fn field_to_half_delta_container(ty: &Type) -> TokenStream2 {
     let Type::Path(container_path) = container_ty else {
         return ty.to_token_stream();
     };
+
     let Some(container_last) = container_path.path.segments.last() else {
         return ty.to_token_stream();
     };
+
     match &container_last.arguments {
         PathArguments::AngleBracketed(container_ab) => {
             if container_ab.args.len() != 1 {

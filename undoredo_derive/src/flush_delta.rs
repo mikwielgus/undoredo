@@ -30,7 +30,7 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                     let field_ident = field.ident.as_ref().expect("named field must have ident");
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     let removed_ident = format_ident!("removed_{}", field_ident);
                     let inserted_ident = format_ident!("inserted_{}", field_ident);
@@ -67,7 +67,7 @@ pub(crate) fn expand_flush_delta(input: DeriveInput) -> syn::Result<TokenStream>
                     let field_index = Index::from(i);
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     let removed_ident = format_ident!("removed_{}", half_field_index);
                     let inserted_ident = format_ident!("inserted_{}", half_field_index);

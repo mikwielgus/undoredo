@@ -26,7 +26,7 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
                     let field_ident = field.ident.as_ref().expect("named field must have ident");
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     extra_where_predicates.push(quote! {
                         #field_ty: ::undoredo::DiscardDelta<#field_half_delta_ty>
@@ -46,7 +46,7 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
                     let field_index = Index::from(i);
                     let field_ty = &field.ty;
                     let field_half_delta_ty =
-                        crate::half_delta::field_to_half_delta_container(field_ty);
+                        crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     extra_where_predicates.push(quote! {
                         #field_ty: ::undoredo::DiscardDelta<#field_half_delta_ty>

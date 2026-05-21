@@ -37,8 +37,8 @@ and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
-[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html)
+[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 (read more in the [Supported containers](#supported-containers) section).
 
 This library is compatible with `no_std` and `serde` and has no mandatory
@@ -276,7 +276,7 @@ the top of the *undone* stack.
 For a full usage example, see
 [examples/snapshots.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/snapshots.rs).
 
-#### Delta recording on maps with pushing
+#### Delta-recording on maps with pushing
 
 Some containers with map semantics also provide a special type of insertion
 where a value is inserted without specifying a key, which the container instead
@@ -299,7 +299,7 @@ and
 [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs)
 for complete examples of their usage.
 
-#### Delta recording on sets
+#### Delta-recording on sets
 
 Some containers have set semantics: they operate only on values, without
 exposing any usable notion of key or index. `undoredo` can provide delta-based
@@ -324,7 +324,7 @@ Keeping in mind to pass values as keys, `recorder` and
 [examples/btreeset.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/btreeset.rs)
 for a complete example.
 
-Among the supported third-party types, `rstar::RTree` is one data structure for
+Among the supported third-party types, `rstar::RTree` is a data structure for
 which `undoredo` has a convenience implementation over set semantics. See
 [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs)
 for an example of its usage.
@@ -335,6 +335,16 @@ fact, `rstar::RTree` is a multiset. `undoredo` will work correctly with such
 data structures, seeing them as sets, but only if you never make use of their
 multiset property: you must never insert a key again when it is already present
 in a multiset.
+
+#### Delta-recording on bidirectional maps
+
+Delta-recording can be performed on bidirectional maps (bimaps). `undoredo`
+has a convenience implementation for the `BiBTreeMap` and `BiHashMap` from the
+`bidimap` crate (`bidimap` is a maintained fork of the `bimap` crate).
+
+See
+[examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/bihashmap.rs)
+for an example of undo-redo performed on a bidirectional map.
 
 ## Supported containers
 
@@ -393,16 +403,16 @@ from certain external crates:
 - [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
   gated by the `bidimap` feature flag (usage example:
   [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/bihashmap.rs));
+- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
+  `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
+- [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
+  `rstared` feature flag (usage example: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs));
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature flag (usage example:
   [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
   gated by the `thunderdome` feature flag (usage example:
-  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs));
-- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
-  `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
-- [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature flag (usage example: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs)).
+  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs)).
 
 To use these, enable their corresponding feature flags next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type
@@ -410,7 +420,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.10.20", features = ["stable-vec", "thunderdome", "rstar", "rstared"] }
+undoredo = { version = "0.10.20", features = ["bidimap", "rstar", "rstared", "stable-vec", "thunderdome"] }
 ```
 
 #### Custom types

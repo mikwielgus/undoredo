@@ -34,11 +34,12 @@ as well as convenience implementations for standard library collections:
 [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html),
 [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html),
 and for some third-party feature-gated types:
-[`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
-[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
+[`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
-[`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/) (read more in the
-[Supported containers](#supported-containers) section).
+[`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
+[`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
+[`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html)
+(read more in the [Supported containers](#supported-containers) section).
 
 This library is compatible with `no_std` and `serde` and has no mandatory
 third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
@@ -389,6 +390,9 @@ In addition to the standard library, `undoredo` has also has built-in
 feature-gated convenience implementations of delta-editing for data structures
 from certain external crates:
 
+- [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
+  gated by the `bidimap` feature flag (usage example:
+  [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/bihashmap.rs));
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature flag (usage example:
   [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));

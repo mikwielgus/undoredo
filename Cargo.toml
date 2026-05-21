@@ -34,26 +34,30 @@ serde = ["dep:serde"]
 ## Disable for `no_std` compatibility.
 std = []
 
-## Enables support of delta-recording for `rstar::RTree` type.
+## Enables support of delta-recording for `bidimap::BiBTreeMap` and `bidimap::BiHashMap`.
+bidimap = ["dep:bidimap", "maplike/bidimap"]
+
+## Enables support of delta-recording for `rstar::RTree`.
 rstar = ["dep:rstar", "maplike/rstar"]
 
-## Enables support of delta-recording for `rstared::RTreed` type.
+## Enables support of delta-recording for `rstared::RTreed`.
 rstared = ["rstar", "dep:rstared"]
 
-## Enables support of delta-recording for `stable_vec::StableVec` type.
+## Enables support of delta-recording for `stable_vec::StableVec`.
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 
-## Enables support of delta-recording for `thunderdome::Arena` type.
+## Enables support of delta-recording for `thunderdome::Arena`.
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
 [dependencies]
 maplike = { version = "0.10", features = ["derive"] }
+undoredo_derive = { version = "0.10", optional = true, path = "undoredo_derive" }
+bidimap = { version = "0.7", optional = true }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.10", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
-undoredo_derive = { version = "0.10", optional = true, path = "undoredo_derive" }
 
 [dev-dependencies]
 stable-vec = "0.4"
@@ -85,6 +89,11 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
+name = "bihashmap"
+required-features = ["bidimap"]
+doc-scrape-examples = true
+
+[[example]]
 name = "cmd_commit"
 required-features = ["std"]
 doc-scrape-examples = true
@@ -95,23 +104,8 @@ required-features = ["std"]
 doc-scrape-examples = true
 
 [[example]]
-name = "snapshots"
-required-features = ["std"]
-doc-scrape-examples = true
-
-[[example]]
 name = "entities"
 required-features = ["std", "derive"]
-doc-scrape-examples = true
-
-[[example]]
-name = "stable_vec"
-required-features = ["stable-vec"]
-doc-scrape-examples = true
-
-[[example]]
-name = "thunderdome"
-required-features = ["thunderdome"]
 doc-scrape-examples = true
 
 [[example]]
@@ -122,4 +116,19 @@ doc-scrape-examples = true
 [[example]]
 name = "rstared"
 required-features = ["rstared"]
+doc-scrape-examples = true
+
+[[example]]
+name = "snapshots"
+required-features = ["std"]
+doc-scrape-examples = true
+
+[[example]]
+name = "stable_vec"
+required-features = ["stable-vec"]
+doc-scrape-examples = true
+
+[[example]]
+name = "thunderdome"
+required-features = ["thunderdome"]
 doc-scrape-examples = true

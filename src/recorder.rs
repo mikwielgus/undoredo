@@ -7,7 +7,8 @@ use core::marker::PhantomData;
 use core::ops::Index;
 
 use maplike::{
-    Assign, Clear, Container, Get, Insert, IntoIter, Len, Modify, Pop, Push, Remove, Set,
+    Assign, Clear, Container, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop,
+    Push, Remove, RemoveByLeft, RemoveByRight, Set,
 };
 
 use crate::{ApplyDelta, UndoRedo, delta::Delta};
@@ -114,6 +115,54 @@ where
     #[inline]
     pub fn get(&self, key: &K) -> Option<&C::Value> {
         self.container.get(key)
+    }
+}
+
+impl<K, V, C, DC> GetByLeft<K> for Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + GetByLeft<K>,
+    DC: Container,
+{
+    #[inline]
+    fn get_by_left(&self, key: &K) -> Option<&C::Value> {
+        self.get_by_left(key)
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + GetByLeft<K>,
+    DC: Container,
+{
+    /// Returns a reference to the right value corresponding to the given left
+    /// value in a bidirectional map.
+    #[inline]
+    pub fn get_by_left(&self, key: &K) -> Option<&V> {
+        self.container.get_by_left(key)
+    }
+}
+
+impl<K, V, C, DC> GetByRight<K> for Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + GetByRight<K>,
+    DC: Container,
+{
+    #[inline]
+    fn get_by_right(&self, key: &Self::Value) -> Option<&K> {
+        self.get_by_right(key)
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + GetByRight<K>,
+    DC: Container,
+{
+    /// Returns a reference to the left value corresponding to the given right
+    /// value in a bidirectional map.
+    #[inline]
+    pub fn get_by_right(&self, key: &V) -> Option<&K> {
+        self.container.get_by_right(key)
     }
 }
 
@@ -278,6 +327,74 @@ where
         }
 
         Some(value)
+    }
+}
+
+impl<K, V, C, DC> RemoveByLeft<K> for Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + RemoveByLeft<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn remove_by_left(&mut self, key: &K) -> Option<V> {
+        self.remove_by_left(key)
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + RemoveByLeft<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Remove the left and right values from pair corresponding to the given
+    /// left value in a bidirectional map.
+    #[inline]
+    pub fn remove_by_left(&mut self, key: &K) -> Option<V> {
+        let value = self.container.remove_by_left(key)?;
+
+        if self.delta.inserted.remove(key).is_none() {
+            self.delta.removed.insert(key.clone(), value.clone());
+        }
+
+        Some(value)
+    }
+}
+
+impl<K, V, C, DC> RemoveByRight<K> for Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + RemoveByRight<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    #[inline]
+    fn remove_by_right(&mut self, key: &Self::Value) -> Option<K> {
+        self.remove_by_right(key)
+    }
+}
+
+impl<K, V, C, DC> Recorder<C, DC>
+where
+    C: Container<Key = K, Value = V> + RemoveByRight<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    K: Clone,
+    V: Clone,
+{
+    /// Remove the left and right values from pair corresponding to the given
+    /// right value in a bidirectional map.
+    #[inline]
+    pub fn remove_by_right(&mut self, key: &V) -> Option<K> {
+        let left_key = self.container.remove_by_right(key)?;
+
+        if self.delta.inserted.remove(&left_key).is_none() {
+            self.delta.removed.insert(left_key.clone(), key.clone());
+        }
+
+        Some(left_key)
     }
 }
 

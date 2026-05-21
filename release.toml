@@ -3,5 +3,5 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
 shared-version = true
-pre-release-commit-message = "Release {{version}}"
+pre-release-commit-message = "Release version {{version}}"
 tag-name = "{{version}}"

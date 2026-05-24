@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use bidimap::BiHashMap;
-use undoredo::aliases::{HashMapDelta, HashMapHalfDelta};
+use undoredo::aliases::{BiHashMapDelta, BiHashMapHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
@@ -12,9 +12,9 @@ fn main() {
     map.insert("BB", 2);
     map.insert("CCC", 3);
 
-    let mut recorder: Recorder<BiHashMap<&str, usize>, HashMapHalfDelta<&str, usize>> =
+    let mut recorder: Recorder<BiHashMap<&str, usize>, BiHashMapHalfDelta<&str, usize>> =
         Recorder::new(map);
-    let mut undoredo: UndoRedo<HashMapDelta<&str, usize>> = UndoRedo::new();
+    let mut undoredo: UndoRedo<BiHashMapDelta<&str, usize>> = UndoRedo::new();
 
     assert_eq!(recorder.get_by_left(&"A"), Some(&1));
     assert_eq!(recorder.get_by_right(&2), Some(&"BB"));

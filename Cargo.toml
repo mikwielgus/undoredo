@@ -9,7 +9,7 @@ members = [".", "undoredo_derive"]
 name = "undoredo"
 version = "0.10.22"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
-description = "Undo-redo for Rust using deltas, snapshots, or commands."
+description = "Undo/Redo in Rust using deltas, snapshots or commands with convenience implementations for many standard and third-party types."
 repository = "https://github.com/mikwielgus/undoredo"
 documentation = "https://docs.rs/undoredo"
 readme = "README.md"
@@ -40,7 +40,8 @@ bidimap = ["dep:bidimap", "maplike/bidimap"]
 ## Enables support of delta-recording for `rstar::RTree`.
 rstar = ["dep:rstar", "maplike/rstar"]
 
-## Enables support of delta-recording for `rstared::RTreed`.
+## Enables support of delta-recording for `rstared::RTreed`. Enables `rstar`
+## feature flag as well.
 rstared = ["rstar", "dep:rstared"]
 
 ## Enables support of delta-recording for `stable_vec::StableVec`.

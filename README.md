@@ -37,7 +37,7 @@ and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
-[`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html)
+[`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 (read more in the [Supported containers](#supported-containers) section).
 
@@ -145,7 +145,7 @@ macro,
 
 Below is an example of an undoredoable
 [struct-of-arrays](https://en.wikipedia.org/wiki/AoS_and_SoA)
-storage with generic coordinate type `K` that could be used for a simple
+storage with generic coordinate type `T` that could be used for a simple
 [entity-component-system](https://en.wikipedia.org/wiki/Entity_component_system):
 
 ```rust,ignore
@@ -168,7 +168,7 @@ pub struct Vector2<T> {
 // Each delta is made of two collections of elements called "half-deltas".
 // `#[derive(Delta)]` generates a type for them as well, named similarly to full
 // deltas. If that name does not suit you, you can analogously use the
-// `undoredo` attribute with key `half_delta` to rename them.,
+// `undoredo` attribute with key `half_delta` to rename them.
 #[undoredo(half_delta = EntitiesHalfDelta)]
 pub struct Entities<T> {
     positions: Recorder<Vec<Vector2<T>>>,
@@ -316,7 +316,7 @@ bistack for a `BTreeSet`:
 
 ```rust,ignore
 let mut recorder: Recorder<BTreeSet<char>> = Recorder::new(BTreeSet::new());
-let mut undoredo: UndoRedo<Delta<BTreeSet<char>>> = UndoRedo::new();
+let mut undoredo: UndoRedo<BTreeSetDelta<char>> = UndoRedo::new();
 ```
 
 Keeping in mind to pass values as keys, `recorder` and
@@ -338,9 +338,9 @@ in a multiset.
 
 #### Delta-recording on bidirectional maps
 
-Delta-recording can be performed on bidirectional maps (bimaps). `undoredo`
-has a convenience implementation for the `BiBTreeMap` and `BiHashMap` from the
-`bidimap` crate (`bidimap` is a maintained fork of the `bimap` crate).
+Delta-recording can be performed on bidirectional maps (bimaps). `undoredo` has
+a convenience implementation for `BiBTreeMap` and `BiHashMap` from the `bidimap`
+crate (`bidimap` is a maintained fork of the `bimap` crate).
 
 See
 [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/bihashmap.rs)
@@ -396,9 +396,9 @@ of delta-editing:
 
 #### Third-party types
 
-In addition to the standard library, `undoredo` has also has built-in
-feature-gated convenience implementations of delta-editing for data structures
-from certain external crates:
+In addition to the standard library, `undoredo` also has built-in feature-gated
+convenience implementations of delta-editing for data structures from certain
+external crates:
 
 - [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
   gated by the `bidimap` feature flag (usage example:
@@ -443,6 +443,20 @@ undo-redo because they lack an interface on which
 `maplike`'s traits could be implemented. See the [Unsupported
 containers](https://docs.rs/maplike/latest/maplike/#unsupported-containers)
 section in `maplike`'s documentation for details.
+
+## Feature flags
+
+- `derive`: Enables the Delta derive macro (and also its constituent macros,
+  ApplyDelta, FlushDelta, HalfDelta).
+- `serde`: Enables serde support (derives `serde::Serialize` and `serde::Deserialize` traits).
+- `std` (enabled by default) —  Disable for `no_std` compatibility.
+- `bidimap`: Enables support of delta-recording for `bidimap::BiBTreeMap` and
+  `bidimap::BiHashMap`.
+- `rstar`: Enables support of delta-recording for `rstar::RTree`.
+- `rstared`: Enables support of delta-recording for `rstared::RTreed`. Enables
+  `rstar` feature flag as well.
+- `stable-vec`: Enables support of delta-recording for `stable_vec::StableVec`.
+- `thunderdome`: Enables support of delta-recording for `thunderdome::Arena`.
 
 ## Documentation
 

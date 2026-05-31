@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::undoredo::{Extract, Revert};
+use crate::undoredo::{ExtractEdit, RevertEdit};
 
 /// A snapshot of the whole state of a container.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -23,8 +23,8 @@ impl<T> Snapshot<T> {
     }
 }
 
-impl<T: Clone> Revert<T> for Snapshot<T> {
-    fn revert(self, target: &mut T) -> Self {
+impl<T: Clone> RevertEdit<T> for Snapshot<T> {
+    fn revert_edit(self, target: &mut T) -> Self {
         let reverse = Self::new(target.clone());
         *target = self.state;
 
@@ -32,8 +32,8 @@ impl<T: Clone> Revert<T> for Snapshot<T> {
     }
 }
 
-impl<T: Clone> Extract<T> for Snapshot<T> {
-    fn extract(target: &mut T) -> Self {
+impl<T: Clone> ExtractEdit<T> for Snapshot<T> {
+    fn extract_edit(target: &mut T) -> Self {
         Self::new(target.clone())
     }
 }

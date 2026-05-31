@@ -36,7 +36,7 @@ use rstared::RTreed;
 
 use crate::{
     FlushDelta,
-    undoredo::{Extract, Revert},
+    undoredo::{ExtractEdit, RevertEdit},
 };
 
 /// A reversible set of changes to a container.
@@ -87,9 +87,9 @@ impl<DC> Delta<DC> {
     }
 }
 
-impl<DC: Clone, T: ApplyDelta<DC>> Revert<T> for Delta<DC> {
+impl<DC: Clone, T: ApplyDelta<DC>> RevertEdit<T> for Delta<DC> {
     #[inline]
-    fn revert(self, target: &mut T) -> Self {
+    fn revert_edit(self, target: &mut T) -> Self {
         let reverse = self.reverse();
         target.apply_delta(reverse.clone());
 
@@ -97,9 +97,9 @@ impl<DC: Clone, T: ApplyDelta<DC>> Revert<T> for Delta<DC> {
     }
 }
 
-impl<DC, T: FlushDelta<DC>> Extract<T> for Delta<DC> {
+impl<DC, T: FlushDelta<DC>> ExtractEdit<T> for Delta<DC> {
     #[inline]
-    fn extract(target: &mut T) -> Self {
+    fn extract_edit(target: &mut T) -> Self {
         target.flush_delta()
     }
 }

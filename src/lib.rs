@@ -26,7 +26,7 @@ mod undoredo;
 pub use crate::delta::*;
 pub use crate::recorder::{ResetDelta, FlushDelta, Recorder};
 pub use crate::snapshot::Snapshot;
-pub use crate::undoredo::{CmdEdit, Extract, Revert, UndoRedo};
+pub use crate::undoredo::{CmdEdit, ExtractEdit, RevertEdit, UndoRedo};
 pub use maplike;
 
 #[cfg(feature = "derive")]

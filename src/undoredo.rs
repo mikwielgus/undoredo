@@ -8,13 +8,13 @@ use maplike::{Container, Get};
 use crate::{Delta, Recorder};
 
 /// Revert an edit and return an edit that reverts the revert.
-pub trait Revert<T> {
+pub trait RevertEdit<T> {
     /// Revert an edit and return an edit that reverts the revert.
-    fn revert(self, target: &mut T) -> Self;
+    fn revert_edit(self, target: &mut T) -> Self;
 }
 
-impl<T> Revert<T> for () {
-    fn revert(self, _target: &mut T) -> Self {
+impl<T> RevertEdit<T> for () {
+    fn revert_edit(self, _target: &mut T) -> Self {
         ()
     }
 }
@@ -23,16 +23,16 @@ impl<T> Revert<T> for () {
 ///
 /// In delta-based undo-redo, this flushes the delta. In snapshot-based
 /// undo-redo, this clones the current state into a snapshot.
-pub trait Extract<T> {
+pub trait ExtractEdit<T> {
     /// Extract an edit corresponding to the current state.
     ///
     /// In delta-based undo-redo, this flushes the delta. In snapshot-based
     /// undo-redo, this clones the current state into a snapshot.
-    fn extract(target: &mut T) -> Self;
+    fn extract_edit(target: &mut T) -> Self;
 }
 
-impl<T> Extract<T> for () {
-    fn extract(_target: &mut T) -> Self {
+impl<T> ExtractEdit<T> for () {
+    fn extract_edit(_target: &mut T) -> Self {
         ()
     }
 }
@@ -90,9 +90,9 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
     /// Clears the undone stack.
     pub fn commit<T>(&mut self, target: &mut T)
     where
-        E: Extract<T>,
+        E: ExtractEdit<T>,
     {
-        self.cmd_commit(Default::default(), E::extract(target));
+        self.cmd_commit(Default::default(), E::extract_edit(target));
     }
 }
 
@@ -125,12 +125,12 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
     /// and pushed onto the *undone* stack.
     pub fn undo<T>(&mut self, target: &mut T) -> Option<Cmd>
     where
-        E: Revert<T>,
+        E: RevertEdit<T>,
     {
         let CmdEdit { cmd, edit } = self.done.pop()?;
         self.undone.push(CmdEdit {
             cmd: cmd.clone(),
-            edit: edit.revert(target),
+            edit: edit.revert_edit(target),
         });
 
         Some(cmd)
@@ -142,12 +142,12 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
     /// and pushed back onto the *done* stack.
     pub fn redo<T>(&mut self, target: &mut T) -> Option<Cmd>
     where
-        E: Revert<T>,
+        E: RevertEdit<T>,
     {
         let CmdEdit { cmd, edit } = self.undone.pop()?;
         self.done.push(CmdEdit {
             cmd: cmd.clone(),
-            edit: edit.revert(target),
+            edit: edit.revert_edit(target),
         });
 
         Some(cmd)

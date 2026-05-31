@@ -446,17 +446,17 @@ section in `maplike`'s documentation for details.
 
 ## Feature flags
 
-- `derive`: Enables the Delta derive macro (and also its constituent macros,
-  ApplyDelta, FlushDelta, HalfDelta).
-- `serde`: Enables serde support (derives `serde::Serialize` and `serde::Deserialize` traits).
-- `std` (enabled by default) —  Disable for `no_std` compatibility.
-- `bidimap`: Enables support of delta-recording for `bidimap::BiBTreeMap` and
+- `derive` – Enables the Delta derive macro (and also its constituent macros,
+  `ApplyDelta`, `ResetDelta`, `FlushDelta`, `HalfDelta`).
+- `serde` – Enables serde support (derives `serde::Serialize` and `serde::Deserialize` traits).
+- `std` (enabled by default): Disable for `no_std` compatibility.
+- `bidimap` – Enables support of delta-recording for `bidimap::BiBTreeMap` and
   `bidimap::BiHashMap`.
-- `rstar`: Enables support of delta-recording for `rstar::RTree`.
-- `rstared`: Enables support of delta-recording for `rstared::RTreed`. Enables
+- `rstar` – Enables support of delta-recording for `rstar::RTree`.
+- `rstared` – Enables support of delta-recording for `rstared::RTreed`. Enables
   `rstar` feature flag as well.
-- `stable-vec`: Enables support of delta-recording for `stable_vec::StableVec`.
-- `thunderdome`: Enables support of delta-recording for `thunderdome::Arena`.
+- `stable-vec` – Enables support of delta-recording for `stable_vec::StableVec`.
+- `thunderdome` – Enables support of delta-recording for `thunderdome::Arena`.
 
 ## Documentation
 

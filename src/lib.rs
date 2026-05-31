@@ -24,7 +24,7 @@ mod snapshot;
 mod undoredo;
 
 pub use crate::delta::*;
-pub use crate::recorder::{DiscardDelta, FlushDelta, Recorder};
+pub use crate::recorder::{ResetDelta, FlushDelta, Recorder};
 pub use crate::snapshot::Snapshot;
 pub use crate::undoredo::{CmdEdit, Extract, Revert, UndoRedo};
 pub use maplike;
@@ -37,7 +37,7 @@ pub use undoredo_derive::ApplyDelta;
 pub use undoredo_derive::Delta;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
-pub use undoredo_derive::DiscardDelta;
+pub use undoredo_derive::ResetDelta;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::FlushDelta;

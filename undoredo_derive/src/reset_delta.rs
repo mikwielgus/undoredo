@@ -6,13 +6,13 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, Index};
 
-pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStream> {
+pub(crate) fn expand_reset_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
 
-    let mut discard_stmts = Vec::new();
+    let mut reset_stmts = Vec::new();
 
     // Besides inheriting the trait bounds from the input type, we also need to
-    // also require having `DiscardDelta` implemented for all fields.
+    // also require having `ResetDelta` implemented for all fields.
     let mut extra_where_predicates = Vec::new();
 
     match &input.data {
@@ -29,11 +29,11 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
                         crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     extra_where_predicates.push(quote! {
-                        #field_ty: ::undoredo::DiscardDelta<#field_half_delta_ty>
+                        #field_ty: ::undoredo::ResetDelta<#field_half_delta_ty>
                     });
 
-                    discard_stmts.push(quote! {
-                        ::undoredo::DiscardDelta::<#field_half_delta_ty>::discard_delta(&mut self.#field_ident);
+                    reset_stmts.push(quote! {
+                        ::undoredo::ResetDelta::<#field_half_delta_ty>::reset_delta(&mut self.#field_ident);
                     });
                 }
             }
@@ -49,11 +49,11 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
                         crate::half_delta::field_to_half_delta_container(field_ty, &input.generics);
 
                     extra_where_predicates.push(quote! {
-                        #field_ty: ::undoredo::DiscardDelta<#field_half_delta_ty>
+                        #field_ty: ::undoredo::ResetDelta<#field_half_delta_ty>
                     });
 
-                    discard_stmts.push(quote! {
-                        ::undoredo::DiscardDelta::<#field_half_delta_ty>::discard_delta(&mut self.#field_index);
+                    reset_stmts.push(quote! {
+                        ::undoredo::ResetDelta::<#field_half_delta_ty>::reset_delta(&mut self.#field_index);
                     });
                 }
             }
@@ -62,13 +62,13 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
         Data::Enum(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(DiscardDelta) does not support enums",
+                "derive(ResetDelta) does not support enums",
             ));
         }
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(DiscardDelta) does not support unions",
+                "derive(ResetDelta) does not support unions",
             ));
         }
     };
@@ -93,11 +93,11 @@ pub(crate) fn expand_discard_delta(input: DeriveInput) -> syn::Result<TokenStrea
     };
 
     let output = quote! {
-        impl #impl_generics ::undoredo::DiscardDelta<#half_delta #ty_generics> for #name #ty_generics
+        impl #impl_generics ::undoredo::ResetDelta<#half_delta #ty_generics> for #name #ty_generics
         #where_tokens
         {
-            fn discard_delta(&mut self) {
-                #(#discard_stmts)*
+            fn reset_delta(&mut self) {
+                #(#reset_stmts)*
             }
         }
     };

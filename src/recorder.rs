@@ -625,26 +625,26 @@ impl<V, DC: Default> FlushDelta<DC> for PhantomData<V> {
     }
 }
 
-/// Discard the currently recorded delta by flushing it out of the recorder and
+/// Reset the currently recorded delta by flushing it out of the recorder and
 /// then applying its reverse.
-pub trait DiscardDelta<DC> {
-    /// Discard the currently recorded delta by flushing it out of the recorder and
+pub trait ResetDelta<DC> {
+    /// Reset the currently recorded delta by flushing it out of the recorder and
     /// then applying its reverse.
-    fn discard_delta(&mut self);
+    fn reset_delta(&mut self);
 }
 
-impl<C: Container + ApplyDelta<DC>, DC: Container + Default> DiscardDelta<DC> for Recorder<C, DC> {
+impl<C: Container + ApplyDelta<DC>, DC: Container + Default> ResetDelta<DC> for Recorder<C, DC> {
     #[inline]
-    fn discard_delta(&mut self) {
-        self.discard_delta()
+    fn reset_delta(&mut self) {
+        self.reset_delta()
     }
 }
 
 impl<C: Container + ApplyDelta<DC>, DC: Container + Default> Recorder<C, DC> {
-    /// Discard the currently recorded delta by flushing it out of the recorder and
+    /// Reset the currently recorded delta by flushing it out of the recorder and
     /// then applying its reverse.
     #[inline]
-    pub fn discard_delta(&mut self) {
+    pub fn reset_delta(&mut self) {
         let delta = self.flush_delta();
         self.container.apply_delta(delta.reverse());
     }
@@ -653,18 +653,18 @@ impl<C: Container + ApplyDelta<DC>, DC: Container + Default> Recorder<C, DC> {
 impl<
     C: Container + Default + ApplyDelta<DC>,
     DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value> + Default,
-> DiscardDelta<Recorder<C, DC>> for Recorder<C, DC>
+> ResetDelta<Recorder<C, DC>> for Recorder<C, DC>
 {
     #[inline]
-    fn discard_delta(&mut self) {
+    fn reset_delta(&mut self) {
         let delta = self.flush_delta();
         self.apply_delta(delta.reverse());
     }
 }
 
-impl<V, DC: Default> DiscardDelta<DC> for PhantomData<V> {
+impl<V, DC: Default> ResetDelta<DC> for PhantomData<V> {
     #[inline]
-    fn discard_delta(&mut self) {
+    fn reset_delta(&mut self) {
         // Nothing happens, obviously.
     }
 }

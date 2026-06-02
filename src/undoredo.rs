@@ -92,7 +92,7 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
     where
         E: ExtractEdit<T>,
     {
-        self.cmd_commit(Default::default(), E::extract_edit(target));
+        self.cmd_commit(Default::default(), target);
     }
 }
 
@@ -101,8 +101,14 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
     /// metadata ("cmd").
     ///
     /// Clears the undone stack.
-    pub fn cmd_commit(&mut self, cmd: Cmd, edit: E) {
-        self.done.push(CmdEdit { cmd, edit });
+    pub fn cmd_commit<T>(&mut self, cmd: Cmd, target: &mut T)
+    where
+        E: ExtractEdit<T>,
+    {
+        self.done.push(CmdEdit {
+            cmd,
+            edit: E::extract_edit(target),
+        });
         self.undone.clear();
     }
 }
@@ -114,7 +120,7 @@ impl<Cmd> UndoRedo<(), Cmd> {
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern), equivalent to
     /// calling [`cmd_commit()`] with the `command` as `cmd` and `()` as `edit`.
     pub fn command(&mut self, command: Cmd) {
-        self.cmd_commit(command, ());
+        self.cmd_commit(command, &mut ());
     }
 }
 
@@ -176,7 +182,8 @@ impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
         let cmd = f(&mut recorder);
         let (container, delta) = recorder.dissolve();
 
-        self.cmd_commit(cmd, delta);
+        self.done.push(CmdEdit { cmd, edit: delta });
+        self.undone.clear();
 
         container
     }

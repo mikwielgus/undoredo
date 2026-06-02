@@ -23,7 +23,7 @@ fn main() {
 
     // Commit `Command::PushChar` enum variant as command metadata ("cmd") along
     // with the recorded delta.
-    undoredo.cmd_commit(Command::PushChar, recorder.flush_delta());
+    undoredo.cmd_commit(Command::PushChar, &mut recorder);
 
     // `Command::PushChar` is now the top element of the stack of done cmd-deltas.
     assert_eq!(undoredo.done().last().unwrap().cmd, Command::PushChar);

@@ -85,31 +85,64 @@ impl<DC> Delta<DC> {
     }
 }
 
-impl<K, V, DC> Delta<DC>
+/// Merge two deltas into one.
+///
+/// Applying the result is equivalent to applying `self` and then `other`.
+pub trait MergeDelta<DC> {
+    /// Merge `other` into `self`.
+    fn merge_delta(self, other: Delta<DC>) -> Self;
+}
+
+fn merge_map_delta<K, V, M>(self_delta: Delta<M>, other: Delta<M>) -> Delta<M>
 where
-    DC: Container<Key = K, Value = V> + IntoIter<K> + Insert<K> + Remove<K> + Get<K>,
+    M: Container<Key = K, Value = V> + IntoIter<K> + Get<K> + Insert<K> + Remove<K>,
+{
+    let (mut self_removed, mut self_inserted) = self_delta.dissolve();
+    let (other_removed, other_inserted) = other.dissolve();
+
+    for (key, value) in IntoIter::into_iter(other_removed) {
+        if Remove::remove(&mut self_inserted, &key).is_none()
+            && Get::get(&self_removed, &key).is_none()
+        {
+            Insert::insert(&mut self_removed, key, value);
+        }
+    }
+
+    for (key, value) in IntoIter::into_iter(other_inserted) {
+        Insert::insert(&mut self_inserted, key, value);
+    }
+    Delta::with_removed_inserted(self_removed, self_inserted)
+}
+
+impl<K, V> MergeDelta<BTreeMap<K, V>> for Delta<BTreeMap<K, V>>
+where
+    K: Ord,
+{
+    fn merge_delta(self, other: Self) -> Self {
+        merge_map_delta(self, other)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<K, V> MergeDelta<HashMap<K, V>> for Delta<HashMap<K, V>>
+where
+    K: Eq + Hash,
+{
+    fn merge_delta(self, other: Self) -> Self {
+        merge_map_delta(self, other)
+    }
+}
+
+impl<DC> Delta<DC>
+where
+    Self: MergeDelta<DC>,
 {
     /// Merge two deltas into one.
     ///
     /// Applying the result is equivalent to applying `self` and then `other`.
-    pub fn merge(self, other: Self) -> Self {
-        let (mut self_removed, mut self_inserted) = self.dissolve();
-        let (other_removed, other_inserted) = other.dissolve();
-
-        for (key, value) in other_removed.into_iter() {
-            if self_inserted.remove(&key).is_none() && self_removed.get(&key).is_none() {
-                self_removed.insert(key, value);
-            }
-        }
-
-        for (key, value) in other_inserted.into_iter() {
-            self_inserted.insert(key, value);
-        }
-
-        Self {
-            removed: self_removed,
-            inserted: self_inserted,
-        }
+    #[inline]
+    pub fn merge_delta(self, other: Self) -> Self {
+        MergeDelta::merge_delta(self, other)
     }
 }
 

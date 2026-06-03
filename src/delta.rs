@@ -6,9 +6,7 @@ use alloc::{
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
 };
-#[cfg(feature = "rstared")]
-use maplike::Get;
-use maplike::{Container, Insert, IntoIter, Remove};
+use maplike::{Container, Get, Insert, IntoIter, Remove};
 
 use core::marker::PhantomData;
 #[cfg(feature = "std")]
@@ -83,6 +81,34 @@ impl<DC> Delta<DC> {
         Self {
             removed: self.inserted,
             inserted: self.removed,
+        }
+    }
+}
+
+impl<K, V, DC> Delta<DC>
+where
+    DC: Container<Key = K, Value = V> + IntoIter<K> + Insert<K> + Remove<K> + Get<K>,
+{
+    /// Merge two deltas into one.
+    ///
+    /// Applying the result is equivalent to applying `self` and then `other`.
+    pub fn merge(self, other: Self) -> Self {
+        let (mut self_removed, mut self_inserted) = self.dissolve();
+        let (other_removed, other_inserted) = other.dissolve();
+
+        for (key, value) in other_removed.into_iter() {
+            if self_inserted.remove(&key).is_none() && self_removed.get(&key).is_none() {
+                self_removed.insert(key, value);
+            }
+        }
+
+        for (key, value) in other_inserted.into_iter() {
+            self_inserted.insert(key, value);
+        }
+
+        Self {
+            removed: self_removed,
+            inserted: self_inserted,
         }
     }
 }

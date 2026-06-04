@@ -97,10 +97,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
     Ok(output.into())
 }
 
-pub(crate) fn field_to_half_delta_container(
-    ty: &Type,
-    generics: &Generics,
-) -> TokenStream2 {
+pub(crate) fn field_to_half_delta_container(ty: &Type, generics: &Generics) -> TokenStream2 {
     let Type::Path(type_path) = ty else {
         return ty.to_token_stream();
     };
@@ -143,27 +140,42 @@ pub(crate) fn field_to_half_delta_container(
         return ty.to_token_stream();
     };
 
+    container_ty_to_half_delta_alias(container_ty).unwrap_or_else(|| ty.to_token_stream())
+}
+
+fn container_ty_to_half_delta_alias(container_ty: &Type) -> Option<TokenStream2> {
     let Type::Path(container_path) = container_ty else {
-        return ty.to_token_stream();
+        return None;
     };
 
-    let Some(container_last) = container_path.path.segments.last() else {
-        return ty.to_token_stream();
-    };
+    let container_last = container_path.path.segments.last()?;
 
     match &container_last.arguments {
-        PathArguments::AngleBracketed(container_ab) => {
-            if container_ab.args.len() != 1 {
-                return ty.to_token_stream();
+        PathArguments::AngleBracketed(container_ab) => match container_ab.args.len() {
+            1 => {
+                let GenericArgument::Type(ty) = &container_ab.args[0] else {
+                    return None;
+                };
+
+                let container_half = format_ident!("{}HalfDelta", container_last.ident);
+                Some(quote! { ::undoredo::aliases::#container_half<#ty> })
             }
+            // `BiBTreeMap` and `BiHashMap` accept two generic parameters
+            // (arguments), so we need a separate code branch for them.
+            2 => {
+                let GenericArgument::Type(left_ty) = &container_ab.args[0] else {
+                    return None;
+                };
 
-            let GenericArgument::Type(ref t) = container_ab.args[0] else {
-                return ty.to_token_stream();
-            };
+                let GenericArgument::Type(right_ty) = &container_ab.args[1] else {
+                    return None;
+                };
 
-            let container_half = format_ident!("{}HalfDelta", container_last.ident);
-            quote! { ::undoredo::aliases::#container_half<#t> }
-        }
-        _ => quote! { ::undoredo::aliases::BTreeMapHalfDelta<usize, #container_ty> },
+                let container_half = format_ident!("{}HalfDelta", container_last.ident);
+                Some(quote! { ::undoredo::aliases::#container_half<#left_ty, #right_ty> })
+            }
+            _ => None,
+        },
+        _ => Some(quote! { ::undoredo::aliases::BTreeMapHalfDelta<usize, #container_ty> }),
     }
 }

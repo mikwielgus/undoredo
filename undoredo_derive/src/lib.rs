@@ -8,6 +8,7 @@ mod reset_delta;
 mod field_attrs;
 mod flush_delta;
 mod half_delta;
+mod merge_delta;
 
 use proc_macro::TokenStream;
 use syn::{DeriveInput, parse_macro_input};
@@ -24,6 +25,13 @@ pub fn derive_half_delta(input: TokenStream) -> TokenStream {
 pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     apply_delta::expand_apply_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
+}
+
+/// Generates an impl of the trait `MergeDelta` for the struct's delta type.
+#[proc_macro_derive(MergeDelta, attributes(undoredo))]
+pub fn derive_merge_delta(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    merge_delta::expand_merge_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
 /// Generates an impl of the trait `FlushDelta`.

@@ -25,7 +25,7 @@ maintenance = { status = "actively-developed" }
 default = ["std"]
 
 ## Enables the `Delta` derive macro (and also its constituent macros,
-## `ApplyDelta`, `FlushDelta`, `HalfDelta`).
+## `ApplyDelta`, `FlushDelta`, `HalfDelta`, `MergeDelta`).
 derive = ["undoredo_derive"]
 
 ## Enables `serde` support (derives `Serialize` and `Deserialize` traits).

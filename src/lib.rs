@@ -44,3 +44,6 @@ pub use undoredo_derive::FlushDelta;
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::HalfDelta;
+#[cfg(feature = "derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
+pub use undoredo_derive::MergeDelta;

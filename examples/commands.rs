@@ -28,7 +28,8 @@ fn command(s: &mut String, undoredo: &mut UndoRedo<(), Command>, cmd: Command) {
 
 /// Undo the latest command.
 fn undo(s: &mut String, undoredo: &mut UndoRedo<(), Command>) {
-    if let Some(cmd) = undoredo.undo(s) {
+    // `.undo_command()` is a convenience function equivalent to `.undo(&mut ())`.
+    if let Some(cmd) = undoredo.undo_command() {
         // Manually implemented application logic.
         match &cmd {
             Command::PushChar(_) => {
@@ -40,7 +41,8 @@ fn undo(s: &mut String, undoredo: &mut UndoRedo<(), Command>) {
 
 /// Redo the last undone command.
 fn redo(s: &mut String, undoredo: &mut UndoRedo<(), Command>) {
-    if let Some(cmd) = undoredo.redo(s) {
+    // `.redo_command()` is a convenience function equivalent to `.redo(&mut ())`.
+    if let Some(cmd) = undoredo.redo_command() {
         // Manually implemented application logic.
         match &cmd {
             Command::PushChar(c) => s.push(*c),

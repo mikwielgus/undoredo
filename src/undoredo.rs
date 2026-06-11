@@ -116,7 +116,7 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
 impl<Cmd> UndoRedo<(), Cmd> {
     /// Push command onto the *done* stack without any edit (delta or snapshot).
     ///
-    /// This is convenience interface for [Command
+    /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern), equivalent to
     /// calling [`cmd_commit()`] with the `command` as `cmd` and `()` as `edit`.
     pub fn command(&mut self, command: Cmd) {
@@ -154,6 +154,42 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
         self.done.push(CmdEdit {
             cmd: cmd.clone(),
             edit: edit.revert_edit(target),
+        });
+
+        Some(cmd)
+    }
+}
+
+impl<Cmd: Clone> UndoRedo<(), Cmd> {
+    /// Pop the last done command from the *done* stack and push it onto the
+    /// *undone* stack, returning its clone. The underlying data is not anyhow
+    /// mutated otherwise.
+    ///
+    /// This is a convenience interface for [Command
+    /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing
+    /// the returned command's behavior is the responsibility of the caller.
+    pub fn undo_command(&mut self) -> Option<Cmd> {
+        let CmdEdit { cmd, .. } = self.done.pop()?;
+        self.undone.push(CmdEdit {
+            cmd: cmd.clone(),
+            edit: (),
+        });
+
+        Some(cmd)
+    }
+
+    /// Pop the last undone command from the *undone* stack and push it onto the
+    /// *done* stack, returning its clone. The underlying data is not anyhow
+    /// mutated otherwise.
+    ///
+    /// This is a convenience interface for [Command
+    /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing
+    /// the returned command's action is the responsibility of the caller.
+    pub fn redo_command(&mut self) -> Option<Cmd> {
+        let CmdEdit { cmd, .. } = self.undone.pop()?;
+        self.done.push(CmdEdit {
+            cmd: cmd.clone(),
+            edit: (),
         });
 
         Some(cmd)

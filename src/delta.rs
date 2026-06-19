@@ -93,6 +93,7 @@ pub trait MergeDeltas<DC> {
     fn merge_deltas(self, other: Delta<DC>) -> Self;
 }
 
+#[inline]
 fn merge_map_delta<K, V, M>(self_delta: Delta<M>, other: Delta<M>) -> Delta<M>
 where
     M: Container<Key = K, Value = V> + IntoIter<K> + Get<K> + Insert<K> + Remove<K>,
@@ -111,6 +112,7 @@ where
     for (key, value) in IntoIter::into_iter(other_inserted) {
         Insert::insert(&mut self_inserted, key, value);
     }
+
     Delta::with_removed_inserted(self_removed, self_inserted)
 }
 
@@ -118,6 +120,7 @@ impl<K, V> MergeDeltas<BTreeMap<K, V>> for Delta<BTreeMap<K, V>>
 where
     K: Ord,
 {
+    #[inline]
     fn merge_deltas(self, other: Self) -> Self {
         merge_map_delta(self, other)
     }
@@ -128,6 +131,7 @@ impl<K, V> MergeDeltas<HashMap<K, V>> for Delta<HashMap<K, V>>
 where
     K: Eq + Hash,
 {
+    #[inline]
     fn merge_deltas(self, other: Self) -> Self {
         merge_map_delta(self, other)
     }

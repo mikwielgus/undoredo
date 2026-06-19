@@ -4,11 +4,12 @@
 
 mod apply_delta;
 mod delta;
-mod reset_delta;
+mod extend_delta;
 mod field_attrs;
 mod flush_delta;
 mod half_delta;
-mod merge_delta;
+mod merge_deltas;
+mod reset_delta;
 
 use proc_macro::TokenStream;
 use syn::{DeriveInput, parse_macro_input};
@@ -27,11 +28,18 @@ pub fn derive_apply_delta(input: TokenStream) -> TokenStream {
     apply_delta::expand_apply_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
-/// Generates an impl of the trait `MergeDelta` for the struct's delta type.
-#[proc_macro_derive(MergeDelta, attributes(undoredo))]
-pub fn derive_merge_delta(input: TokenStream) -> TokenStream {
+/// Generates an impl of the trait `MergeDeltas` for the struct's delta type.
+#[proc_macro_derive(MergeDeltas, attributes(undoredo))]
+pub fn derive_merge_deltas(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    merge_delta::expand_merge_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
+    merge_deltas::expand_merge_deltas(input).unwrap_or_else(|err| err.to_compile_error().into())
+}
+
+/// Generates an impl of the trait `ExtendDelta`.
+#[proc_macro_derive(ExtendDelta, attributes(undoredo))]
+pub fn derive_extend_delta(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    extend_delta::expand_extend_delta(input).unwrap_or_else(|err| err.to_compile_error().into())
 }
 
 /// Generates an impl of the trait `FlushDelta`.

@@ -6,7 +6,7 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{Data, DeriveInput, Fields, Index, Member};
 
-pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream> {
+pub(crate) fn expand_merge_deltas(input: DeriveInput) -> syn::Result<TokenStream> {
     let name = input.ident.clone();
     let half_delta = crate::half_delta::resolve_half_delta_ident(&input)?;
 
@@ -35,7 +35,7 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
                     let inserted_ident = format_ident!("inserted_{}", field_ident);
 
                     extra_where_predicates.push(quote! {
-                        ::undoredo::Delta<#field_half_delta_ty>: ::undoredo::MergeDelta<#field_half_delta_ty>
+                        ::undoredo::Delta<#field_half_delta_ty>: ::undoredo::MergeDeltas<#field_half_delta_ty>
                     });
 
                     merge_stmts.push(quote! {
@@ -48,7 +48,7 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
                                 other_removed.#field_member,
                                 other_inserted.#field_member,
                             );
-                            ::undoredo::MergeDelta::merge_delta(self_field_delta, other_field_delta)
+                            ::undoredo::MergeDeltas::merge_deltas(self_field_delta, other_field_delta)
                         };
                         let (#removed_ident, #inserted_ident) = #merged_ident.dissolve();
                     });
@@ -84,7 +84,7 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
                     half_field_index += 1;
 
                     extra_where_predicates.push(quote! {
-                        ::undoredo::Delta<#field_half_delta_ty>: ::undoredo::MergeDelta<#field_half_delta_ty>
+                        ::undoredo::Delta<#field_half_delta_ty>: ::undoredo::MergeDeltas<#field_half_delta_ty>
                     });
 
                     merge_stmts.push(quote! {
@@ -97,7 +97,7 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
                                 other_removed.#field_member_half,
                                 other_inserted.#field_member_half,
                             );
-                            ::undoredo::MergeDelta::merge_delta(self_field_delta, other_field_delta)
+                            ::undoredo::MergeDeltas::merge_deltas(self_field_delta, other_field_delta)
                         };
                         let (#removed_ident, #inserted_ident) = #merged_ident.dissolve();
                     });
@@ -116,13 +116,13 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
         Data::Enum(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(MergeDelta) does not support enums",
+                "derive(MergeDeltas) does not support enums",
             ));
         }
         Data::Union(_) => {
             return Err(syn::Error::new_spanned(
                 &name,
-                "derive(MergeDelta) does not support unions",
+                "derive(MergeDeltas) does not support unions",
             ));
         }
     };
@@ -147,11 +147,11 @@ pub(crate) fn expand_merge_delta(input: DeriveInput) -> syn::Result<TokenStream>
     };
 
     let output = quote! {
-        impl #impl_generics ::undoredo::MergeDelta<#half_delta #ty_generics>
+        impl #impl_generics ::undoredo::MergeDeltas<#half_delta #ty_generics>
             for ::undoredo::Delta<#half_delta #ty_generics>
         #where_tokens
         {
-            fn merge_delta(
+            fn merge_deltas(
                 self,
                 other: ::undoredo::Delta<#half_delta #ty_generics>,
             ) -> Self {

@@ -4,14 +4,14 @@
 
 #![allow(dead_code)]
 
+// TODO: Tests for `ExtendDelta`.
+
 use std::collections::BTreeMap;
 use std::vec::Vec;
 
-use undoredo::{
-    ApplyDelta, Delta, Recorder, Snapshot, UndoRedo,
-};
 use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::maplike::{Container, Get, Insert, IntoIter, Push, Remove};
+use undoredo::{ApplyDelta, Delta, Recorder, Snapshot, UndoRedo};
 
 pub(crate) trait Keyed<K>: Container<Key = K> {}
 impl<T: Container<Key = K>, K> Keyed<K> for T {}

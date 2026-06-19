@@ -11,7 +11,7 @@ use maplike::{
     Remove, RemoveByLeft, RemoveByRight, Set,
 };
 
-use crate::{ApplyDelta, delta::Delta};
+use crate::{ApplyDelta, MergeDeltas, delta::Delta};
 
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
@@ -568,6 +568,52 @@ where
         self.container.apply_delta(delta);
     }
 }*/
+
+/// Extend (merge) the recorder's recorded delta with the delta passed as an
+/// argument.
+pub trait ExtendDelta<DC> {
+    /// Extend (merge) the recorder's recorded delta with the delta passed as an
+    /// argument.
+    fn extend_delta(&mut self, delta: Delta<DC>);
+}
+
+impl<
+    C: Container + ApplyDelta<DC>,
+    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
+> ExtendDelta<DC> for Recorder<C, DC>
+where
+    Delta<DC>: Clone + Default + MergeDeltas<DC>,
+{
+    #[inline]
+    fn extend_delta(&mut self, delta: Delta<DC>) {
+        self.extend_delta(delta);
+    }
+}
+
+impl<
+    C: Container + ApplyDelta<DC>,
+    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
+> Recorder<C, DC>
+where
+    Delta<DC>: Clone + Default + MergeDeltas<DC>,
+{
+    /// Extend (merge) the recorder's recorded delta with the delta passed as an
+    /// argument.
+    #[inline]
+    pub fn extend_delta(&mut self, delta: Delta<DC>) {
+        self.apply_delta(delta.clone());
+
+        let delta = std::mem::replace(&mut self.delta, Default::default()).merge_deltas(delta);
+        self.delta = delta;
+    }
+}
+
+impl<V, DC> ExtendDelta<DC> for PhantomData<V> {
+    #[inline]
+    fn extend_delta(&mut self, _delta: Delta<DC>) {
+        // Nothing happens, obviously.
+    }
+}
 
 /// Flush the recorder, returning the recorded delta and replacing it with a
 /// new empty one.

@@ -88,9 +88,9 @@ impl<DC> Delta<DC> {
 /// Merge two deltas into one.
 ///
 /// Applying the result is equivalent to applying `self` and then `other`.
-pub trait MergeDelta<DC> {
+pub trait MergeDeltas<DC> {
     /// Merge `other` into `self`.
-    fn merge_delta(self, other: Delta<DC>) -> Self;
+    fn merge_deltas(self, other: Delta<DC>) -> Self;
 }
 
 fn merge_map_delta<K, V, M>(self_delta: Delta<M>, other: Delta<M>) -> Delta<M>
@@ -114,35 +114,35 @@ where
     Delta::with_removed_inserted(self_removed, self_inserted)
 }
 
-impl<K, V> MergeDelta<BTreeMap<K, V>> for Delta<BTreeMap<K, V>>
+impl<K, V> MergeDeltas<BTreeMap<K, V>> for Delta<BTreeMap<K, V>>
 where
     K: Ord,
 {
-    fn merge_delta(self, other: Self) -> Self {
+    fn merge_deltas(self, other: Self) -> Self {
         merge_map_delta(self, other)
     }
 }
 
 #[cfg(feature = "std")]
-impl<K, V> MergeDelta<HashMap<K, V>> for Delta<HashMap<K, V>>
+impl<K, V> MergeDeltas<HashMap<K, V>> for Delta<HashMap<K, V>>
 where
     K: Eq + Hash,
 {
-    fn merge_delta(self, other: Self) -> Self {
+    fn merge_deltas(self, other: Self) -> Self {
         merge_map_delta(self, other)
     }
 }
 
 impl<DC> Delta<DC>
 where
-    Self: MergeDelta<DC>,
+    Self: MergeDeltas<DC>,
 {
     /// Merge two deltas into one.
     ///
     /// Applying the result is equivalent to applying `self` and then `other`.
     #[inline]
-    pub fn merge_delta(self, other: Self) -> Self {
-        MergeDelta::merge_delta(self, other)
+    pub fn merge_deltas(self, other: Self) -> Self {
+        MergeDeltas::merge_deltas(self, other)
     }
 }
 

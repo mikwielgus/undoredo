@@ -7,7 +7,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use syn::{Data, DeriveInput};
 
-use crate::{apply_delta, reset_delta, flush_delta, half_delta, merge_deltas};
+use crate::{apply_delta, extend_delta, flush_delta, half_delta, merge_deltas, reset_delta};
 
 fn resolve_delta_ident(input: &DeriveInput) -> syn::Result<syn::Ident> {
     let default = format_ident!("{}Delta", input.ident);
@@ -56,15 +56,19 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
             };
             let apply_delta = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
             let flush_delta = TokenStream2::from(flush_delta::expand_flush_delta(input.clone())?);
+            let merge_deltas =
+                TokenStream2::from(merge_deltas::expand_merge_deltas(input.clone())?);
+            let extend_delta =
+                TokenStream2::from(extend_delta::expand_extend_delta(input.clone())?);
             let reset_delta = TokenStream2::from(reset_delta::expand_reset_delta(input.clone())?);
-            let merge_deltas = TokenStream2::from(merge_deltas::expand_merge_deltas(input)?);
             quote! {
                 #half_delta
                 #delta_alias
                 #apply_delta
                 #flush_delta
-                #reset_delta
                 #merge_deltas
+                #extend_delta
+                #reset_delta
             }
         }
         Data::Enum(_) => {

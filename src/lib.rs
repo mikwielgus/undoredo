@@ -21,14 +21,16 @@ pub extern crate alloc;
 pub mod aliases;
 
 mod delta;
+mod edit;
 mod recorder;
 mod snapshot;
 mod undoredo;
 
 pub use crate::delta::*;
+pub use crate::edit::{CmdEdit, ExtractEdit, RevertEdit};
 pub use crate::recorder::{ExtendDelta, FlushDelta, Recorder, ResetDelta};
 pub use crate::snapshot::Snapshot;
-pub use crate::undoredo::{CmdEdit, ExtractEdit, RevertEdit, UndoRedo};
+pub use crate::undoredo::UndoRedo;
 pub use maplike;
 
 #[cfg(feature = "derive")]

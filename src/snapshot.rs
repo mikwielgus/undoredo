@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::undoredo::{ExtractEdit, RevertEdit};
+use crate::{ExtractEdit, RevertEdit};
 
 /// A snapshot of the whole state of a container.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

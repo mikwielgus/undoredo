@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::{ExtractEdit, RevertEdit};
+use crate::{ExtractEdit, RevertEdit, edit::ApplyEdit};
 
 /// A snapshot of the whole state of a container.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -13,17 +13,27 @@ pub struct Snapshot<T> {
 
 impl<T> Snapshot<T> {
     /// Create a new snapshot from a state of a target.
+    #[inline]
     pub fn new(state: T) -> Self {
         Self { state }
     }
 
     /// Dissolve the snapshot, returning the state it was holding.
+    #[inline]
     pub fn dissolve(self) -> T {
         self.state
     }
 }
 
+impl<T: Clone> ApplyEdit<T> for Snapshot<T> {
+    #[inline]
+    fn apply_edit(self, target: &mut T) {
+        *target = self.state;
+    }
+}
+
 impl<T: Clone> RevertEdit<T> for Snapshot<T> {
+    #[inline]
     fn revert_edit(self, target: &mut T) -> Self {
         let reverse = Self::new(target.clone());
         *target = self.state;
@@ -33,6 +43,7 @@ impl<T: Clone> RevertEdit<T> for Snapshot<T> {
 }
 
 impl<T: Clone> ExtractEdit<T> for Snapshot<T> {
+    #[inline]
     fn extract_edit(target: &mut T) -> Self {
         Self::new(target.clone())
     }

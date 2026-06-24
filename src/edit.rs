@@ -2,15 +2,31 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+/// Apply an edit.
+pub trait ApplyEdit<T> {
+    /// Apply an edit.
+    fn apply_edit(self, target: &mut T);
+}
+
+impl<T> ApplyEdit<T> for () {
+    fn apply_edit(self, _target: &mut T) {
+        // Nothing happens, obviously.
+    }
+}
+
 /// Revert an edit and return an edit that reverts the revert.
+///
+/// If an edit has a reverse, this should be equivalent to applying it.
 pub trait RevertEdit<T> {
     /// Revert an edit and return an edit that reverts the revert.
+    ///
+    /// If an edit has a reverse, this should be equivalent to applying it.
     fn revert_edit(self, target: &mut T) -> Self;
 }
 
 impl<T> RevertEdit<T> for () {
     fn revert_edit(self, _target: &mut T) -> Self {
-        ()
+        // Nothing happens, obviously.
     }
 }
 

@@ -32,7 +32,7 @@ use rstar::{RTree, RTreeObject};
 #[cfg(feature = "rstared")]
 use rstared::RTreed;
 
-use crate::{ExtractEdit, FlushDelta, RevertEdit};
+use crate::{ExtractEdit, FlushDelta, RevertEdit, edit::ApplyEdit};
 
 /// A reversible set of changes to a container.
 ///
@@ -144,6 +144,13 @@ where
     #[inline]
     pub fn merge_deltas(self, other: Self) -> Self {
         MergeDeltas::merge_deltas(self, other)
+    }
+}
+
+impl<DC: Clone, T: ApplyDelta<DC>> ApplyEdit<T> for Delta<DC> {
+    #[inline]
+    fn apply_edit(self, target: &mut T) {
+        target.apply_delta(self);
     }
 }
 

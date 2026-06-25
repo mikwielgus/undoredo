@@ -35,3 +35,8 @@ fn test_delta_undo_redo_at_specified_indices() {
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo::<usize, i32, BTreeMap<usize, i32>>(BTreeMap::new());
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

@@ -32,7 +32,7 @@ use rstar::{RTree, RTreeObject};
 #[cfg(feature = "rstared")]
 use rstared::RTreed;
 
-use crate::{ExtractEdit, FlushDelta, RevertEdit, edit::ApplyEdit};
+use crate::{ApplyEdit, ExtractEdit, FlushDelta, RevertEdit};
 
 /// A reversible set of changes to a container.
 ///

@@ -40,3 +40,8 @@ fn test_snapshot_undo_redo() {
     let rect_hashmap: HashMap<i32, Rectangle<(i32, i32)>> = HashMap::new();
     common::test_snapshot_undo_redo::<i32, Rectangle<(i32, i32)>, _>(RTreed::new(rect_hashmap));
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

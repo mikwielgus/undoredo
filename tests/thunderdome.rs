@@ -31,3 +31,8 @@ fn test_delta_undo_redo_at_generated_indices() {
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo_vec::<Index, Arena<i32>>(Arena::new());
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

@@ -612,6 +612,7 @@ impl<V, DC> ExtendDelta<DC> for PhantomData<V> {
     #[inline]
     fn extend_delta(&mut self, _delta: Delta<DC>) {
         // Nothing happens, obviously.
+        ()
     }
 }
 

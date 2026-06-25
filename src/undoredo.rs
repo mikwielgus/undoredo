@@ -7,10 +7,7 @@ use std::vec::Vec;
 
 use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
 
-/// An undo-redo bistack.
-///
-/// `E` is the type of each committed edit (for example, the concrete diff type
-/// your recorder or domain uses).
+/// An history bistack for linear undo-redo action.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct UndoRedo<E, Cmd = ()> {
@@ -19,7 +16,8 @@ pub struct UndoRedo<E, Cmd = ()> {
 }
 
 impl<Cmd, E> UndoRedo<E, Cmd> {
-    /// Create a new empty undo-redo bistack.
+    /// Create a new empty history bistack.
+    #[inline]
     pub fn new() -> Self {
         Self {
             done: Vec::new(),
@@ -29,21 +27,25 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
 
     /// Returns a slice of the *done* stack, which contains all the done (or
     /// redone) edits.
+    #[inline]
     pub fn done(&self) -> &[CmdEdit<Cmd, E>] {
         &self.done
     }
 
     /// Returns a slice of the *undone* stack, which contains all the undone
     /// edits.
+    #[inline]
     pub fn undone(&self) -> &[CmdEdit<Cmd, E>] {
         &self.undone
     }
 }
 
 impl<Cmd: Default, E> UndoRedo<E, Cmd> {
-    /// Flush and push changes onto the *done* stack.
+    /// Flush the target container and push its changes as an edit onto the
+    /// *done* stack.
     ///
-    /// Clears the undone stack.
+    /// This clears the undone stack.
+    #[inline]
     pub fn commit<T>(&mut self, target: &mut T)
     where
         E: ExtractEdit<T>,
@@ -53,10 +55,11 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
 }
 
 impl<Cmd, E> UndoRedo<E, Cmd> {
-    /// Flush and push changes onto the *done* stack along with additional
-    /// metadata ("cmd").
+    /// Flush the target container and push its changes as an edit onto the
+    /// *done* stack as an edit along with additional metadata ("cmd").
     ///
-    /// Clears the undone stack.
+    /// This clears the undone stack.
+    #[inline]
     pub fn cmd_commit<T>(&mut self, cmd: Cmd, target: &mut T)
     where
         E: ExtractEdit<T>,
@@ -75,6 +78,7 @@ impl<Cmd> UndoRedo<(), Cmd> {
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern), equivalent to
     /// calling [`cmd_commit()`] with the `command` as `cmd` and `()` as `edit`.
+    #[inline]
     pub fn command(&mut self, command: Cmd) {
         self.cmd_commit(command, &mut ());
     }
@@ -85,6 +89,7 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
     ///
     /// The undone edit is popped from the *done* stack, reversed, reverted,
     /// and pushed onto the *undone* stack.
+    #[inline]
     pub fn undo<T>(&mut self, target: &mut T) -> Option<Cmd>
     where
         E: RevertEdit<T>,
@@ -102,6 +107,7 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
     ///
     /// The redone edit is popped from the *undone* stack, reversed, reverted,
     /// and pushed back onto the *done* stack.
+    #[inline]
     pub fn redo<T>(&mut self, target: &mut T) -> Option<Cmd>
     where
         E: RevertEdit<T>,
@@ -124,6 +130,7 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing
     /// the returned command's behavior is the responsibility of the caller.
+    #[inline]
     pub fn undo_command(&mut self) -> Option<Cmd> {
         let CmdEdit { cmd, .. } = self.done.pop()?;
         self.undone.push(CmdEdit {
@@ -141,6 +148,7 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing
     /// the returned command's action is the responsibility of the caller.
+    #[inline]
     pub fn redo_command(&mut self) -> Option<Cmd> {
         let CmdEdit { cmd, .. } = self.undone.pop()?;
         self.done.push(CmdEdit {
@@ -155,6 +163,7 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
 impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
     /// Make and record changes to the recorded container from within a closure,
     /// automatically committing them once the closure finishes.
+    #[inline]
     pub fn edit<K, V, C, F>(&mut self, container: C, f: F) -> C
     where
         C: Container<Key = K, Value = V> + Get<K>,

@@ -11,7 +11,7 @@ use std::vec::Vec;
 
 use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::maplike::{Container, Get, Insert, IntoIter, Push, Remove};
-use undoredo::{ApplyDelta, Delta, Recorder, Snapshot, UndoRedo};
+use undoredo::{ApplyDelta, Delta, HistoryTree, Recorder, Snapshot, UndoRedo};
 
 pub(crate) trait Keyed<K>: Container<Key = K> {}
 impl<T: Container<Key = K>, K> Keyed<K> for T {}
@@ -608,4 +608,30 @@ pub fn test_snapshot_undo_redo_set<
     assert_eq!(container.get(&K::from_usize(50)), Some(&()));
 
     assert_eq!(undoredo.redo(&mut container), None);
+}
+
+pub fn test_tree_checkout_between_branches() {
+    let mut tree = HistoryTree::<(), u8>::new();
+    let mut cursor = tree.root_cursor(());
+
+    tree.cmd_commit(1, &mut cursor);
+    tree.cmd_commit(3, &mut cursor);
+    let left_leaf = cursor.curr_node();
+
+    assert_eq!(tree.undo(&mut cursor), Some(3));
+    assert_eq!(tree.undo(&mut cursor), Some(1));
+
+    tree.cmd_commit(2, &mut cursor);
+    tree.cmd_commit(4, &mut cursor);
+    let right_leaf = cursor.curr_node();
+
+    assert_eq!(tree.checkout(&mut cursor, left_leaf), vec![1, 3]);
+    assert_eq!(cursor.curr_node(), left_leaf);
+
+    assert_eq!(tree.checkout(&mut cursor, right_leaf), vec![2, 4]);
+    assert_eq!(cursor.curr_node(), right_leaf);
+
+    // Checkouting to the same node again results in no commands emitted.
+    assert_eq!(tree.checkout(&mut cursor, right_leaf), vec![]);
+    assert_eq!(cursor.curr_node(), right_leaf);
 }

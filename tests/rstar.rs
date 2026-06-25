@@ -39,3 +39,8 @@ fn test_delta_undo_redo_on_set() {
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo_set::<(i32, i32), RTree<(i32, i32)>>(RTree::new());
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

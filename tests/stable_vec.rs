@@ -57,3 +57,8 @@ fn test_snapshot_undo_redo_vec() {
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo::<usize, i32, StableVec<i32>>(StableVec::new());
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

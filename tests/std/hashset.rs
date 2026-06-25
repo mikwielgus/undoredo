@@ -33,3 +33,8 @@ fn test_delta_undo_redo_on_set() {
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo_set::<i32, HashSet<i32>>(HashSet::new());
 }
+
+#[test]
+fn test_tree_checkout_between_branches() {
+    common::test_tree_checkout_between_branches();
+}

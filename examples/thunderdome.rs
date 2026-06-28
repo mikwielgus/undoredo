@@ -7,8 +7,7 @@ use undoredo::aliases::{ArenaDelta, ArenaHalfDelta};
 use undoredo::{Recorder, UndoRedo};
 
 fn main() {
-    let mut recorder: Recorder<Arena<char>, ArenaHalfDelta<char>> =
-        Recorder::new(Arena::new());
+    let mut recorder: Recorder<Arena<char>, ArenaHalfDelta<char>> = Recorder::new(Arena::new());
     let mut undoredo: UndoRedo<ArenaDelta<char>> = UndoRedo::new();
 
     recorder.push('A');

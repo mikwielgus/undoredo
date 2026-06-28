@@ -6,8 +6,8 @@
 mod common;
 
 use alloc::collections::BTreeMap;
-use undoredo::aliases::BTreeMapHalfDelta;
 use undoredo::Recorder;
+use undoredo::aliases::BTreeMapHalfDelta;
 
 #[test]
 fn test_recorder_apply_delta_at_specified_indices() {

@@ -85,7 +85,7 @@ impl<T: Add<T, Output = T> + AddAssign<T> + Copy + PartialOrd> Entities<T> {
         // Alternatively, you could update them more verbosely this way:
 
         /*self.positions
-            .set(index, self.positions[index] + self.velocities[index]);*/
+        .set(index, self.positions[index] + self.velocities[index]);*/
 
         // Decrease health by 1 on every update.
         self.healths.set(index, self.healths[index] - 1);

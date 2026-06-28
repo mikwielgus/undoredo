@@ -6,8 +6,8 @@
 mod common;
 
 use alloc::collections::BTreeSet;
-use undoredo::aliases::BTreeSetHalfDelta;
 use undoredo::Recorder;
+use undoredo::aliases::BTreeSetHalfDelta;
 
 #[test]
 fn test_recorder_apply_delta_on_set() {

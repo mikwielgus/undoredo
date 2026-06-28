@@ -7,7 +7,7 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
 
-use undoredo::{ResetDelta, HalfDelta, Recorder};
+use undoredo::{HalfDelta, Recorder, ResetDelta};
 
 #[derive(Clone, HalfDelta, ResetDelta)]
 struct TestNamedFieldStruct {

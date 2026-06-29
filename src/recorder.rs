@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::collections::BTreeMap;
+use core::borrow::Borrow;
 use core::marker::PhantomData;
 use core::ops::Index;
 
@@ -95,14 +96,15 @@ where
     }
 }
 
-impl<K, C, DC> Get<K> for Recorder<C, DC>
+impl<K, Q: ?Sized, C, DC> Get<K, Q> for Recorder<C, DC>
 where
-    C: Get<K, Key = K>,
+    K: Borrow<Q>,
+    C: Get<K, Q, Key = K>,
     DC: Container,
 {
     #[inline]
-    fn get(&self, key: &K) -> Option<&C::Value> {
-        self.get(key)
+    fn get(&self, key: &Q) -> Option<&C::Value> {
+        self.container.get(key)
     }
 }
 
@@ -118,14 +120,15 @@ where
     }
 }
 
-impl<K, V, C, DC> GetByLeft<K> for Recorder<C, DC>
+impl<K, Q: ?Sized, V, C, DC> GetByLeft<K, Q> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + GetByLeft<K>,
+    K: Borrow<Q>,
+    C: Container<Key = K, Value = V> + GetByLeft<K, Q>,
     DC: Container,
 {
     #[inline]
-    fn get_by_left(&self, key: &K) -> Option<&C::Value> {
-        self.get_by_left(key)
+    fn get_by_left(&self, key: &Q) -> Option<&C::Value> {
+        self.container.get_by_left(key)
     }
 }
 
@@ -142,14 +145,15 @@ where
     }
 }
 
-impl<K, V, C, DC> GetByRight<K> for Recorder<C, DC>
+impl<K, V, Q: ?Sized, C, DC> GetByRight<K, Q> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + GetByRight<K>,
+    V: Borrow<Q>,
+    C: Container<Key = K, Value = V> + GetByRight<K, Q>,
     DC: Container,
 {
     #[inline]
-    fn get_by_right(&self, key: &Self::Value) -> Option<&K> {
-        self.get_by_right(key)
+    fn get_by_right(&self, key: &Q) -> Option<&K> {
+        self.container.get_by_right(key)
     }
 }
 
@@ -223,11 +227,11 @@ where
     V: Clone,
 {
     #[inline]
-    fn modify<F>(&mut self, key: K, f: F)
+    fn modify<F>(&mut self, key: &K, f: F)
     where
         F: FnOnce(&mut Self::Value),
     {
-        self.modify(key, f);
+        self.modify(key.clone(), f);
     }
 }
 
@@ -252,7 +256,7 @@ where
             }
         }
 
-        self.container.modify(key.clone(), f);
+        self.container.modify(&key, f);
 
         if let Some(value) = self.container.get(&key) {
             self.delta.inserted.insert(key, value.clone());

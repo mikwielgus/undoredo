@@ -26,8 +26,8 @@ as well.
 Delta-recording undo-redo requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
-to automatically generate these types on arbitrary custom `struct`s and `enum`s,
-as well as convenience implementations for standard library collections:
+to automatically generate these types on arbitrary custom `struct`s and `enum`s.
+There are also convenience implementations for standard library collections:
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
@@ -53,7 +53,7 @@ third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
 The above demo animation shows Undo/Redo action over dynamically added and
 subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots
 are stored, but all edits in history are made of sparse deltas of the polygon
-container and the associated R-tree:
+container and the associated R-tree.
 
 Source code with instructions for running the above interactive visualization
 can be found in the repository of the

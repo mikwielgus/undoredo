@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 
 use crate::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
 
-/// Identifier of a node in [`HistoryTree`].
+/// Id of a node in [`HistoryTree`].
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub struct HistoryTreeNodeId(usize);
 

@@ -26,7 +26,7 @@ impl HistoryTreeNodeId {
 }
 
 /// A single history node in [`HistoryTree`].
-pub struct HistoryNode<E, Cmd = ()> {
+pub struct HistoryTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
     pub cmd_edit: CmdEdit<Cmd, E>,
     /// Parent node id.
@@ -78,7 +78,7 @@ impl<C> AsRef<C> for HistoryTreeCursor<C> {
 
 /// A history tree for non-linear undo-redo action.
 pub struct HistoryTree<E, Cmd = ()> {
-    nodes: Vec<HistoryNode<E, Cmd>>,
+    nodes: Vec<HistoryTreeNode<E, Cmd>>,
 }
 
 impl<Cmd: Default, E: Default> HistoryTree<E, Cmd> {
@@ -86,7 +86,7 @@ impl<Cmd: Default, E: Default> HistoryTree<E, Cmd> {
     #[inline]
     pub fn new() -> Self {
         Self {
-            nodes: vec![HistoryNode {
+            nodes: vec![HistoryTreeNode {
                 cmd_edit: CmdEdit::default(),      // Empty edit.
                 parent: HistoryTreeNodeId::new(0), // Parent of root is self.
                 children: Vec::new(),
@@ -132,7 +132,7 @@ impl<Cmd, E> HistoryTree<E, Cmd> {
     where
         E: ExtractEdit<T>,
     {
-        self.nodes.push(HistoryNode {
+        self.nodes.push(HistoryTreeNode {
             cmd_edit: CmdEdit {
                 cmd,
                 edit: E::extract_edit(cursor.container_mut()),

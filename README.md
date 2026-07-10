@@ -13,7 +13,9 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 `undoredo` is a Rust library that implements the Undo/Redo pattern on
 arbitrary data structures by automatically recording sparse *deltas* (aka.
 *diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
-pattern](https://en.wikipedia.org/wiki/Memento_pattern)).
+pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These edits can then
+be stored in linear undo-redo bistack or non-linear history tree provided by
+the library.
 
 This approach is much easier than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle

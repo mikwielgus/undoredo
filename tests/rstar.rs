@@ -41,6 +41,6 @@ fn test_snapshot_undo_redo() {
 }
 
 #[test]
-fn test_tree_checkout_between_branches() {
-    common::test_tree_checkout_between_branches();
+fn test_history_tree_command_checkout() {
+    common::test_history_tree_command_checkout();
 }

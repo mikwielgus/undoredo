@@ -22,16 +22,16 @@ pub mod aliases;
 
 mod delta;
 mod edit;
+mod history_tree;
 mod recorder;
 mod snapshot;
-mod tree;
 mod undoredo;
 
 pub use crate::delta::*;
 pub use crate::edit::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
+pub use crate::history_tree::{HistoryTree, HistoryTreeCursor, HistoryTreeNode, HistoryTreeNodeId};
 pub use crate::recorder::{ExtendDelta, FlushDelta, Recorder, ResetDelta};
 pub use crate::snapshot::Snapshot;
-pub use crate::tree::{HistoryNode, HistoryTree, HistoryTreeCursor, HistoryTreeNodeId};
 pub use crate::undoredo::UndoRedo;
 pub use maplike;
 

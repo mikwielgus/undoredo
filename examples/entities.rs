@@ -9,7 +9,7 @@ use undoredo::{Delta, Recorder, UndoRedo};
 // No need for `#[derive(Delta)]` for types stored in containers, only the
 // containers themselves need this.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Vector2<T> {
+struct Vector2<T> {
     x: T,
     y: T,
 }
@@ -45,7 +45,7 @@ impl<T: AddAssign<T>> AddAssign for Vector2<T> {
 // deltas. If that name does not suit you, you can analogously use the
 // `undoredo` attribute with key `half_delta` to rename them.,
 #[undoredo(half_delta = EntitiesHalfDelta)]
-pub struct Entities<T> {
+struct Entities<T> {
     positions: Recorder<Vec<Vector2<T>>>,
     velocities: Recorder<Vec<Vector2<T>>>,
     healths: Recorder<Vec<i64>>,

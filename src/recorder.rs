@@ -190,9 +190,11 @@ where
     K: Clone,
     V: Clone,
 {
+    type Output = <C as Set<K>>::Output;
+
     #[inline]
-    fn set(&mut self, key: K, value: Self::Value) {
-        self.set(key, value);
+    fn set(&mut self, key: K, value: Self::Value) -> Self::Output {
+        self.set(key, value)
     }
 }
 
@@ -205,7 +207,7 @@ where
 {
     /// Set the value of an already existing element under a key.
     #[inline]
-    pub fn set(&mut self, key: K, value: V) {
+    pub fn set(&mut self, key: K, value: V) -> <C as Set<K>>::Output {
         if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.container.get(&key) {
                 self.delta
@@ -215,7 +217,7 @@ where
         }
 
         self.delta.inserted.insert(key.clone(), value.clone());
-        self.container.set(key, value);
+        self.container.set(key, value)
     }
 }
 
@@ -271,8 +273,10 @@ where
     K: Clone,
     V: Clone,
 {
+    type Output = <C as Insert<K>>::Output;
+
     #[inline]
-    fn insert(&mut self, key: K, value: V) {
+    fn insert(&mut self, key: K, value: V) -> Self::Output {
         self.insert(key, value)
     }
 }
@@ -286,7 +290,7 @@ where
 {
     /// Insert a key-value pair into the container.
     #[inline]
-    pub fn insert(&mut self, key: K, value: V) {
+    pub fn insert(&mut self, key: K, value: V) -> <C as Insert<K>>::Output {
         if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.container.get(&key) {
                 self.delta
@@ -296,7 +300,7 @@ where
         }
 
         self.delta.inserted.insert(key.clone(), value.clone());
-        self.container.insert(key, value.clone());
+        self.container.insert(key, value)
     }
 }
 

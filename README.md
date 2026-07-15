@@ -18,12 +18,12 @@ be stored in linear undo-redo bistack or non-linear history tree provided by
 the library.
 
 This approach is much easier than the commonly used [Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
-of operation of other Undo/Redo crates, as having to implement commands requires
-maintenance of additional application logic that is often complicated and can
-lead to elusive bugs. But if needed, `undoredo` can also store a command or
-other metadata along with every edit, allowing for easy use of the Command pattern
-as well.
+pattern](https://en.wikipedia.org/wiki/Command_pattern), which is commonly
+the principle of operation of other Undo/Redo crates, as having to implement
+commands requires maintenance of additional application logic that is often
+complicated and can lead to elusive bugs. But if needed, `undoredo` can also
+store a command or other metadata along with every edit, allowing for easy use
+of the Command pattern as well.
 
 Delta-recording undo-redo requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro

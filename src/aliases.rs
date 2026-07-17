@@ -7,6 +7,9 @@ use alloc::collections::BTreeMap;
 #[cfg(feature = "std")]
 use std::collections::HashMap;
 
+#[cfg(feature = "indexmap")]
+use indexmap::IndexMap;
+
 #[cfg(feature = "thunderdome")]
 use thunderdome::Index;
 
@@ -255,6 +258,24 @@ pub type HashSetHalfDelta<K> = HashMap<K, ()>;
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Delta for `HashSet<K>`. Alias for `Delta<HashSetHalfDelta<K>>`.
 pub type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
+
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+/// Half-delta for `IndexMap<K, V>`. Alias for `IndexMap<K, V>`.
+pub type IndexMapHalfDelta<K, V> = IndexMap<K, V>;
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+/// Delta for `IndexMap<K, V>`. Alias for `Delta<IndexMapHalfDelta<K, V>>`.
+pub type IndexMapDelta<K, V> = Delta<IndexMapHalfDelta<K, V>>;
+
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+/// Half-delta for `IndexSet<K>`. Alias for `IndexMap<K, ()>`.
+pub type IndexSetHalfDelta<K> = IndexMap<K, ()>;
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+/// Delta for `IndexSet<K>`. Alias for `Delta<IndexSetHalfDelta<K>>`.
+pub type IndexSetDelta<K> = Delta<IndexSetHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
 #[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]

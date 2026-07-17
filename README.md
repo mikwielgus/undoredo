@@ -37,6 +37,7 @@ There are also convenience implementations for standard library collections:
 [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html),
 and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
+[`indexmap::IndexMap` and `indexmap::IndexSet`](https://docs.rs/indexmap/latest/indexmap/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
@@ -405,6 +406,8 @@ external crates:
 - [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
   gated by the `bidimap` feature flag (usage example:
   [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/bihashmap.rs));
+- [`indexmap::IndexMap` and `indexmap::IndexSet`](https://docs.rs/indexmap/latest/indexmap/),
+  gated by the `indexmap` feature flag;
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
   `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
 - [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
@@ -422,7 +425,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.12.1", features = ["bidimap", "rstar", "rstared", "stable-vec", "thunderdome"] }
+undoredo = { version = "0.12.1", features = ["bidimap", "indexmap", "rstar", "rstared", "stable-vec", "thunderdome"] }
 ```
 
 #### Custom types

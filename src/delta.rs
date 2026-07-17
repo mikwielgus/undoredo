@@ -9,12 +9,13 @@ use alloc::{
 use maplike::containers::Container;
 use maplike::ops::{Get, Insert, IntoIter, Remove};
 
+use core::hash::Hash;
 use core::marker::PhantomData;
 #[cfg(feature = "std")]
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-};
+use std::collections::{HashMap, HashSet};
+
+#[cfg(feature = "indexmap")]
+use indexmap::{IndexMap, IndexSet};
 
 #[cfg(feature = "bidimap")]
 use bidimap::BiBTreeMap;
@@ -126,6 +127,17 @@ where
 
 #[cfg(feature = "std")]
 impl<K, V> MergeDeltas<HashMap<K, V>> for Delta<HashMap<K, V>>
+where
+    K: Eq + Hash,
+{
+    #[inline]
+    fn merge_deltas(self, other: Self) -> Self {
+        merge_map_delta(self, other)
+    }
+}
+
+#[cfg(feature = "indexmap")]
+impl<K, V> MergeDeltas<IndexMap<K, V>> for Delta<IndexMap<K, V>>
 where
     K: Eq + Hash,
 {
@@ -437,6 +449,28 @@ impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        apply_delta_on_map(self, delta);
+    }
+}
+
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
+    for IndexMap<K, V>
+{
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        apply_delta_on_map(self, delta);
+    }
+}
+
+#[cfg(feature = "indexmap")]
+#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
+impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
+    for IndexSet<K>
+{
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);

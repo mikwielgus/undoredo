@@ -303,3 +303,21 @@ pub type StableVecHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Delta for `StableVec<V>`. Alias for `Delta<StableVecHalfDelta<V>>`.
 pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
+
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+/// Half-delta for `ArrayVec<A>`. Alias for `BTreeMap<usize, A::Item>`.
+pub type ArrayVecHalfDelta<A> = BTreeMap<usize, <A as tinyvec::Array>::Item>;
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+/// Delta for `ArrayVec<A>`. Alias for `Delta<ArrayVecHalfDelta<A>>`.
+pub type ArrayVecDelta<A> = Delta<ArrayVecHalfDelta<A>>;
+
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+/// Half-delta for `TinyVec<A>`. Alias for `BTreeMap<usize, A::Item>`.
+pub type TinyVecHalfDelta<A> = BTreeMap<usize, <A as tinyvec::Array>::Item>;
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+/// Delta for `TinyVec<A>`. Alias for `Delta<TinyVecHalfDelta<A>>`.
+pub type TinyVecDelta<A> = Delta<TinyVecHalfDelta<A>>;

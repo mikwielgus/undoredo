@@ -7,7 +7,7 @@ use alloc::{
     vec::Vec,
 };
 use maplike::containers::Container;
-use maplike::ops::{Get, Insert, IntoIter, Remove};
+use maplike::ops::{Get, Insert, IntoIter, Len, Pop, Push, Remove, Resize, Set};
 
 use core::hash::Hash;
 use core::marker::PhantomData;
@@ -33,6 +33,9 @@ use rstar::{RTree, RTreeObject};
 
 #[cfg(feature = "rstared")]
 use rstared::RTreed;
+
+#[cfg(feature = "tinyvec")]
+use tinyvec::{Array, ArrayVec, TinyVec};
 
 use crate::{ApplyEdit, ExtractEdit, FlushDelta, RevertEdit};
 
@@ -213,38 +216,48 @@ where
     }
 }
 
+#[inline]
+fn apply_delta_on_vec<V, C, DC>(container: &mut C, delta: Delta<DC>)
+where
+    V: Clone,
+    C: Pop<Value = V> + Push<usize, Value = V> + Set<usize, Value = V> + Len<Key = usize> + Resize,
+    DC: Clone + IntoIter<usize, Value = V>,
+    DC::IntoIter: DoubleEndedIterator,
+{
+    let (removed, inserted) = delta.dissolve();
+
+    // This implementation is different than the others because stable element
+    // removal is impossible in `Vec` and some other types similar to `Vec`.
+
+    // We reverse the order of removeds to be descending so that we never
+    // miss a pop.
+    for (removed_index, _removed_value) in removed.into_iter().rev() {
+        if removed_index + 1 == Len::len(container) {
+            Pop::pop(container);
+        } else {
+            // No-op. The value will just get overridden by the subsequent
+            // insertion.
+        }
+    }
+
+    for (inserted_index, inserted_value) in inserted.into_iter() {
+        if inserted_index == Len::len(container) {
+            Push::push(container, inserted_value);
+        } else if inserted_index < Len::len(container) {
+            Set::set(container, inserted_index, inserted_value);
+        } else {
+            Resize::resize(container, inserted_index + 1, inserted_value);
+        }
+    }
+}
+
 impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
 where
     DC::IntoIter: DoubleEndedIterator,
 {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
-        let (removed, inserted) = delta.dissolve();
-        // This implementation is different than the others because stable
-        // removal is impossible on `Vec`.
-
-        // We reverse the order of removeds to be descending so that we never
-        // miss a pop.
-        for (removed_index, _removed_value) in removed.into_iter().rev() {
-            if removed_index + 1 == self.len() {
-                self.pop();
-            } else {
-                // No-op. The value will just get overridden by the subsequent
-                // insertion.
-            }
-        }
-
-        for (inserted_index, inserted_value) in inserted.into_iter() {
-            if inserted_index == self.len() {
-                self.push(inserted_value);
-            } else {
-                if inserted_index < self.len() {
-                    self[inserted_index] = inserted_value;
-                } else {
-                    self.resize(inserted_index + 1, inserted_value);
-                }
-            }
-        }
+        apply_delta_on_vec(self, delta);
     }
 }
 
@@ -520,5 +533,31 @@ impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> 
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
+    }
+}
+
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+impl<A: Array, DC: Clone + IntoIter<usize, Value = A::Item>> ApplyDelta<DC> for ArrayVec<A>
+where
+    A::Item: Clone,
+    DC::IntoIter: DoubleEndedIterator,
+{
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        apply_delta_on_vec(self, delta);
+    }
+}
+
+#[cfg(feature = "tinyvec")]
+#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
+impl<A: Array, DC: Clone + IntoIter<usize, Value = A::Item>> ApplyDelta<DC> for TinyVec<A>
+where
+    A::Item: Clone,
+    DC::IntoIter: DoubleEndedIterator,
+{
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        apply_delta_on_vec(self, delta);
     }
 }

@@ -53,6 +53,9 @@ stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 ## Enables support of delta-recording for `thunderdome::Arena`.
 thunderdome = ["dep:thunderdome", "maplike/thunderdome"]
 
+## Enables support of delta-recording for `tinyvec::ArrayVec` and `tinyvec::TinyVec`.
+tinyvec = ["dep:tinyvec", "maplike/tinyvec"]
+
 [dependencies]
 bidimap = { version = "0.7", optional = true }
 document-features = { version = "0.2", optional = true }
@@ -63,6 +66,7 @@ rstared = { version = "0.12", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
+tinyvec = { version = "1", features = ["alloc"], optional = true }
 undoredo_derive = { version = "0.12", optional = true, path = "undoredo_derive" }
 
 [dev-dependencies]
@@ -72,8 +76,9 @@ rstared = "0.12"
 serde = { version = "1.0", features = ["derive"] }
 stable-vec = "0.4"
 thunderdome = "0.6"
+tinyvec = { version = "1", features = ["alloc"] }
 # This enables `derive` on the library, which we need for integration tests.
-undoredo = { path = ".", default-features = false, features = ["derive", "std", "indexmap"] }
+undoredo = { path = ".", default-features = false, features = ["derive", "std", "indexmap", "tinyvec"] }
 
 # Version replacements apply only to this crate. We have to keep this here
 # and not in `release.toml` because the replacements are applied to each

@@ -5,24 +5,32 @@
 extern crate alloc;
 
 #[path = "alloc/btreemap.rs"]
-mod btreemap;
+mod alloc_btreemap;
 
 #[path = "alloc/btreeset.rs"]
-mod btreeset;
+mod alloc_btreeset;
 
 #[path = "alloc/vec.rs"]
-mod vec;
+mod alloc_vec;
 
 #[path = "std/hashmap.rs"]
-mod hashmap;
+mod std_hashmap;
 
 #[path = "std/hashset.rs"]
-mod hashset;
+mod std_hashset;
 
 #[cfg(feature = "indexmap")]
 #[path = "indexmap/indexmap.rs"]
-mod indexmap;
+mod indexmap_indexmap;
 
 #[cfg(feature = "indexmap")]
 #[path = "indexmap/indexset.rs"]
-mod indexset;
+mod indexmap_indexset;
+
+#[cfg(feature = "tinyvec")]
+#[path = "tinyvec/arrayvec.rs"]
+mod tinyvec_arrayvec;
+
+#[cfg(feature = "tinyvec")]
+#[path = "tinyvec/tinyvec.rs"]
+mod tinyvec_tinyvec;

@@ -42,6 +42,8 @@ and for some third-party feature-gated types:
 [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
+[`tinyvec::ArrayVec`](https://docs.rs/tinyvec/latest/tinyvec/struct.ArrayVec.html)
+and [`tinyvec::TinyVec`](https://docs.rs/tinyvec/latest/tinyvec/enum.TinyVec.html),
 (read more in the [Supported containers](#supported-containers) section).
 
 This library is compatible with `no_std` and `serde` and has no mandatory
@@ -417,7 +419,9 @@ external crates:
   [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));
 - [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
   gated by the `thunderdome` feature flag (usage example:
-  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs)).
+  [examples/thunderdome.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/thunderdome.rs));
+- [`tinyvec::ArrayVec` and `tinyvec::TinyVec`](https://docs.rs/tinyvec/latest/tinyvec/),
+  gated by the `tinyvec` feature flag.
 
 To use these, enable their corresponding feature flags next to your `undoredo`
 dependency in your `Cargo.toml`. For example, to enable all third-party type
@@ -425,7 +429,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.12.1", features = ["bidimap", "indexmap", "rstar", "rstared", "stable-vec", "thunderdome"] }
+undoredo = { version = "0.12.1", features = ["bidimap", "indexmap", "rstar", "rstared", "stable-vec", "thunderdome", "tinyvec"] }
 ```
 
 #### Custom types

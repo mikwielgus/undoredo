@@ -6,7 +6,8 @@ use alloc::{
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
 };
-use maplike::{Container, Get, Insert, IntoIter, Remove};
+use maplike::containers::Container;
+use maplike::ops::{Get, Insert, IntoIter, Remove};
 
 use core::marker::PhantomData;
 #[cfg(feature = "std")]

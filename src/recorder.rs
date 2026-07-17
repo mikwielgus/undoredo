@@ -7,9 +7,10 @@ use core::borrow::Borrow;
 use core::marker::PhantomData;
 use core::ops::Index;
 
-use maplike::{
-    Assign, Clear, Container, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop, Push,
-    Remove, RemoveByLeft, RemoveByRight, Set,
+use maplike::containers::Container;
+use maplike::ops::{
+    Assign, Clear, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop, Push, Remove,
+    RemoveByLeft, RemoveByRight, Set,
 };
 
 use crate::{ApplyDelta, MergeDeltas, delta::Delta};

@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use maplike::{Container, Get};
+use maplike::containers::Container;
+use maplike::ops::Get;
 use std::vec::Vec;
 
 use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};

@@ -10,12 +10,12 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements the Undo/Redo pattern on
-arbitrary data structures by automatically recording sparse *deltas* (aka.
-*diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
-pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These edits can then
-be stored in linear undo-redo bistack or non-linear history tree provided by
-the library.
+`undoredo` is a Rust library that implements the Undo/Redo pattern (or delta
+encoding) on arbitrary data structures by automatically recording sparse
+*deltas* (aka. *diffs*, *patches*) of changes, or whole *snapshots* of past
+states ([Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These
+edits can then be stored in linear undo-redo bistack or non-linear history tree
+provided by the library.
 
 This approach is much easier than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is commonly
@@ -25,7 +25,14 @@ complicated and can lead to elusive bugs. But if needed, `undoredo` can also
 store a command or other metadata along with every edit, allowing for easy use
 of the Command pattern as well.
 
-Delta-recording undo-redo requires creating a separate delta edit type for each
+In networking applications, the recorded deltas can be used for delta encoding
+(delta compression): you can cut network bandwidth requirements by sending them
+across network instead of snapshots. Even better, this is differencing-free:
+you don't have to compute a costly difference on each transmission because the
+recorded deltas are gradually and automatically constructed during each applied
+operation.
+
+Delta recording requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
 to automatically generate these types on arbitrary custom `struct`s and `enum`s.

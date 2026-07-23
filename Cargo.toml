@@ -14,8 +14,8 @@ repository = "https://github.com/mikwielgus/undoredo"
 documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
-keywords = ["undo", "redo", "no_std"]
-categories = ["data-structures", "gui", "no-std", "rust-patterns"]
+keywords = ["delta", "diff", "undo", "redo", "no_std"]
+categories = ["compression", "data-structures", "gui", "no-std", "rust-patterns"]
 edition = "2024"
 
 [badges]
@@ -60,9 +60,9 @@ tinyvec = ["dep:tinyvec", "maplike/tinyvec"]
 bidimap = { version = "0.7", optional = true }
 document-features = { version = "0.2", optional = true }
 indexmap = { version = "2.14", optional = true }
-maplike = { version = "0.12", features = ["derive"] }
+maplike = { version = "0.13", features = ["derive"] }
 rstar = { version = "0.12", optional = true }
-rstared = { version = "0.12", optional = true }
+rstared = { version = "0.13", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
@@ -72,7 +72,7 @@ undoredo_derive = { version = "0.12", optional = true, path = "undoredo_derive" 
 [dev-dependencies]
 indexmap = "2.14"
 rstar = "0.12"
-rstared = "0.12"
+rstared = "0.13"
 serde = { version = "1.0", features = ["derive"] }
 stable-vec = "0.4"
 thunderdome = "0.6"

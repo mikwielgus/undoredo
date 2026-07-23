@@ -8,8 +8,9 @@ use core::marker::PhantomData;
 use core::ops::Index;
 
 use maplike::containers::Container;
+use maplike::iter::IntoIter;
 use maplike::ops::{
-    Assign, Clear, Get, GetByLeft, GetByRight, Insert, IntoIter, Len, Modify, Pop, Push, Remove,
+    Assign, Clear, Get, GetByLeft, GetByRight, Insert, Len, Modify, Pop, Push, Remove,
     RemoveByLeft, RemoveByRight, Set,
 };
 
@@ -307,11 +308,13 @@ where
 
 impl<K, V, C, DC> Remove<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Remove<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    C: Container<Key = K, Value = V> + Remove<K, Output = Option<V>>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
+    type Output = Option<V>;
+
     #[inline]
     fn remove(&mut self, key: &K) -> Option<V> {
         self.remove(key)
@@ -320,8 +323,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Remove<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    C: Container<Key = K, Value = V> + Remove<K, Output = Option<V>>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -342,7 +345,7 @@ where
 impl<K, V, C, DC> RemoveByLeft<K> for Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + RemoveByLeft<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -355,7 +358,7 @@ where
 impl<K, V, C, DC> Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + RemoveByLeft<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -376,7 +379,7 @@ where
 impl<K, V, C, DC> RemoveByRight<K> for Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + RemoveByRight<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -389,7 +392,7 @@ where
 impl<K, V, C, DC> Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + RemoveByRight<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -441,7 +444,7 @@ where
 impl<K, V, C, DC> Pop for Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + Len + Pop,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -454,7 +457,7 @@ where
 impl<K, V, C, DC> Recorder<C, DC>
 where
     C: Container<Key = K, Value = V> + Len + Pop,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -477,7 +480,7 @@ where
 impl<K, V, C, DC> Clear for Recorder<C, DC>
 where
     C: Clear + Clone + IntoIter<K, Value = V>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
 {
     #[inline]
     fn clear(&mut self) {
@@ -488,7 +491,7 @@ where
 impl<K, V, C, DC> Recorder<C, DC>
 where
     C: Clear + Clone + IntoIter<K, Value = V>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
 {
     /// Remove all elements from the container.
     pub fn clear(&mut self) {

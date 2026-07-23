@@ -7,7 +7,8 @@ use alloc::{
     vec::Vec,
 };
 use maplike::containers::Container;
-use maplike::ops::{Get, Insert, IntoIter, Len, Pop, Push, Remove, Resize, Set};
+use maplike::iter::IntoIter;
+use maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Resize, Set};
 
 use core::hash::Hash;
 use core::marker::PhantomData;
@@ -98,7 +99,11 @@ pub trait MergeDeltas<DC> {
 #[inline]
 fn merge_map_delta<K, V, M>(self_delta: Delta<M>, other: Delta<M>) -> Delta<M>
 where
-    M: Container<Key = K, Value = V> + IntoIter<K> + Get<K> + Insert<K> + Remove<K>,
+    M: Container<Key = K, Value = V>
+        + IntoIter<K>
+        + Get<K>
+        + Insert<K>
+        + Remove<K, Output = Option<V>>,
 {
     let (mut self_removed, mut self_inserted) = self_delta.dissolve();
     let (other_removed, other_inserted) = other.dissolve();
@@ -506,7 +511,7 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 impl<
     K: Clone + PartialEq,
     V: Clone + PartialEq + RTreeObject,
-    C: Get<K> + Container<Key = K, Value = V> + Insert<K> + Remove<K>,
+    C: Get<K> + Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
     DC: IntoIter<K> + Container<Key = K, Value = V>,
 > ApplyDelta<DC> for RTreed<C>
 {

@@ -4,33 +4,35 @@ SPDX-FileCopyrightText: 2025 undoredo contributors
 SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
+[![Repository](https://img.shields.io/badge/repository-GitHub-0FBF3E)](https://github.com/mikwielgus/undoredo)
 [![Docs](https://docs.rs/undoredo/badge.svg)](https://docs.rs/undoredo/)
 [![Crates.io](https://img.shields.io/crates/v/undoredo.svg)](https://crates.io/crates/undoredo)
 [![MIT OR Apache 2.0](https://img.shields.io/crates/l/undoredo.svg)](#licence)
 
 # undoredo
 
-`undoredo` is a Rust library that implements the Undo/Redo pattern (or delta
-encoding) on arbitrary data structures by automatically recording sparse
-*deltas* (aka. *diffs*, *patches*) of changes, or whole *snapshots* of past
-states ([Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These
-edits can then be stored in linear undo-redo bistack or non-linear history tree
-provided by the library.
+`undoredo` is a Rust library that implements the Undo/Redo pattern on
+arbitrary data structures by automatically recording sparse deltas (aka.
+*diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
+pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These edits can then
+be stored in linear undo-redo bistack or non-linear history tree provided by
+the library. Alternatively, the sparse deltas can be also sent across a computer
+network in packets as a form of delta encoding.
 
-This approach is much easier than the commonly used [Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern), which is commonly
-the principle of operation of other Undo/Redo crates, as having to implement
-commands requires maintenance of additional application logic that is often
-complicated and can lead to elusive bugs. But if needed, `undoredo` can also
-store a command or other metadata along with every edit, allowing for easy use
-of the Command pattern as well.
+For Undo/Redo, this approach is much easier than the commonly used [Command
+pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
+of operation of many other Undo/Redo crates, as having to implement commands
+requires maintenance of additional application logic that is often complicated
+and can lead to elusive bugs. But if needed, `undoredo` can also store a command
+or other metadata along with every edit, allowing for easy use of the Command
+pattern as well.
 
-In networking applications, the recorded deltas can be used for delta encoding
-(delta compression): you can cut network bandwidth requirements by sending them
-across network instead of snapshots. Even better, this is differencing-free:
-you don't have to compute a costly difference on each transmission because the
-recorded deltas are gradually and automatically constructed during each applied
-operation.
+In networking applications, the recorded deltas can also be used for delta
+encoding (delta compression): you can cut network bandwidth requirements
+by sending them across network instead of snapshots. Even better, this is
+differencing-free: you don't have to compute a costly difference on each
+packet transmission because the recorded deltas are gradually and automatically
+constructed during each operation on data.
 
 Delta recording requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro
@@ -53,8 +55,10 @@ and for some third-party feature-gated types:
 and [`tinyvec::TinyVec`](https://docs.rs/tinyvec/latest/tinyvec/enum.TinyVec.html),
 (read more in the [Supported containers](#supported-containers) section).
 
-This library is compatible with `no_std` and `serde` and has no mandatory
-third-party dependencies except for [`alloc`](https://doc.rust-lang.org/alloc/).
+This library is compatible with `no_std` and `serde` and
+has no mandatory third-party dependencies, but it relies on
+[`maplike`](https://github.com/mikwielgus/maplike) crate also developed by this
+library's authors and requires [`alloc`](https://doc.rust-lang.org/alloc/).
 
 ## Demo
 

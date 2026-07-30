@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2026 undoredo contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+name: cargo-check-no-std
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  thumbv6m-none-eabi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv6m-none-eabi
+
+      - uses: Swatinem/rust-cache@v2
+
+      # thumbv6m-non-eabi has no std, so let's build it to make sure we really
+      # are `no_std` compatible.
+      - name: Check no_std compatibility
+        run: cargo check --target thumbv6m-none-eabi --no-default-features --features derive

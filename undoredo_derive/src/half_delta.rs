@@ -40,8 +40,10 @@ pub(crate) fn resolve_half_delta_ident(input: &DeriveInput) -> syn::Result<syn::
 
 pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> {
     let vis = &input.vis;
+    let name = &input.ident;
     let half_delta = resolve_half_delta_ident(&input)?;
     let generics = &input.generics;
+    let half_delta_doc = format!("Half-delta for `{name}`.");
 
     let output = match &input.data {
         Data::Struct(data) => match &data.fields {
@@ -62,6 +64,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 }
 
                 quote! {
+                    #[doc = #half_delta_doc]
                     #[derive(Clone, Debug, Default)]
                     #vis struct #half_delta #generics {
                         #( #transformed_fields )*
@@ -81,11 +84,13 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
                 }
 
                 quote! {
+                    #[doc = #half_delta_doc]
                     #[derive(Clone, Debug, Default)]
                     #vis struct #half_delta #generics ( #( #transformed_fields ),* );
                 }
             }
             Fields::Unit => quote! {
+                #[doc = #half_delta_doc]
                 #[derive(Clone, Debug, Default)]
                 #vis struct #half_delta #generics;
             },

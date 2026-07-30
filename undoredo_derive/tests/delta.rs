@@ -2,16 +2,20 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+//! Tests for `derive(Delta)` (doc comments here are to pass deny(missing_docs)).
+
+#![deny(missing_docs)]
 #![allow(dead_code)]
 
 use maplike::ops::Assign;
 use undoredo::aliases::VecHalfDelta;
 use undoredo::{ApplyDelta, Delta, Recorder, ResetDelta};
 
+/// Struct under test for `derive(Delta)`.
 #[derive(Delta)]
 #[undoredo(half_delta = TestStructHalfDelta)]
 #[undoredo(delta = TestStructDelta)]
-struct TestStruct {
+pub struct TestStruct {
     v: Recorder<Vec<i32>>,
 }
 
@@ -46,10 +50,18 @@ fn test_delta_derive_struct_provides_reset_delta() {
     assert_eq!(*s.v.container(), vec![1, 2, 3]);
 }
 
+/// Enum under test for `derive(Delta)`.
 #[derive(Clone, Debug, PartialEq, Delta)]
-enum TestEnum {
+pub enum TestEnum {
+    /// Unit variant.
     Unit,
-    Fields { i: i32, u: u32 },
+    /// Variant with named fields.
+    Fields {
+        /// Signed field.
+        i: i32,
+        /// Unsigned field.
+        u: u32,
+    },
 }
 
 #[test]

@@ -2,15 +2,19 @@
 //
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+//! Tests for `derive(HalfDelta)` (doc comments here are to pass deny(missing_docs)).
+
+#![deny(missing_docs)]
 #![allow(dead_code)]
 
 use std::collections::BTreeMap;
 
 use undoredo::{HalfDelta, Recorder};
 
+/// Struct under test.
 #[derive(HalfDelta)]
 #[undoredo(half_delta = TestStructHalfDelta)]
-struct TestStruct {
+pub struct TestStruct {
     v: Recorder<Vec<i32>>,
 }
 

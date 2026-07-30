@@ -50,8 +50,10 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
             let half_id = half_delta::resolve_half_delta_ident(&input)?;
             let delta_alias_ident = resolve_delta_ident(&input)?;
             let vis = &input.vis;
+            let delta_alias_doc = format!("Delta for `{name}`. Alias for `Delta<{half_id}>`.");
             let half_delta = TokenStream2::from(half_delta::expand_half_delta(input.clone())?);
             let delta_alias = quote! {
+                #[doc = #delta_alias_doc]
                 #vis type #delta_alias_ident #generics = ::undoredo::Delta<#half_id #ty_generics>;
             };
             let apply_delta = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);

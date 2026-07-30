@@ -31,7 +31,7 @@ fn main() {
         recorder
             .container()
             .rtree()
-            .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
+            .locate_in_envelope(AABB::from_corners((0, 0), (2, 2)))
             .count(),
         2
     );
@@ -43,7 +43,7 @@ fn main() {
         recorder
             .container()
             .rtree()
-            .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
+            .locate_in_envelope(AABB::from_corners((0, 0), (2, 2)))
             .count(),
         1
     );
@@ -55,7 +55,7 @@ fn main() {
         recorder
             .container()
             .rtree()
-            .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
+            .locate_in_envelope(AABB::from_corners((0, 0), (2, 2)))
             .count(),
         0
     );
@@ -67,7 +67,7 @@ fn main() {
         recorder
             .container()
             .rtree()
-            .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
+            .locate_in_envelope(AABB::from_corners((0, 0), (2, 2)))
             .count(),
         1
     );
@@ -79,7 +79,7 @@ fn main() {
         recorder
             .container()
             .rtree()
-            .locate_in_envelope(&AABB::from_corners((0, 0), (2, 2)))
+            .locate_in_envelope(AABB::from_corners((0, 0), (2, 2)))
             .count(),
         2
     );

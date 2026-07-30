@@ -15,7 +15,7 @@ documentation = "https://docs.rs/undoredo"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["delta", "diff", "undo", "redo", "no_std"]
-categories = ["compression", "data-structures", "gui", "no-std", "rust-patterns"]
+categories = ["gui", "compression", "data-structures", "no-std", "rust-patterns"]
 edition = "2024"
 
 [badges]
@@ -32,7 +32,7 @@ derive = ["undoredo_derive"]
 serde = ["dep:serde"]
 
 ## Disable for `no_std` compatibility.
-std = []
+std = ["maplike/std"]
 
 ## Enables support of delta-recording for `bidimap::BiBTreeMap` and `bidimap::BiHashMap`.
 bidimap = ["dep:bidimap", "maplike/bidimap"]
@@ -60,7 +60,7 @@ tinyvec = ["dep:tinyvec", "maplike/tinyvec"]
 bidimap = { version = "0.7", optional = true }
 document-features = { version = "0.2", optional = true }
 indexmap = { version = "2.14", optional = true }
-maplike = { version = "0.13", features = ["derive"] }
+maplike = { version = "0.13", default-features = false, features = ["alloc", "derive"] }
 rstar = { version = "0.12", optional = true }
 rstared = { version = "0.13", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }

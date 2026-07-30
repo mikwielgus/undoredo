@@ -30,9 +30,9 @@ pattern as well.
 In networking applications, the recorded deltas can also be used for delta
 encoding (delta compression): you can cut network bandwidth requirements
 by sending them across network instead of snapshots. Even better, this is
-differencing-free: you don't have to compute a costly difference on each
-packet transmission because the recorded deltas are gradually and automatically
-constructed during each operation on data.
+differencing-free: you don't have to compute one costly difference upon packet
+transmission; the cost is spread incrementally as recorded deltas are gradually
+and automatically constructed during each operation on data.
 
 Delta recording requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro

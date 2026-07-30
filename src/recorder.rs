@@ -615,7 +615,7 @@ where
     pub fn extend_delta(&mut self, delta: Delta<DC>) {
         self.apply_delta(delta.clone());
 
-        let delta = std::mem::replace(&mut self.delta, Default::default()).merge_deltas(delta);
+        let delta = core::mem::replace(&mut self.delta, Default::default()).merge_deltas(delta);
         self.delta = delta;
     }
 }

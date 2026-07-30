@@ -10,6 +10,7 @@ use maplike::containers::Container;
 use maplike::iter::IntoIter;
 use maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Resize, Set};
 
+#[cfg(any(feature = "std", feature = "indexmap"))]
 use core::hash::Hash;
 use core::marker::PhantomData;
 #[cfg(feature = "std")]

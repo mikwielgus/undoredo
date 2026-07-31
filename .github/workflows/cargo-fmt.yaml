@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  check-formatting:
+  cargo-fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

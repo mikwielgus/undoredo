@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
-name: cargo-hack-test
+name: cargo-hack-test-each-feature
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  each-feature-examples-tests-doc:
+  cargo-hack-test-each-feature:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

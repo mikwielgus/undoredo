@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  thumbv6m-none-eabi:
+  cargo-check-no-std:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

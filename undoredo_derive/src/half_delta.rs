@@ -65,7 +65,7 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
 
                 quote! {
                     #[doc = #half_delta_doc]
-                    #[derive(Clone, Debug, Default)]
+                    #[derive(Clone, Debug, Default, Eq, PartialEq)]
                     #vis struct #half_delta #generics {
                         #( #transformed_fields )*
                     }
@@ -85,13 +85,13 @@ pub(crate) fn expand_half_delta(input: DeriveInput) -> syn::Result<TokenStream> 
 
                 quote! {
                     #[doc = #half_delta_doc]
-                    #[derive(Clone, Debug, Default)]
+                    #[derive(Clone, Debug, Default, Eq, PartialEq)]
                     #vis struct #half_delta #generics ( #( #transformed_fields ),* );
                 }
             }
             Fields::Unit => quote! {
                 #[doc = #half_delta_doc]
-                #[derive(Clone, Debug, Default)]
+                #[derive(Clone, Debug, Default, Eq, PartialEq)]
                 #vis struct #half_delta #generics;
             },
         },

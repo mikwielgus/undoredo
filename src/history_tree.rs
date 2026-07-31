@@ -8,7 +8,7 @@ use alloc::vec::Vec;
 use crate::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
 
 /// Id of a node in [`HistoryTree`].
-#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct HistoryTreeNodeId(usize);
 
 impl HistoryTreeNodeId {
@@ -26,6 +26,7 @@ impl HistoryTreeNodeId {
 }
 
 /// A single history node in [`HistoryTree`].
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
     pub cmd_edit: CmdEdit<Cmd, E>,
@@ -38,6 +39,7 @@ pub struct HistoryTreeNode<E, Cmd = ()> {
 }
 
 /// A cursor that points to a node and owns the edited container.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTreeCursor<C> {
     curr_node: HistoryTreeNodeId,
     container: C,
@@ -77,6 +79,7 @@ impl<C> AsRef<C> for HistoryTreeCursor<C> {
 }
 
 /// A history tree for non-linear undo-redo action.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTree<E, Cmd = ()> {
     nodes: Vec<HistoryTreeNode<E, Cmd>>,
 }

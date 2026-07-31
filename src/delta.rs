@@ -46,7 +46,7 @@ use crate::{ApplyEdit, ExtractEdit, FlushDelta, RevertEdit};
 /// Consists of a container of removed elements and another container of
 /// inserted elements.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct Delta<DC> {
     pub(super) removed: DC,
     pub(super) inserted: DC,

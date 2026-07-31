@@ -19,7 +19,7 @@ use crate::{ApplyDelta, MergeDeltas, delta::Delta};
 /// Records deltas applied to a container so that they can be replayed or
 /// reverted.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct Recorder<
     C: Container,
     DC: Container = BTreeMap<<C as Container>::Key, <C as Container>::Value>,

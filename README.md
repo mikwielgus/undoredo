@@ -169,7 +169,7 @@ use undoredo::{Delta, Recorder};
 
 // No need for `#[derive(Delta)]` for types stored in containers, only the
 // containers themselves need this.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct Vector2<T> {
     x: T,
     y: T,

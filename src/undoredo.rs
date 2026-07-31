@@ -10,7 +10,7 @@ use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
 
 /// An history bistack for linear undo-redo action.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct UndoRedo<E, Cmd = ()> {
     done: Vec<CmdEdit<Cmd, E>>,
     undone: Vec<CmdEdit<Cmd, E>>,

@@ -10,13 +10,13 @@ use std::collections::BTreeMap;
 use undoredo::aliases::BTreeMapDelta;
 use undoredo::{Delta, Recorder, UndoRedo};
 
-#[derive(Delta, Clone, Debug, PartialEq)]
+#[derive(Delta, Clone, Debug, Eq, Hash, PartialEq)]
 enum TestEnum {
     Unit,
     Tuple(Vec<i32>, Vec<i32>),
 }
 
-#[derive(Delta, Clone, Debug, PartialEq)]
+#[derive(Delta, Clone, Debug, Eq, Hash, PartialEq)]
 struct TestStruct {
     v: Recorder<Vec<TestEnum>>,
     i: Recorder<i32>,

@@ -165,6 +165,8 @@ storage with generic coordinate type `T` that could be used for a simple
 [entity-component-system](https://en.wikipedia.org/wiki/Entity_component_system):
 
 ```rust,ignore
+use undoredo::{Delta, Recorder};
+
 // No need for `#[derive(Delta)]` for types stored in containers, only the
 // containers themselves need this.
 #[derive(Clone, Copy, Debug, PartialEq)]

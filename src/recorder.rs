@@ -8,7 +8,7 @@ use core::marker::PhantomData;
 use core::ops::Index;
 
 use maplike::containers::Container;
-use maplike::iter::IntoIter;
+use maplike::iter::{IntoIter, IntoValues, Iter, Values};
 use maplike::ops::{
     Assign, Clear, Get, GetByLeft, GetByRight, Insert, Len, Modify, Pop, Push, Remove,
     RemoveByLeft, RemoveByRight, Set,
@@ -523,6 +523,47 @@ where
     #[inline]
     fn len(&self) -> C::Key {
         self.container.len()
+    }
+}
+
+impl<'a, C, DC> Values<'a> for Recorder<C, DC>
+where
+    C: Values<'a>,
+    DC: Container,
+    Self: 'a,
+{
+    type Values = C::Values;
+
+    #[inline]
+    fn values(&'a self) -> C::Values {
+        self.container.values()
+    }
+}
+
+impl<C, DC> IntoValues for Recorder<C, DC>
+where
+    C: IntoValues,
+    DC: Container,
+{
+    type IntoValues = C::IntoValues;
+
+    #[inline]
+    fn into_values(self) -> C::IntoValues {
+        self.container.into_values()
+    }
+}
+
+impl<'a, K, C, DC> Iter<'a, K> for Recorder<C, DC>
+where
+    C: Iter<'a, K>,
+    DC: Container,
+    Self: 'a,
+{
+    type Iter = C::Iter;
+
+    #[inline]
+    fn iter(&'a self) -> C::Iter {
+        self.container.iter()
     }
 }
 

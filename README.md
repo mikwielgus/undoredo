@@ -27,8 +27,8 @@ and can lead to elusive bugs. But if needed, `undoredo` can also store a command
 or other metadata along with every edit, allowing for easy use of the Command
 pattern as well.
 
-In networking applications, the recorded deltas can also be used for delta
-encoding (delta compression): you can cut network bandwidth requirements
+In networking applications, the recorded deltas can also be used for
+delta encoding (delta compression): you can cut needed network bandwidth
 by sending them across network instead of snapshots. Even better, this is
 differencing-free: you don't have to compute one costly difference upon packet
 transmission; the cost is spread incrementally as recorded deltas are gradually
@@ -38,11 +38,12 @@ Delta recording requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
 to automatically generate these types on arbitrary custom `struct`s and `enum`s.
-There are also convenience implementations for standard library collections:
+There are also convenience implementations for standard library containers:
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html),
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
 [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html),
+[`Option`](https://doc.rust-lang.org/std/option/enum.Option.html),
 [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html),
 and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
@@ -410,6 +411,7 @@ of delta-editing:
 - [`HashSet`](https://doc.rust-lang.org/std/collections/struct.HashSet.html), gated by the `std` feature flag (enabled by default);
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
 - [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated;
+- [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html), not feature-gated;
 - [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html), not feature-gated.
 
 #### Third-party types

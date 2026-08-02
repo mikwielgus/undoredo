@@ -428,6 +428,21 @@ impl_delta_for_tuple!(
     11 T11
 );
 
+impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Option<V> {
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        let (removed, inserted) = delta.dissolve();
+
+        for (removed_key, _removed_value) in removed.into_iter() {
+            self.remove(&removed_key);
+        }
+
+        for (inserted_key, inserted_value) in inserted.into_iter() {
+            self.set(inserted_key, inserted_value);
+        }
+    }
+}
+
 impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
     #[inline]
     fn apply_delta(&mut self, _delta: Delta<DC>) {

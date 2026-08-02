@@ -209,6 +209,11 @@ declare_tuple_aliases!(
     "(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)"
 );
 
+/// Half-delta for `Option<V>`. Alias for `BTreeMap<usize, V>`.
+pub type OptionHalfDelta<V> = BTreeMap<usize, V>;
+/// Delta for `Option<V>`. Alias for `Delta<OptionHalfDelta<V>>`.
+pub type OptionDelta<V> = Delta<OptionHalfDelta<V>>;
+
 /// Half-delta for `PhantomData<V>`. Alias for `BTreeMap<usize, ()>`.
 pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
 /// Delta for `PhantomData<V>`. Alias for `Delta<PhantomDataHalfDelta>`.

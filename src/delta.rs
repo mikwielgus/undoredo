@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::{
+    boxed::Box,
     collections::{BTreeMap, BTreeSet},
     vec::Vec,
 };
@@ -439,6 +440,17 @@ impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Option<V> {
 
         for (inserted_key, inserted_value) in inserted.into_iter() {
             self.set(inserted_key, inserted_value);
+        }
+    }
+}
+
+impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Box<V> {
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        let (_removed, inserted) = delta.dissolve();
+
+        for (inserted_key, inserted_value) in inserted.into_iter() {
+            Set::set(self, inserted_key, inserted_value);
         }
     }
 }

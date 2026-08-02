@@ -44,6 +44,7 @@ There are also convenience implementations for standard library containers:
 [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html),
 [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html),
 [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html),
+[`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html),
 [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html),
 and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
@@ -412,6 +413,7 @@ of delta-editing:
 - [`BTreeMap`](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html), not feature-gated;
 - [`BTreeSet`](https://doc.rust-lang.org/std/collections/struct.BTreeSet.html), not feature-gated;
 - [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html), not feature-gated;
+- [`Box`](https://doc.rust-lang.org/std/boxed/struct.Box.html), not feature-gated;
 - [`Vec`](https://doc.rust-lang.org/std/vec/struct.Vec.html), not feature-gated.
 
 #### Third-party types

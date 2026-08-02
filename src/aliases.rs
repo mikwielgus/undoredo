@@ -214,6 +214,11 @@ pub type OptionHalfDelta<V> = BTreeMap<usize, V>;
 /// Delta for `Option<V>`. Alias for `Delta<OptionHalfDelta<V>>`.
 pub type OptionDelta<V> = Delta<OptionHalfDelta<V>>;
 
+/// Half-delta for `Box<V>`. Alias for `BTreeMap<usize, V>`.
+pub type BoxHalfDelta<V> = BTreeMap<usize, V>;
+/// Delta for `Box<V>`. Alias for `Delta<BoxHalfDelta<V>>`.
+pub type BoxDelta<V> = Delta<BoxHalfDelta<V>>;
+
 /// Half-delta for `PhantomData<V>`. Alias for `BTreeMap<usize, ()>`.
 pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
 /// Delta for `PhantomData<V>`. Alias for `Delta<PhantomDataHalfDelta>`.

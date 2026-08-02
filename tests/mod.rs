@@ -13,6 +13,9 @@ mod alloc_btreeset;
 #[path = "alloc/vec.rs"]
 mod alloc_vec;
 
+#[path = "alloc/boxed.rs"]
+mod alloc_boxed;
+
 #[path = "std/hashmap.rs"]
 mod std_hashmap;
 

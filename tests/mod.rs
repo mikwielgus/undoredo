@@ -16,6 +16,9 @@ mod alloc_vec;
 #[path = "alloc/boxed.rs"]
 mod alloc_boxed;
 
+#[path = "alloc/rc.rs"]
+mod alloc_rc;
+
 #[path = "std/hashmap.rs"]
 mod std_hashmap;
 

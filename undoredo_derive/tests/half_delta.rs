@@ -10,10 +10,11 @@
 
 use std::boxed::Box;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::rc::Rc;
 
 use undoredo::aliases::{
     BTreeMapHalfDelta, BTreeSetHalfDelta, BoxHalfDelta, HashMapHalfDelta, HashSetHalfDelta,
-    OptionHalfDelta, VecHalfDelta,
+    OptionHalfDelta, RcHalfDelta, VecHalfDelta,
 };
 use undoredo::{HalfDelta, Recorder};
 
@@ -27,6 +28,7 @@ pub struct TestStruct {
     btreeset: Recorder<BTreeSet<i32>>,
     option: Recorder<Option<i32>>,
     boxed: Recorder<Box<i32>>,
+    rc: Recorder<Rc<i32>>,
     vec: Recorder<Vec<i32>>,
 }
 
@@ -39,6 +41,7 @@ fn test_struct_half_delta() {
         btreeset: BTreeSetHalfDelta::new(),
         option: OptionHalfDelta::new(),
         boxed: BoxHalfDelta::new(),
+        rc: RcHalfDelta::new(),
         vec: VecHalfDelta::new(),
     };
 }

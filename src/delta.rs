@@ -5,6 +5,7 @@
 use alloc::{
     boxed::Box,
     collections::{BTreeMap, BTreeSet},
+    rc::Rc,
     vec::Vec,
 };
 use maplike::containers::Container;
@@ -445,6 +446,17 @@ impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Option<V> {
 }
 
 impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Box<V> {
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        let (_removed, inserted) = delta.dissolve();
+
+        for (inserted_key, inserted_value) in inserted.into_iter() {
+            Set::set(self, inserted_key, inserted_value);
+        }
+    }
+}
+
+impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Rc<V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (_removed, inserted) = delta.dissolve();

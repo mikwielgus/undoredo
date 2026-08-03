@@ -10,11 +10,12 @@
 
 use std::boxed::Box;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::rc::Rc;
 
 use maplike::ops::Assign;
 use undoredo::aliases::{
     BTreeMapHalfDelta, BTreeSetHalfDelta, BoxHalfDelta, HashMapHalfDelta, HashSetHalfDelta,
-    OptionHalfDelta, VecHalfDelta,
+    OptionHalfDelta, RcHalfDelta, VecHalfDelta,
 };
 use undoredo::{ApplyDelta, Delta, Recorder, ResetDelta};
 
@@ -29,6 +30,7 @@ pub struct TestStruct {
     btreeset: Recorder<BTreeSet<i32>>,
     option: Recorder<Option<i32>>,
     boxed: Recorder<Box<i32>>,
+    rc: Recorder<Rc<i32>>,
     vec: Recorder<Vec<i32>>,
 }
 
@@ -42,6 +44,7 @@ fn test_struct_delta() {
             btreeset: BTreeSetHalfDelta::new(),
             option: OptionHalfDelta::new(),
             boxed: BoxHalfDelta::new(),
+            rc: RcHalfDelta::new(),
             vec: VecHalfDelta::new(),
         },
         TestStructHalfDelta {
@@ -51,6 +54,7 @@ fn test_struct_delta() {
             btreeset: BTreeSetHalfDelta::new(),
             option: OptionHalfDelta::new(),
             boxed: BoxHalfDelta::new(),
+            rc: RcHalfDelta::new(),
             vec: VecHalfDelta::new(),
         },
     );
@@ -65,6 +69,7 @@ fn test_delta_derive_struct() {
         btreeset: Recorder::new(BTreeSet::from([1])),
         option: Recorder::new(Some(1)),
         boxed: Recorder::new(Box::new(1)),
+        rc: Recorder::new(Rc::new(1)),
         vec: Recorder::new(vec![1, 2, 3]),
     };
 
@@ -76,6 +81,7 @@ fn test_delta_derive_struct() {
             btreeset: BTreeSetHalfDelta::new(),
             option: OptionHalfDelta::new(),
             boxed: BoxHalfDelta::new(),
+            rc: RcHalfDelta::new(),
             vec: VecHalfDelta::from([(2, 3)]),
         },
         TestStructHalfDelta {
@@ -85,6 +91,7 @@ fn test_delta_derive_struct() {
             btreeset: BTreeSetHalfDelta::new(),
             option: OptionHalfDelta::new(),
             boxed: BoxHalfDelta::new(),
+            rc: RcHalfDelta::new(),
             vec: VecHalfDelta::from([(2, 7)]),
         },
     );
@@ -102,6 +109,7 @@ fn test_delta_derive_struct_provides_reset_delta() {
         btreeset: Recorder::new(BTreeSet::from([1])),
         option: Recorder::new(Some(1)),
         boxed: Recorder::new(Box::new(1)),
+        rc: Recorder::new(Rc::new(1)),
         vec: Recorder::new(vec![1, 2, 3]),
     };
 

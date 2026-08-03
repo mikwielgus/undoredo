@@ -315,15 +315,6 @@ pub type RTreeHalfDelta<K> = BTreeMap<K, ()>;
 /// Delta for `RTree<K>`. Alias for `Delta<RTreeHalfDelta<K>>`.
 pub type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
-#[cfg(feature = "rstared")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
-/// Half-delta for `RTreed<C>`. Alias for `BTreeMap<K, V>`.
-pub type RTreedHalfDelta<K, V> = BTreeMap<K, V>;
-#[cfg(feature = "rstared")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
-/// Delta for `RTreed<C>`. Alias for `Delta<RTreedHalfDelta<K, V>>`.
-pub type RTreedDelta<K, V> = Delta<RTreedHalfDelta<K, V>>;
-
 #[cfg(feature = "stable-vec")]
 #[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Half-delta for `StableVec<V>`. Alias for `BTreeMap<usize, V>`.

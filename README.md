@@ -54,7 +54,6 @@ and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
 [`indexmap::IndexMap` and `indexmap::IndexSet`](https://docs.rs/indexmap/latest/indexmap/),
 [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
-[`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/),
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 [`tinyvec::ArrayVec`](https://docs.rs/tinyvec/latest/tinyvec/struct.ArrayVec.html)
@@ -447,8 +446,6 @@ external crates:
   gated by the `indexmap` feature flag;
 - [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
   `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
-- [`rstared::RTreed`](https://docs.rs/rstared/latest/rstared/), gated by the
-  `rstared` feature flag (usage example: [examples/rstared.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstared.rs));
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature flag (usage example:
   [examples/stable_vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/stable_vec.rs));
@@ -464,7 +461,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.14.0", features = ["bidimap", "indexmap", "rstar", "rstared", "stable-vec", "thunderdome", "tinyvec"] }
+undoredo = { version = "0.14.0", features = ["bidimap", "indexmap", "rstar", "stable-vec", "thunderdome", "tinyvec"] }
 ```
 
 #### Custom types

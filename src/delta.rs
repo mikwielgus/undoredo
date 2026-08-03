@@ -37,9 +37,6 @@ use thunderdome::{Arena, Index};
 #[cfg(feature = "rstar")]
 use rstar::{RTree, RTreeObject};
 
-#[cfg(feature = "rstared")]
-use rstared::RTreed;
-
 #[cfg(feature = "tinyvec")]
 use tinyvec::{Array, ArrayVec, TinyVec};
 
@@ -564,21 +561,6 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 #[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for RTree<K>
-{
-    #[inline]
-    fn apply_delta(&mut self, delta: Delta<DC>) {
-        apply_delta_on_map(self, delta);
-    }
-}
-
-#[cfg(feature = "rstared")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstared")))]
-impl<
-    K: Clone + PartialEq,
-    V: Clone + PartialEq + RTreeObject,
-    C: Get<K> + Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
-    DC: IntoIter<K> + Container<Key = K, Value = V>,
-> ApplyDelta<DC> for RTreed<C>
 {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {

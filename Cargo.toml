@@ -44,10 +44,6 @@ indexmap = ["dep:indexmap", "maplike/indexmap"]
 ## Enables support of delta-recording for `rstar::RTree`.
 rstar = ["dep:rstar", "maplike/rstar"]
 
-## Enables support of delta-recording for `rstared::RTreed`. Enables `rstar`
-## feature flag as well.
-rstared = ["rstar", "dep:rstared"]
-
 ## Enables support of delta-recording for `stable_vec::StableVec`.
 stable-vec = ["dep:stable-vec", "maplike/stable-vec"]
 
@@ -63,7 +59,6 @@ document-features = { version = "0.2", optional = true }
 indexmap = { version = "2.14", optional = true }
 maplike = { version = "0.14", default-features = false, features = ["alloc", "derive"] }
 rstar = { version = "0.13", optional = true }
-rstared = { version = "0.13", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
@@ -73,7 +68,6 @@ undoredo_derive = { version = "0.14", optional = true, path = "undoredo_derive" 
 [dev-dependencies]
 indexmap = "2.14"
 rstar = "0.13"
-rstared = "0.13"
 serde = { version = "1.0", features = ["derive"] }
 stable-vec = "0.4"
 thunderdome = "0.6"
@@ -138,11 +132,6 @@ doc-scrape-examples = true
 [[example]]
 name = "rstar"
 required-features = ["rstar"]
-doc-scrape-examples = true
-
-[[example]]
-name = "rstared"
-required-features = ["rstared"]
 doc-scrape-examples = true
 
 [[example]]

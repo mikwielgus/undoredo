@@ -25,6 +25,9 @@ mod std_hashmap;
 #[path = "std/hashset.rs"]
 mod std_hashset;
 
+#[path = "std/arc.rs"]
+mod std_arc;
+
 #[cfg(feature = "indexmap")]
 #[path = "indexmap/indexmap.rs"]
 mod indexmap_indexmap;

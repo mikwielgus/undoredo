@@ -17,6 +17,8 @@ use core::hash::Hash;
 use core::marker::PhantomData;
 #[cfg(feature = "std")]
 use std::collections::{HashMap, HashSet};
+#[cfg(feature = "std")]
+use std::sync::Arc;
 
 #[cfg(feature = "indexmap")]
 use indexmap::{IndexMap, IndexSet};
@@ -457,6 +459,19 @@ impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Box<V> {
 }
 
 impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Rc<V> {
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        let (_removed, inserted) = delta.dissolve();
+
+        for (inserted_key, inserted_value) in inserted.into_iter() {
+            Set::set(self, inserted_key, inserted_value);
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Arc<V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         let (_removed, inserted) = delta.dissolve();

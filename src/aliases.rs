@@ -224,6 +224,15 @@ pub type RcHalfDelta<V> = BTreeMap<usize, V>;
 /// Delta for `Rc<V>`. Alias for `Delta<RcHalfDelta<V>>`.
 pub type RcDelta<V> = Delta<RcHalfDelta<V>>;
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+/// Half-delta for `Arc<V>`. Alias for `BTreeMap<usize, V>`.
+pub type ArcHalfDelta<V> = BTreeMap<usize, V>;
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+/// Delta for `Arc<V>`. Alias for `Delta<ArcHalfDelta<V>>`.
+pub type ArcDelta<V> = Delta<ArcHalfDelta<V>>;
+
 /// Half-delta for `PhantomData<V>`. Alias for `BTreeMap<usize, ()>`.
 pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
 /// Delta for `PhantomData<V>`. Alias for `Delta<PhantomDataHalfDelta>`.

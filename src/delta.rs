@@ -4,7 +4,7 @@
 
 use alloc::{
     boxed::Box,
-    collections::{BTreeMap, BTreeSet},
+    collections::{BTreeMap, BTreeSet, VecDeque},
     rc::Rc,
     vec::Vec,
 };
@@ -262,6 +262,16 @@ where
 }
 
 impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for Vec<V>
+where
+    DC::IntoIter: DoubleEndedIterator,
+{
+    #[inline]
+    fn apply_delta(&mut self, delta: Delta<DC>) {
+        apply_delta_on_vec(self, delta);
+    }
+}
+
+impl<V: Clone, DC: Clone + IntoIter<usize, Value = V>> ApplyDelta<DC> for VecDeque<V>
 where
     DC::IntoIter: DoubleEndedIterator,
 {

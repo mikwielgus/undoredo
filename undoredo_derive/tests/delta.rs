@@ -9,14 +9,14 @@
 #![allow(dead_code)]
 
 use std::boxed::Box;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 use std::sync::Arc;
 
 use maplike::ops::Assign;
 use undoredo::aliases::{
     ArcHalfDelta, BTreeMapHalfDelta, BTreeSetHalfDelta, BoxHalfDelta, HashMapHalfDelta,
-    HashSetHalfDelta, OptionHalfDelta, RcHalfDelta, VecHalfDelta,
+    HashSetHalfDelta, OptionHalfDelta, RcHalfDelta, VecDequeHalfDelta, VecHalfDelta,
 };
 use undoredo::{ApplyDelta, Delta, Recorder, ResetDelta};
 
@@ -34,6 +34,7 @@ pub struct TestStruct {
     rc: Recorder<Rc<i32>>,
     arc: Recorder<Arc<i32>>,
     vec: Recorder<Vec<i32>>,
+    vecdeque: Recorder<VecDeque<i32>>,
 }
 
 #[test]
@@ -49,6 +50,7 @@ fn test_struct_delta() {
             rc: RcHalfDelta::new(),
             arc: ArcHalfDelta::new(),
             vec: VecHalfDelta::new(),
+            vecdeque: VecDequeHalfDelta::new(),
         },
         TestStructHalfDelta {
             hashmap: HashMapHalfDelta::new(),
@@ -60,6 +62,7 @@ fn test_struct_delta() {
             rc: RcHalfDelta::new(),
             arc: ArcHalfDelta::new(),
             vec: VecHalfDelta::new(),
+            vecdeque: VecDequeHalfDelta::new(),
         },
     );
 }
@@ -76,6 +79,7 @@ fn test_delta_derive_struct() {
         rc: Recorder::new(Rc::new(1)),
         arc: Recorder::new(Arc::new(1)),
         vec: Recorder::new(vec![1, 2, 3]),
+        vecdeque: Recorder::new(VecDeque::from([1, 2, 3])),
     };
 
     let d = TestStructDelta::with_removed_inserted(
@@ -89,6 +93,7 @@ fn test_delta_derive_struct() {
             rc: RcHalfDelta::new(),
             arc: ArcHalfDelta::new(),
             vec: VecHalfDelta::from([(2, 3)]),
+            vecdeque: VecDequeHalfDelta::new(),
         },
         TestStructHalfDelta {
             hashmap: HashMapHalfDelta::new(),
@@ -100,6 +105,7 @@ fn test_delta_derive_struct() {
             rc: RcHalfDelta::new(),
             arc: ArcHalfDelta::new(),
             vec: VecHalfDelta::from([(2, 7)]),
+            vecdeque: VecDequeHalfDelta::new(),
         },
     );
     s.apply_delta(d);
@@ -119,6 +125,7 @@ fn test_delta_derive_struct_provides_reset_delta() {
         rc: Recorder::new(Rc::new(1)),
         arc: Recorder::new(Arc::new(1)),
         vec: Recorder::new(vec![1, 2, 3]),
+        vecdeque: Recorder::new(VecDeque::from([1, 2, 3])),
     };
 
     s.vec.set(2, 7);

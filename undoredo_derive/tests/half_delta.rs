@@ -9,13 +9,13 @@
 #![allow(dead_code)]
 
 use std::boxed::Box;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 use std::sync::Arc;
 
 use undoredo::aliases::{
     ArcHalfDelta, BTreeMapHalfDelta, BTreeSetHalfDelta, BoxHalfDelta, HashMapHalfDelta,
-    HashSetHalfDelta, OptionHalfDelta, RcHalfDelta, VecHalfDelta,
+    HashSetHalfDelta, OptionHalfDelta, RcHalfDelta, VecDequeHalfDelta, VecHalfDelta,
 };
 use undoredo::{HalfDelta, Recorder};
 
@@ -32,6 +32,7 @@ pub struct TestStruct {
     rc: Recorder<Rc<i32>>,
     arc: Recorder<Arc<i32>>,
     vec: Recorder<Vec<i32>>,
+    vecdeque: Recorder<VecDeque<i32>>,
 }
 
 #[test]
@@ -46,5 +47,6 @@ fn test_struct_half_delta() {
         rc: RcHalfDelta::new(),
         arc: ArcHalfDelta::new(),
         vec: VecHalfDelta::new(),
+        vecdeque: VecDequeHalfDelta::new(),
     };
 }

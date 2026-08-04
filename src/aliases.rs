@@ -20,6 +20,11 @@ pub type VecHalfDelta<V> = BTreeMap<usize, V>;
 /// Delta for `Vec<V>`. Alias for `Delta<VecHalfDelta<V>>`.
 pub type VecDelta<V> = Delta<VecHalfDelta<V>>;
 
+/// Half-delta for `VecDeque<V>`. Alias for `BTreeMap<usize, V>`.
+pub type VecDequeHalfDelta<V> = BTreeMap<usize, V>;
+/// Delta for `VecDeque<V>`. Alias for `Delta<VecDequeHalfDelta<V>>`.
+pub type VecDequeDelta<V> = Delta<VecDequeHalfDelta<V>>;
+
 /// Half-delta for `BTreeMap<K, V>`. Alias for `BTreeMap<K, V>`.
 pub type BTreeMapHalfDelta<K, V> = BTreeMap<K, V>;
 /// Delta for `BTreeMap<K, V>`. Alias for `Delta<BTreeMapHalfDelta<K, V>>`.

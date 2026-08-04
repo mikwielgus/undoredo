@@ -13,6 +13,9 @@ mod alloc_btreeset;
 #[path = "alloc/vec.rs"]
 mod alloc_vec;
 
+#[path = "alloc/vecdeque.rs"]
+mod alloc_vecdeque;
+
 #[path = "alloc/boxed.rs"]
 mod alloc_boxed;
 

@@ -14,6 +14,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["undo", "redo", "no_std"]
 categories = ["data-structures", "gui", "no-std", "rust-patterns"]
 edition = "2024"
+rust-version = "1.92"
 
 [lib]
 proc-macro = true

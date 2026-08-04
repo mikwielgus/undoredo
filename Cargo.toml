@@ -17,6 +17,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["delta", "diff", "undo", "redo", "no_std"]
 categories = ["gui", "compression", "data-structures", "no-std", "rust-patterns"]
 edition = "2024"
+rust-version = "1.92"
 
 [badges]
 maintenance = { status = "actively-developed" }

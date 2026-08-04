@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 [![Repository](https://img.shields.io/badge/repository-GitHub-0FBF3E)](https://github.com/mikwielgus/undoredo)
 [![Docs](https://docs.rs/undoredo/badge.svg)](https://docs.rs/undoredo/)
 [![Crates.io](https://img.shields.io/crates/v/undoredo.svg)](https://crates.io/crates/undoredo)
+[![MSRV](https://img.shields.io/crates/msrv/undoredo.svg)](https://blog.rust-lang.org/2025/12/11/Rust-1.92.0/)
 [![MIT OR Apache 2.0](https://img.shields.io/crates/l/undoredo.svg)](#licence)
 
 # undoredo

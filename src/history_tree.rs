@@ -29,16 +29,42 @@ impl HistoryTreeNodeId {
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
-    pub cmd_edit: CmdEdit<Cmd, E>,
+    cmd_edit: CmdEdit<Cmd, E>,
     /// Parent node id.
-    pub parent: HistoryTreeNodeId,
+    parent: HistoryTreeNodeId,
     /// Child node ids.
-    pub children: Vec<HistoryTreeNodeId>,
-    /// Node depth in the tree. Root has depth `0`.
-    pub depth: u64,
+    children: Vec<HistoryTreeNodeId>,
+    /// Depth of this node in the tree. Root has depth `0`.
+    depth: u64,
 }
 
-/// A cursor that points to a node and owns the edited container.
+impl<E, Cmd> HistoryTreeNode<E, Cmd> {
+    /// Returns command metadata together with the recorded edit at this node.
+    #[inline]
+    pub fn cmd_edit(&self) -> &CmdEdit<Cmd, E> {
+        &self.cmd_edit
+    }
+
+    /// Returns parent node id.
+    #[inline]
+    pub fn parent(&self) -> HistoryTreeNodeId {
+        self.parent
+    }
+
+    /// Returns child node ids.
+    #[inline]
+    pub fn children(&self) -> &[HistoryTreeNodeId] {
+        &self.children
+    }
+
+    /// Returns depth of this node in the tree. Root has depth `0`.
+    #[inline]
+    pub fn depth(&self) -> u64 {
+        self.depth
+    }
+}
+
+/// A cursor that points to a node and owns the container subject to editing.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTreeCursor<C> {
     curr_node: HistoryTreeNodeId,
@@ -100,6 +126,12 @@ impl<Cmd: Default, E: Default> HistoryTree<E, Cmd> {
 }
 
 impl<Cmd, E> HistoryTree<E, Cmd> {
+    /// Returns an immutable reference to the node with the given id.
+    #[inline]
+    pub fn node(&self, id: HistoryTreeNodeId) -> &HistoryTreeNode<E, Cmd> {
+        &self.nodes[id.index()]
+    }
+
     /// Creates a new cursor to the root that owns the target container.
     #[inline]
     pub fn root_cursor<T>(&self, target: T) -> HistoryTreeCursor<T> {

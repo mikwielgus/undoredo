@@ -122,6 +122,11 @@ required-features = ["std", "derive"]
 doc-scrape-examples = true
 
 [[example]]
+name = "history_tree"
+required-features = ["std"]
+doc-scrape-examples = true
+
+[[example]]
 name = "rstar"
 required-features = ["rstar"]
 doc-scrape-examples = true

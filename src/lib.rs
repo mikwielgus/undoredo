@@ -24,13 +24,17 @@ mod delta;
 mod edit;
 mod history_tree;
 mod recorder;
+mod shared_history_tree;
 mod snapshot;
 mod undoredo;
 
 pub use crate::delta::*;
 pub use crate::edit::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
-pub use crate::history_tree::{HistoryTree, HistoryTreeCursor, HistoryTreeNode, HistoryTreeNodeId};
+pub use crate::history_tree::{HistoryTree, HistoryTreeNode, HistoryTreeNodeId};
 pub use crate::recorder::{ExtendDelta, FlushDelta, Recorder, ResetDelta};
+pub use crate::shared_history_tree::{
+    SharedHistoryTree, SharedHistoryTreeCursor, SharedHistoryTreeNode, SharedHistoryTreeNodeId,
+};
 pub use crate::snapshot::Snapshot;
 pub use crate::undoredo::UndoRedo;
 pub use maplike;

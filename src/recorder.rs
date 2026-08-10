@@ -441,11 +441,10 @@ where
     }
 }
 
-impl<K, V, C, DC> Pop for Recorder<C, DC>
+impl<V, C, DC> Pop for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Len + Pop,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
-    K: Clone,
+    C: Container<Key = usize, Value = V> + Len + Pop,
+    DC: Container<Key = usize, Value = V> + Insert<usize> + Remove<usize, Output = Option<V>>,
     V: Clone,
 {
     #[inline]
@@ -454,11 +453,10 @@ where
     }
 }
 
-impl<K, V, C, DC> Recorder<C, DC>
+impl<V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Len + Pop,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
-    K: Clone,
+    C: Container<Key = usize, Value = V> + Len + Pop,
+    DC: Container<Key = usize, Value = V> + Insert<usize> + Remove<usize, Output = Option<V>>,
     V: Clone,
 {
     /// Insert a value into the container without specifying a key, returning
@@ -509,7 +507,7 @@ where
     DC: Container,
 {
     #[inline]
-    fn len(&self) -> C::Key {
+    fn len(&self) -> usize {
         self.len()
     }
 }
@@ -521,7 +519,7 @@ where
 {
     /// Returns the length of the container.
     #[inline]
-    fn len(&self) -> C::Key {
+    fn len(&self) -> usize {
         self.container.len()
     }
 }

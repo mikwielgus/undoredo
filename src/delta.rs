@@ -230,7 +230,7 @@ where
 fn apply_delta_on_vec<V, C, DC>(container: &mut C, delta: Delta<DC>)
 where
     V: Clone,
-    C: Pop<Value = V> + Push<usize, Value = V> + Set<usize, Value = V> + Len<Key = usize> + Resize,
+    C: Pop<Value = V> + Push<usize, Value = V> + Set<usize, Value = V> + Len + Resize,
     DC: Clone + IntoIter<usize, Value = V>,
     DC::IntoIter: DoubleEndedIterator,
 {

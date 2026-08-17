@@ -61,7 +61,7 @@ tinyvec = ["dep:tinyvec", "maplike/tinyvec"]
 bidimap = { version = "0.7", optional = true }
 document-features = { version = "0.2", optional = true }
 indexmap = { version = "2.14", optional = true }
-maplike = { version = "0.13", default-features = false, features = ["alloc", "derive"] }
+maplike = { version = "0.14", default-features = false, features = ["alloc", "derive"] }
 rstar = { version = "0.13", optional = true }
 rstared = { version = "0.13", optional = true }
 serde = { version = "1.0", optional = true, default-features = false, features = ["derive", "alloc"] }

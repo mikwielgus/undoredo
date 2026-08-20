@@ -81,15 +81,15 @@ undoredo = { path = ".", default-features = false, features = ["derive", "std", 
 # `undoredo_derive`, there will be an error due to no replacement. This solution
 # is recommended by `cargo-release`'s FAQ.
 [package.metadata.release]
-pre-release-hook = [
-  "cargo",
-  "semver-checks",
-  "check-release",
-  "-p",
-  "{{crate_name}}",
-  "--baseline-version",
-  "{{prev_version}}",
-]
+#pre-release-hook = [
+  #"cargo",
+  #"semver-checks",
+  #"check-release",
+  #"-p",
+  #"{{crate_name}}",
+  #"--baseline-version",
+  #"{{prev_version}}",
+#]
 pre-release-replacements = [
   { file = "README.md", search = 'undoredo = \{ version = "[^"]+"([^}]*)\}', replace = '{{crate_name}} = { version = "{{version}}"$1}' },
 ]

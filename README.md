@@ -90,7 +90,7 @@ First, add `undoredo` as a dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-undoredo = { version = "0.14.0", features = ["derive"] }
+undoredo = { version = "0.14.1", features = ["derive"] }
 ```
 
 The `derive` feature flag is only required when using deltas on custom `struct`
@@ -461,7 +461,7 @@ implementations, write
 
 ```toml
 [dependencies]
-undoredo = { version = "0.14.0", features = ["bidimap", "indexmap", "rstar", "stable-vec", "thunderdome", "tinyvec"] }
+undoredo = { version = "0.14.1", features = ["bidimap", "indexmap", "rstar", "stable-vec", "thunderdome", "tinyvec"] }
 ```
 
 #### Custom types

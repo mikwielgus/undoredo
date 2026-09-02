@@ -286,7 +286,6 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "bidimap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "bidimap")))]
 impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
     for BiBTreeMap<L, R>
 {
@@ -477,7 +476,6 @@ impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Rc<V> {
 }
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Arc<V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -497,7 +495,6 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for HashMap<K, V>
 {
@@ -508,7 +505,6 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(all(feature = "bidimap", feature = "std"))]
-#[cfg_attr(docsrs, doc(cfg(all(feature = "bidimap", feature = "std"))))]
 impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
     for BiHashMap<L, R>
 {
@@ -527,7 +523,6 @@ impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>
 }
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -536,7 +531,6 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
     for IndexMap<K, V>
 {
@@ -547,7 +541,6 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for IndexSet<K>
 {
@@ -558,7 +551,6 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "rstar")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
     for RTree<K>
 {
@@ -569,7 +561,6 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 }
 
 #[cfg(feature = "stable-vec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
     ApplyDelta<DC> for StableVecFacade<V, C>
 {
@@ -580,7 +571,6 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
-#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
@@ -589,7 +579,6 @@ impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 impl<A: Array, DC: Clone + IntoIter<usize, Value = A::Item>> ApplyDelta<DC> for ArrayVec<A>
 where
     A::Item: Clone,
@@ -602,7 +591,6 @@ where
 }
 
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 impl<A: Array, DC: Clone + IntoIter<usize, Value = A::Item>> ApplyDelta<DC> for TinyVec<A>
 where
     A::Item: Clone,

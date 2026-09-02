@@ -230,11 +230,9 @@ pub type RcHalfDelta<V> = BTreeMap<usize, V>;
 pub type RcDelta<V> = Delta<RcHalfDelta<V>>;
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Half-delta for `Arc<V>`. Alias for `BTreeMap<usize, V>`.
 pub type ArcHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Delta for `Arc<V>`. Alias for `Delta<ArcHalfDelta<V>>`.
 pub type ArcDelta<V> = Delta<ArcHalfDelta<V>>;
 
@@ -244,100 +242,78 @@ pub type PhantomDataHalfDelta = BTreeMap<usize, ()>;
 pub type PhantomDataDelta = Delta<PhantomDataHalfDelta>;
 
 #[cfg(feature = "thunderdome")]
-#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 /// Half-delta for `Arena<V>`. Alias for `BTreeMap<Index, V>`.
 pub type ArenaHalfDelta<V> = BTreeMap<Index, V>;
 #[cfg(feature = "thunderdome")]
-#[cfg_attr(docsrs, doc(cfg(feature = "thunderdome")))]
 /// Delta for `Arena<V>`. Alias for `Delta<ArenaHalfDelta<V>>`.
 pub type ArenaDelta<V> = Delta<ArenaHalfDelta<V>>;
 
 #[cfg(feature = "bidimap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "bidimap")))]
 /// Half-delta for `BiBTreeMap<L, R>`. Alias for `BTreeMap<L, R>`.
 pub type BiBTreeMapHalfDelta<L, R> = BTreeMap<L, R>;
 #[cfg(feature = "bidimap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "bidimap")))]
 /// Delta for `BiBTreeMap<L, R>`. Alias for `Delta<BiBTreeMapHalfDelta<L, R>>`.
 pub type BiBTreeMapDelta<L, R> = Delta<BiBTreeMapHalfDelta<L, R>>;
 
 #[cfg(all(feature = "bidimap", feature = "std"))]
-#[cfg_attr(docsrs, doc(cfg(all(feature = "bidimap", feature = "std"))))]
 /// Half-delta for `BiHashMap<L, R>`. Alias for `HashMap<L, R>`.
 pub type BiHashMapHalfDelta<L, R> = HashMap<L, R>;
 #[cfg(all(feature = "bidimap", feature = "std"))]
-#[cfg_attr(docsrs, doc(cfg(all(feature = "bidimap", feature = "std"))))]
 /// Delta for `BiHashMap<L, R>`. Alias for `Delta<BiHashMapHalfDelta<L, R>>`.
 pub type BiHashMapDelta<L, R> = Delta<BiHashMapHalfDelta<L, R>>;
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Half-delta for `HashMap<K, V>`. Alias for `HashMap<K, V>`.
 pub type HashMapHalfDelta<K, V> = HashMap<K, V>;
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Delta for `HashMap<K, V>`. Alias for `Delta<HashMapHalfDelta<K, V>>`.
 pub type HashMapDelta<K, V> = Delta<HashMapHalfDelta<K, V>>;
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Half-delta for `HashSet<K>`. Alias for `HashMap<K, ()>`.
 pub type HashSetHalfDelta<K> = HashMap<K, ()>;
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 /// Delta for `HashSet<K>`. Alias for `Delta<HashSetHalfDelta<K>>`.
 pub type HashSetDelta<K> = Delta<HashSetHalfDelta<K>>;
 
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 /// Half-delta for `IndexMap<K, V>`. Alias for `IndexMap<K, V>`.
 pub type IndexMapHalfDelta<K, V> = IndexMap<K, V>;
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 /// Delta for `IndexMap<K, V>`. Alias for `Delta<IndexMapHalfDelta<K, V>>`.
 pub type IndexMapDelta<K, V> = Delta<IndexMapHalfDelta<K, V>>;
 
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 /// Half-delta for `IndexSet<K>`. Alias for `IndexMap<K, ()>`.
 pub type IndexSetHalfDelta<K> = IndexMap<K, ()>;
 #[cfg(feature = "indexmap")]
-#[cfg_attr(docsrs, doc(cfg(feature = "indexmap")))]
 /// Delta for `IndexSet<K>`. Alias for `Delta<IndexSetHalfDelta<K>>`.
 pub type IndexSetDelta<K> = Delta<IndexSetHalfDelta<K>>;
 
 #[cfg(feature = "rstar")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 /// Half-delta for `RTree<K>`. Alias for `BTreeMap<K, ()>`.
 pub type RTreeHalfDelta<K> = BTreeMap<K, ()>;
 #[cfg(feature = "rstar")]
-#[cfg_attr(docsrs, doc(cfg(feature = "rstar")))]
 /// Delta for `RTree<K>`. Alias for `Delta<RTreeHalfDelta<K>>`.
 pub type RTreeDelta<K> = Delta<RTreeHalfDelta<K>>;
 
 #[cfg(feature = "stable-vec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Half-delta for `StableVec<V>`. Alias for `BTreeMap<usize, V>`.
 pub type StableVecHalfDelta<V> = BTreeMap<usize, V>;
 #[cfg(feature = "stable-vec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "stable-vec")))]
 /// Delta for `StableVec<V>`. Alias for `Delta<StableVecHalfDelta<V>>`.
 pub type StableVecDelta<V> = Delta<StableVecHalfDelta<V>>;
 
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 /// Half-delta for `ArrayVec<A>`. Alias for `BTreeMap<usize, A::Item>`.
 pub type ArrayVecHalfDelta<A> = BTreeMap<usize, <A as tinyvec::Array>::Item>;
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 /// Delta for `ArrayVec<A>`. Alias for `Delta<ArrayVecHalfDelta<A>>`.
 pub type ArrayVecDelta<A> = Delta<ArrayVecHalfDelta<A>>;
 
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 /// Half-delta for `TinyVec<A>`. Alias for `BTreeMap<usize, A::Item>`.
 pub type TinyVecHalfDelta<A> = BTreeMap<usize, <A as tinyvec::Array>::Item>;
 #[cfg(feature = "tinyvec")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tinyvec")))]
 /// Delta for `TinyVec<A>`. Alias for `Delta<TinyVecHalfDelta<A>>`.
 pub type TinyVecDelta<A> = Delta<TinyVecHalfDelta<A>>;

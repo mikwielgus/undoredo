@@ -40,23 +40,16 @@ pub use crate::undoredo::UndoRedo;
 pub use maplike;
 
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::ApplyDelta;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::Delta;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::ExtendDelta;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::FlushDelta;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::HalfDelta;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::MergeDeltas;
 #[cfg(feature = "derive")]
-#[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
 pub use undoredo_derive::ResetDelta;

@@ -17,23 +17,16 @@ arbitrary data structures by automatically recording sparse deltas (aka.
 *diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
 pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These edits can then
 be stored in linear undo-redo bistack or non-linear history tree provided by
-the library. Alternatively, the sparse deltas can be also sent across a computer
-network in packets as a form of delta encoding.
+the library. (Alternatively, the sparse deltas can be also sent across a computer
+network in packets as a form of delta encoding.)
 
-For Undo/Redo, this approach is much easier than the commonly used [Command
+This approach is much easier than the commonly used [Command
 pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
 of operation of many other Undo/Redo crates, as having to implement commands
 requires maintenance of additional application logic that is often complicated
 and can lead to elusive bugs. But if needed, `undoredo` can also store a command
 or other metadata along with every edit, allowing for easy use of the Command
 pattern as well.
-
-In networking applications, the recorded deltas can also be used for
-delta encoding (delta compression): you can cut needed network bandwidth
-by sending them across network instead of snapshots. Even better, this is
-differencing-free: you don't have to compute one costly difference upon packet
-transmission; the cost is spread incrementally as recorded deltas are gradually
-and automatically constructed during each operation on data.
 
 Delta recording requires creating a separate delta edit type for each
 data structure. For ease of use, `undoredo` has derive macro
@@ -379,6 +372,15 @@ tree. We provide a data structure for that purpose,
 See
 [examples/history_tree.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/history_tree.rs)
 for an example of its usage.
+
+#### Delta compression over network
+
+In networking applications, the recorded deltas can also be used for
+delta encoding (delta compression): you can cut needed network bandwidth
+by sending them across network instead of snapshots. Even better, this is
+differencing-free: you don't have to compute one costly difference upon packet
+transmission; the cost is spread incrementally as recorded deltas are gradually
+and automatically constructed during each operation on data.
 
 ## Supported containers
 

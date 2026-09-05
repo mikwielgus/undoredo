@@ -7,7 +7,7 @@ members = [".", "undoredo_derive"]
 
 [package]
 name = "undoredo"
-version = "0.14.1"
+version = "0.15.0"
 authors = ["Mikolaj Wielgus <wielgusmikolaj@gmail.com>"]
 description = "Undo/Redo (and delta encoding) in Rust using deltas, snapshots or commands with convenience implementations for many standard and third-party types."
 repository = "https://github.com/mikwielgus/undoredo"
@@ -63,7 +63,7 @@ serde = { version = "1.0", optional = true, default-features = false, features =
 stable-vec = { version = "0.4", optional = true }
 thunderdome = { version = "0.6", optional = true }
 tinyvec = { version = "1", features = ["alloc"], optional = true }
-undoredo_derive = { version = "0.14", optional = true, path = "undoredo_derive" }
+undoredo_derive = { version = "0.15", optional = true, path = "undoredo_derive" }
 
 [dev-dependencies]
 indexmap = "2.14"

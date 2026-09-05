@@ -8,7 +8,7 @@ use alloc::{
     rc::Rc,
     vec::Vec,
 };
-use maplike::containers::Container;
+use maplike::abc::Keyed;
 use maplike::iter::IntoIter;
 use maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Resize, Set};
 
@@ -101,11 +101,7 @@ pub trait MergeDeltas<DC> {
 #[inline]
 fn merge_map_delta<K, V, M>(self_delta: Delta<M>, other: Delta<M>) -> Delta<M>
 where
-    M: Container<Key = K, Value = V>
-        + IntoIter<K>
-        + Get<K>
-        + Insert<K>
-        + Remove<K, Output = Option<V>>,
+    M: Keyed<Value = V, Key = K> + IntoIter<K> + Get<K> + Insert<K> + Remove<K, Output = Option<V>>,
 {
     let (mut self_removed, mut self_inserted) = self_delta.dissolve();
     let (other_removed, other_inserted) = other.dissolve();
@@ -209,8 +205,8 @@ pub trait ApplyDelta<DC> {
 #[inline]
 fn apply_delta_on_map<K, C, DC>(container: &mut C, delta: Delta<DC>)
 where
-    C: Container<Key = K> + Insert<K> + Remove<K>,
-    DC: IntoIter<K> + Container<Key = K, Value = C::Value>,
+    C: Keyed<Key = K> + Insert<K> + Remove<K>,
+    DC: IntoIter<K> + Keyed<Value = C::Value, Key = K>,
 {
     let (removed, inserted) = delta.dissolve();
 
@@ -278,7 +274,7 @@ where
     }
 }
 
-impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> for BTreeMap<K, V> {
+impl<K: Ord, V, DC: IntoIter<K> + Keyed<Value = V, Key = K>> ApplyDelta<DC> for BTreeMap<K, V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -286,7 +282,7 @@ impl<K: Ord, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC> 
 }
 
 #[cfg(feature = "bidimap")]
-impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
+impl<L: Ord, R: Ord, DC: IntoIter<L> + Keyed<Value = R, Key = L>> ApplyDelta<DC>
     for BiBTreeMap<L, R>
 {
     #[inline]
@@ -303,7 +299,7 @@ impl<L: Ord, R: Ord, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta
     }
 }
 
-impl<K: Ord, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for BTreeSet<K> {
+impl<K: Ord, DC: IntoIter<K> + Keyed<Value = (), Key = K>> ApplyDelta<DC> for BTreeSet<K> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -495,7 +491,7 @@ impl<V, DC> ApplyDelta<DC> for PhantomData<V> {
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Eq + Hash, V, DC: IntoIter<K> + Keyed<Value = V, Key = K>> ApplyDelta<DC>
     for HashMap<K, V>
 {
     #[inline]
@@ -505,7 +501,7 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(all(feature = "bidimap", feature = "std"))]
-impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>> ApplyDelta<DC>
+impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Keyed<Value = R, Key = L>> ApplyDelta<DC>
     for BiHashMap<L, R>
 {
     #[inline]
@@ -523,7 +519,7 @@ impl<L: Eq + Hash, R: Eq + Hash, DC: IntoIter<L> + Container<Key = L, Value = R>
 }
 
 #[cfg(feature = "std")]
-impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC> for HashSet<K> {
+impl<K: Eq + Hash, DC: IntoIter<K> + Keyed<Value = (), Key = K>> ApplyDelta<DC> for HashSet<K> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -531,7 +527,7 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "indexmap")]
-impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelta<DC>
+impl<K: Eq + Hash, V, DC: IntoIter<K> + Keyed<Value = V, Key = K>> ApplyDelta<DC>
     for IndexMap<K, V>
 {
     #[inline]
@@ -541,9 +537,7 @@ impl<K: Eq + Hash, V, DC: IntoIter<K> + Container<Key = K, Value = V>> ApplyDelt
 }
 
 #[cfg(feature = "indexmap")]
-impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
-    for IndexSet<K>
-{
+impl<K: Eq + Hash, DC: IntoIter<K> + Keyed<Value = (), Key = K>> ApplyDelta<DC> for IndexSet<K> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);
@@ -551,7 +545,7 @@ impl<K: Eq + Hash, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<
 }
 
 #[cfg(feature = "rstar")]
-impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()>> ApplyDelta<DC>
+impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Keyed<Value = (), Key = K>> ApplyDelta<DC>
     for RTree<K>
 {
     #[inline]
@@ -561,7 +555,7 @@ impl<K: RTreeObject + PartialEq, DC: IntoIter<K> + Container<Key = K, Value = ()
 }
 
 #[cfg(feature = "stable-vec")]
-impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usize, Value = V>>
+impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Keyed<Value = V, Key = usize>>
     ApplyDelta<DC> for StableVecFacade<V, C>
 {
     #[inline]
@@ -571,7 +565,7 @@ impl<V, C: stable_vec::core::Core<V>, DC: IntoIter<usize> + Container<Key = usiz
 }
 
 #[cfg(feature = "thunderdome")]
-impl<V, DC: IntoIter<Index> + Container<Key = Index, Value = V>> ApplyDelta<DC> for Arena<V> {
+impl<V, DC: IntoIter<Index> + Keyed<Value = V, Key = Index>> ApplyDelta<DC> for Arena<V> {
     #[inline]
     fn apply_delta(&mut self, delta: Delta<DC>) {
         apply_delta_on_map(self, delta);

@@ -7,7 +7,7 @@ use core::borrow::Borrow;
 use core::marker::PhantomData;
 use core::ops::Index;
 
-use maplike::containers::Container;
+use maplike::abc::{Container, Keyed};
 use maplike::iter::{IntoIter, IntoValues, Iter, Values};
 use maplike::ops::{
     Assign, Clear, Get, GetByLeft, GetByRight, Insert, Len, Modify, Pop, Push, Remove,
@@ -20,22 +20,19 @@ use crate::{ApplyDelta, MergeDeltas, delta::Delta};
 /// reverted.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
-pub struct Recorder<
-    C: Container,
-    DC: Container = BTreeMap<<C as Container>::Key, <C as Container>::Value>,
-> {
+pub struct Recorder<C: Keyed, DC: Keyed = BTreeMap<<C as Keyed>::Key, <C as Container>::Value>> {
     container: C,
     delta: Delta<DC>,
 }
 
-impl<C: Container, DC: Container> AsRef<C> for Recorder<C, DC> {
+impl<C: Keyed, DC: Keyed> AsRef<C> for Recorder<C, DC> {
     #[inline]
     fn as_ref(&self) -> &C {
         &self.container
     }
 }
 
-impl<C: Container, DC: Container + Default> Recorder<C, DC> {
+impl<C: Keyed, DC: Keyed + Default> Recorder<C, DC> {
     /// Create a new recorder recording changes to an owned container.
     #[inline]
     pub fn new(container: C) -> Self {
@@ -43,7 +40,7 @@ impl<C: Container, DC: Container + Default> Recorder<C, DC> {
     }
 }
 
-impl<C: Container, DC: Container> Recorder<C, DC> {
+impl<C: Keyed, DC: Keyed> Recorder<C, DC> {
     /// Create a new recorder recording changes to an owned container, storing
     /// them in an already existing delta.
     #[inline]
@@ -65,15 +62,18 @@ impl<C: Container, DC: Container> Recorder<C, DC> {
     }
 }
 
-impl<C: Container, DC: Container> Container for Recorder<C, DC> {
-    type Key = C::Key;
+impl<C: Keyed, DC: Keyed> Container for Recorder<C, DC> {
     type Value = C::Value;
+}
+
+impl<C: Keyed, DC: Keyed> Keyed for Recorder<C, DC> {
+    type Key = C::Key;
 }
 
 impl<C, DC> Assign<C> for Recorder<C, DC>
 where
-    C: Assign + Clone,
-    DC: Get<usize, Value = C> + Set<usize>,
+    C: Assign + Clone + Keyed,
+    DC: Get<usize, Value = C> + Set<usize> + Keyed,
 {
     #[inline]
     fn assign(&mut self, value: C) {
@@ -83,8 +83,8 @@ where
 
 impl<C, DC> Recorder<C, DC>
 where
-    C: Assign + Clone,
-    DC: Get<usize, Value = C> + Set<usize>,
+    C: Assign + Clone + Keyed,
+    DC: Get<usize, Value = C> + Set<usize> + Keyed,
 {
     /// Assign a new value to `*self`.
     #[inline]
@@ -98,11 +98,10 @@ where
     }
 }
 
-impl<K, Q: ?Sized, C, DC> Get<K, Q> for Recorder<C, DC>
+impl<Q: ?Sized, C, DC> Get<Q> for Recorder<C, DC>
 where
-    K: Borrow<Q>,
-    C: Get<K, Q, Key = K>,
-    DC: Container,
+    C: Get<Q> + Keyed,
+    DC: Keyed,
 {
     #[inline]
     fn get(&self, key: &Q) -> Option<&C::Value> {
@@ -112,8 +111,8 @@ where
 
 impl<K, C, DC> Recorder<C, DC>
 where
-    C: Get<K, Key = K>,
-    DC: Container,
+    C: Keyed<Key = K> + Get<K>,
+    DC: Keyed,
 {
     /// Returns a reference to the value corresponding to the key.
     #[inline]
@@ -122,11 +121,11 @@ where
     }
 }
 
-impl<K, Q: ?Sized, V, C, DC> GetByLeft<K, Q> for Recorder<C, DC>
+impl<Q: ?Sized, K, V, C, DC> GetByLeft<Q> for Recorder<C, DC>
 where
     K: Borrow<Q>,
-    C: Container<Key = K, Value = V> + GetByLeft<K, Q>,
-    DC: Container,
+    C: Keyed<Value = V, Key = K> + GetByLeft<Q>,
+    DC: Keyed,
 {
     #[inline]
     fn get_by_left(&self, key: &Q) -> Option<&C::Value> {
@@ -136,8 +135,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + GetByLeft<K>,
-    DC: Container,
+    C: Keyed<Value = V, Key = K> + GetByLeft<K>,
+    DC: Keyed,
 {
     /// Returns a reference to the right value corresponding to the given left
     /// value in a bidirectional map.
@@ -150,8 +149,8 @@ where
 impl<K, V, Q: ?Sized, C, DC> GetByRight<K, Q> for Recorder<C, DC>
 where
     V: Borrow<Q>,
-    C: Container<Key = K, Value = V> + GetByRight<K, Q>,
-    DC: Container,
+    C: Keyed<Value = V, Key = K> + GetByRight<K, Q>,
+    DC: Keyed,
 {
     #[inline]
     fn get_by_right(&self, key: &Q) -> Option<&K> {
@@ -161,8 +160,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + GetByRight<K>,
-    DC: Container,
+    C: Keyed<Value = V, Key = K> + GetByRight<K>,
+    DC: Keyed,
 {
     /// Returns a reference to the left value corresponding to the given right
     /// value in a bidirectional map.
@@ -174,8 +173,8 @@ where
 
 impl<I, C, DC> Index<I> for Recorder<C, DC>
 where
-    C: Container + Index<I, Output = C::Value>,
-    DC: Container,
+    C: Keyed + Index<I, Output = C::Value>,
+    DC: Keyed,
 {
     type Output = C::Value;
 
@@ -187,8 +186,8 @@ where
 
 impl<K, V, C, DC> Set<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Set<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Set<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -202,8 +201,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Set<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Set<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -225,15 +224,15 @@ where
 
 impl<K, V, C, DC> Modify<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Modify<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Modify<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
     #[inline]
     fn modify<F>(&mut self, key: &K, f: F)
     where
-        F: FnOnce(&mut Self::Value),
+        F: FnMut(&mut Self::Value),
     {
         self.modify(key.clone(), f);
     }
@@ -241,8 +240,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Modify<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Modify<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -250,7 +249,7 @@ where
     #[inline]
     pub fn modify<F>(&mut self, key: K, f: F)
     where
-        F: FnOnce(&mut V),
+        F: FnMut(&mut V),
     {
         if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.container.get(&key) {
@@ -270,8 +269,8 @@ where
 
 impl<K, V, C, DC> Insert<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Insert<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -285,8 +284,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Get<K> + Insert<K>,
-    DC: Container<Key = K, Value = V> + Get<K> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
+    DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -308,8 +307,8 @@ where
 
 impl<K, V, C, DC> Remove<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Remove<K, Output = Option<V>>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + Remove<K, Output = Option<V>>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -323,8 +322,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Remove<K, Output = Option<V>>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + Remove<K, Output = Option<V>>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -344,8 +343,8 @@ where
 
 impl<K, V, C, DC> RemoveByLeft<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + RemoveByLeft<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + RemoveByLeft<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -357,8 +356,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + RemoveByLeft<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + RemoveByLeft<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -378,8 +377,8 @@ where
 
 impl<K, V, C, DC> RemoveByRight<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + RemoveByRight<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + RemoveByRight<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -391,8 +390,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + RemoveByRight<K>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Value = V, Key = K> + RemoveByRight<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
     K: Clone,
     V: Clone,
 {
@@ -412,8 +411,8 @@ where
 
 impl<K, V, C, DC> Push<K> for Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Push<K>,
-    DC: Container<Key = K, Value = V> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Push<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -425,8 +424,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = K, Value = V> + Push<K>,
-    DC: Container<Key = K, Value = V> + Insert<K>,
+    C: Keyed<Value = V, Key = K> + Push<K>,
+    DC: Keyed<Value = V, Key = K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
@@ -443,8 +442,8 @@ where
 
 impl<V, C, DC> Pop for Recorder<C, DC>
 where
-    C: Container<Key = usize, Value = V> + Len + Pop,
-    DC: Container<Key = usize, Value = V> + Insert<usize> + Remove<usize, Output = Option<V>>,
+    C: Keyed<Value = V, Key = usize> + Len + Pop,
+    DC: Keyed<Value = V, Key = usize> + Insert<usize> + Remove<usize, Output = Option<V>>,
     V: Clone,
 {
     #[inline]
@@ -455,8 +454,8 @@ where
 
 impl<V, C, DC> Recorder<C, DC>
 where
-    C: Container<Key = usize, Value = V> + Len + Pop,
-    DC: Container<Key = usize, Value = V> + Insert<usize> + Remove<usize, Output = Option<V>>,
+    C: Keyed<Value = V, Key = usize> + Len + Pop,
+    DC: Keyed<Value = V, Key = usize> + Insert<usize> + Remove<usize, Output = Option<V>>,
     V: Clone,
 {
     /// Insert a value into the container without specifying a key, returning
@@ -477,8 +476,8 @@ where
 
 impl<K, V, C, DC> Clear for Recorder<C, DC>
 where
-    C: Clear + Clone + IntoIter<K, Value = V>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Clear + Clone + IntoIter<K, Value = V> + Keyed,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
 {
     #[inline]
     fn clear(&mut self) {
@@ -488,8 +487,8 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Clear + Clone + IntoIter<K, Value = V>,
-    DC: Container<Key = K, Value = V> + Insert<K> + Remove<K, Output = Option<V>>,
+    C: Clear + Clone + IntoIter<K, Value = V> + Keyed,
+    DC: Keyed<Value = V, Key = K> + Insert<K> + Remove<K, Output = Option<V>>,
 {
     /// Remove all elements from the container.
     pub fn clear(&mut self) {
@@ -503,8 +502,8 @@ where
 
 impl<C, DC> Len for Recorder<C, DC>
 where
-    C: Len,
-    DC: Container,
+    C: Len + Keyed,
+    DC: Keyed,
 {
     #[inline]
     fn len(&self) -> usize {
@@ -514,8 +513,8 @@ where
 
 impl<C, DC> Recorder<C, DC>
 where
-    C: Len,
-    DC: Container,
+    C: Len + Keyed,
+    DC: Keyed,
 {
     /// Returns the length of the container.
     #[inline]
@@ -526,8 +525,8 @@ where
 
 impl<'a, C, DC> Values<'a> for Recorder<C, DC>
 where
-    C: Values<'a>,
-    DC: Container,
+    C: Values<'a> + Keyed,
+    DC: Keyed,
     Self: 'a,
 {
     type Values = C::Values;
@@ -540,8 +539,8 @@ where
 
 impl<C, DC> IntoValues for Recorder<C, DC>
 where
-    C: IntoValues,
-    DC: Container,
+    C: IntoValues + Keyed,
+    DC: Keyed,
 {
     type IntoValues = C::IntoValues;
 
@@ -553,8 +552,8 @@ where
 
 impl<'a, K, C, DC> Iter<'a, K> for Recorder<C, DC>
 where
-    C: Iter<'a, K>,
-    DC: Container,
+    C: Iter<'a, K> + Keyed,
+    DC: Keyed,
     Self: 'a,
 {
     type Iter = C::Iter;
@@ -567,8 +566,8 @@ where
 
 impl<K, C, DC> IntoIter<K> for Recorder<C, DC>
 where
-    C: IntoIter<K>,
-    DC: Container,
+    C: IntoIter<K> + Keyed,
+    DC: Keyed,
 {
     type IntoIter = C::IntoIter;
 
@@ -584,7 +583,7 @@ where
 /*impl<K, C, DC> Recorder<C, DC>
 where
     C: IntoIter<K>,
-    DC: Container,
+    DC: Keyed,
 {
     #[inline]
     pub fn into_iter(self) -> C::IntoIter {
@@ -593,9 +592,9 @@ where
 }*/
 
 impl<
-    C: Container + ApplyDelta<DC>,
-    RDC: Container,
-    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
+    C: Keyed + ApplyDelta<DC>,
+    RDC: Keyed,
+    DC: IntoIter<C::Key> + Keyed<Value = C::Value, Key = C::Key>,
 > ApplyDelta<DC> for Recorder<C, RDC>
 {
     #[inline]
@@ -607,12 +606,12 @@ impl<
 // This won't compile because K is unconstrained type parameter.
 //
 /*impl<
-    C: Container + ApplyDelta<DC>,
-    RDC: Container,
-    DC: Clone + IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
+    C: Keyed + ApplyDelta<DC>,
+    RDC: Keyed,
+    DC: Clone + IntoIter<C::Key> + Keyed<Value = C::Value, Key = C::Key>,
 > Recorder<C, RDC>
 where
-    Self: Container<Key = C::Key, Value = C::Value> + Insert<C::Key> + Remove<C::Key>,
+    Self: Keyed<Value = C::Value, Key = C::Key> + Insert<C::Key> + Remove<C::Key>,
 {
     #[inline]
     pub fn apply_delta(&mut self, delta: &Delta<DC>) {
@@ -628,10 +627,8 @@ pub trait ExtendDelta<DC> {
     fn extend_delta(&mut self, delta: Delta<DC>);
 }
 
-impl<
-    C: Container + ApplyDelta<DC>,
-    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
-> ExtendDelta<DC> for Recorder<C, DC>
+impl<C: Keyed + ApplyDelta<DC>, DC: IntoIter<C::Key> + Keyed<Value = C::Value, Key = C::Key>>
+    ExtendDelta<DC> for Recorder<C, DC>
 where
     Delta<DC>: Clone + Default + MergeDeltas<DC>,
 {
@@ -641,10 +638,8 @@ where
     }
 }
 
-impl<
-    C: Container + ApplyDelta<DC>,
-    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value>,
-> Recorder<C, DC>
+impl<C: Keyed + ApplyDelta<DC>, DC: IntoIter<C::Key> + Keyed<Value = C::Value, Key = C::Key>>
+    Recorder<C, DC>
 where
     Delta<DC>: Clone + Default + MergeDeltas<DC>,
 {
@@ -675,14 +670,14 @@ pub trait FlushDelta<DC> {
     fn flush_delta(&mut self) -> Delta<DC>;
 }
 
-impl<C: Container, DC: Container + Default> FlushDelta<DC> for Recorder<C, DC> {
+impl<C: Keyed, DC: Keyed + Default> FlushDelta<DC> for Recorder<C, DC> {
     #[inline]
     fn flush_delta(&mut self) -> Delta<DC> {
         self.flush_delta()
     }
 }
 
-impl<C: Container + Default + ApplyDelta<DC>, DC: Container + Default> FlushDelta<Recorder<C, DC>>
+impl<C: Keyed + Default + ApplyDelta<DC>, DC: Keyed + Default> FlushDelta<Recorder<C, DC>>
     for Recorder<C, DC>
 {
     #[inline]
@@ -706,7 +701,7 @@ impl<C: Container + Default + ApplyDelta<DC>, DC: Container + Default> FlushDelt
     }
 }
 
-impl<C: Container, DC: Container + Default> Recorder<C, DC> {
+impl<C: Keyed, DC: Keyed + Default> Recorder<C, DC> {
     /// Flush the recorder, returning the recorded delta and replacing it with a
     /// new empty one.
     #[inline]
@@ -731,14 +726,14 @@ pub trait ResetDelta<DC> {
     fn reset_delta(&mut self);
 }
 
-impl<C: Container + ApplyDelta<DC>, DC: Container + Default> ResetDelta<DC> for Recorder<C, DC> {
+impl<C: Keyed + ApplyDelta<DC>, DC: Keyed + Default> ResetDelta<DC> for Recorder<C, DC> {
     #[inline]
     fn reset_delta(&mut self) {
         self.reset_delta()
     }
 }
 
-impl<C: Container + ApplyDelta<DC>, DC: Container + Default> Recorder<C, DC> {
+impl<C: Keyed + ApplyDelta<DC>, DC: Keyed + Default> Recorder<C, DC> {
     /// Reset the currently recorded delta by flushing it out of the recorder and
     /// then applying its reverse.
     #[inline]
@@ -749,8 +744,8 @@ impl<C: Container + ApplyDelta<DC>, DC: Container + Default> Recorder<C, DC> {
 }
 
 impl<
-    C: Container + Default + ApplyDelta<DC>,
-    DC: IntoIter<C::Key> + Container<Key = C::Key, Value = C::Value> + Default,
+    C: Keyed + Default + ApplyDelta<DC>,
+    DC: IntoIter<C::Key> + Keyed<Value = C::Value, Key = C::Key> + Default,
 > ResetDelta<Recorder<C, DC>> for Recorder<C, DC>
 {
     #[inline]

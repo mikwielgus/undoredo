@@ -29,4 +29,4 @@ syn = { version = "3", features = ["full"] }
 # tests.
 undoredo = { path = "..", default-features = true, features = ["derive", "std"] }
 bidimap = "0.7"
-maplike = "0.14"
+maplike = "0.15"

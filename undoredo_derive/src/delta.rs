@@ -76,15 +76,12 @@ pub(crate) fn expand_delta(input: DeriveInput) -> syn::Result<TokenStream> {
         Data::Enum(_) => {
             let apply = TokenStream2::from(apply_delta::expand_apply_delta(input.clone())?);
             quote! {
-                impl #impl_generics ::undoredo::maplike::containers::Container for #name #ty_generics #where_clause {
-                    type Key = usize;
+                impl #impl_generics ::undoredo::maplike::abc::Container for #name #ty_generics #where_clause {
                     type Value = Self;
                 }
 
-                impl #impl_generics ::undoredo::maplike::ops::Assign for #name #ty_generics #where_clause {
-                    fn assign(&mut self, value: Self) {
-                        *self = value;
-                    }
+                impl #impl_generics ::undoredo::maplike::abc::Keyed for #name #ty_generics #where_clause {
+                    type Key = usize;
                 }
 
                 #apply

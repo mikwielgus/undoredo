@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use alloc::vec::Vec;
-use maplike::containers::Container;
+use maplike::abc::Keyed;
 use maplike::ops::Get;
 
 use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
@@ -161,14 +161,14 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
     }
 }
 
-impl<Cmd, DC: Container + Default> UndoRedo<Delta<DC>, Cmd> {
+impl<Cmd, DC: Keyed + Default> UndoRedo<Delta<DC>, Cmd> {
     /// Make and record changes to the recorded container from within a closure,
     /// automatically committing them once the closure finishes.
     #[inline]
     pub fn edit<K, V, C, F>(&mut self, container: C, f: F) -> C
     where
-        C: Container<Key = K, Value = V> + Get<K>,
-        DC: Container<Key = K, Value = V>,
+        C: Keyed<Value = V, Key = K> + Get<K>,
+        DC: Keyed<Value = V, Key = K>,
         K: Clone,
         V: Clone,
         F: FnOnce(&mut Recorder<C, DC>) -> Cmd,

@@ -10,13 +10,10 @@ use std::collections::BTreeMap;
 use std::vec::Vec;
 
 use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
-use undoredo::maplike::containers::Container;
+use undoredo::maplike::abc::{Container, Keyed};
 use undoredo::maplike::iter::IntoIter;
 use undoredo::maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Set};
 use undoredo::{ApplyDelta, Delta, HistoryTree, Recorder, Snapshot, UndoRedo};
-
-pub(crate) trait Keyed<K>: Container<Key = K> {}
-impl<T: Container<Key = K>, K> Keyed<K> for T {}
 
 pub(crate) trait Map<V>: Container<Value = V> {}
 impl<T: Container<Value = V>, V> Map<V> for T {}
@@ -39,9 +36,9 @@ impl FromUsize for usize {
 
 pub fn test_recorder_apply_delta_at_generated_indices<
     K: Ord + Clone,
-    C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K, Output = Option<i32>> + Push<K>,
+    C: Keyed<Key = K> + Map<i32> + Get<K> + Insert<K> + Remove<K, Output = Option<i32>> + Push<K>,
     DC: Clone
-        + Keyed<K>
+        + Keyed<Key = K>
         + Map<i32>
         + Get<K>
         + Insert<K>
@@ -77,8 +74,14 @@ pub fn test_recorder_apply_delta_at_generated_indices<
 pub fn test_recorder_apply_delta_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq + Ord,
-    C: Keyed<K> + Map<V> + Insert<K> + Remove<K> + Get<K>,
-    DC: Clone + Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + Remove<K, Output = Option<V>>,
+    C: Keyed<Key = K> + Map<V> + Insert<K> + Remove<K> + Get<K>,
+    DC: Clone
+        + Keyed<Key = K>
+        + Map<V>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + Remove<K, Output = Option<V>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) where
@@ -109,8 +112,14 @@ pub fn test_recorder_apply_delta_at_specified_indices<
 
 pub fn test_recorder_apply_delta_on_set<
     K: Clone + FromUsize + Ord,
-    C: Keyed<K> + Map<()> + Insert<K> + Remove<K> + Get<K>,
-    DC: Clone + Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K, Output = Option<()>>,
+    C: Keyed<Key = K> + Map<()> + Insert<K> + Remove<K> + Get<K>,
+    DC: Clone
+        + Keyed<Key = K>
+        + Map<()>
+        + Get<K>
+        + Insert<K>
+        + IntoIter<K>
+        + Remove<K, Output = Option<()>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) where
@@ -138,8 +147,8 @@ pub fn test_recorder_apply_delta_on_set<
 
 pub fn test_insert_and_remove_at_generated_indices<
     K: Clone,
-    C: Keyed<K> + Map<i32> + Insert<K> + Remove<K, Output = Option<i32>> + Push<K> + Get<K>,
-    DC: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K, Output = Option<i32>>,
+    C: Keyed<Key = K> + Map<i32> + Insert<K> + Remove<K, Output = Option<i32>> + Push<K> + Get<K>,
+    DC: Keyed<Key = K> + Map<i32> + Get<K> + Insert<K> + Remove<K, Output = Option<i32>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) {
@@ -165,8 +174,16 @@ pub fn test_insert_and_remove_at_generated_indices<
 }
 
 pub fn test_recorder_insert_and_remove_at_specified_indices<
-    C: Keyed<usize> + Map<i32> + Insert<usize> + Remove<usize, Output = Option<i32>> + Get<usize>,
-    DC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + Remove<usize, Output = Option<i32>>,
+    C: Keyed<Key = usize>
+        + Map<i32>
+        + Insert<usize>
+        + Remove<usize, Output = Option<i32>>
+        + Get<usize>,
+    DC: Keyed<Key = usize>
+        + Map<i32>
+        + Get<usize>
+        + Insert<usize>
+        + Remove<usize, Output = Option<i32>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) {
@@ -190,8 +207,8 @@ pub fn test_recorder_insert_and_remove_at_specified_indices<
 
 pub fn test_insert_and_remove_on_set<
     K: Clone + FromUsize,
-    C: Keyed<K> + Map<()> + Insert<K> + Remove<K, Output = Option<()>> + Get<K>,
-    DC: Keyed<K> + Map<()> + Get<K> + Insert<K> + Remove<K, Output = Option<()>>,
+    C: Keyed<Key = K> + Map<()> + Insert<K> + Remove<K, Output = Option<()>> + Get<K>,
+    DC: Keyed<Key = K> + Map<()> + Get<K> + Insert<K> + Remove<K, Output = Option<()>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) {
@@ -215,7 +232,7 @@ pub fn test_insert_and_remove_on_set<
 
 pub fn test_delta_undo_redo_at_generated_indices<
     K: Clone,
-    C: Keyed<K>
+    C: Keyed<Key = K>
         + Map<i32>
         + Get<K>
         + Insert<K>
@@ -225,7 +242,7 @@ pub fn test_delta_undo_redo_at_generated_indices<
         + ApplyDelta<DC>,
     DC: Clone
         + Default
-        + Keyed<K>
+        + Keyed<Key = K>
         + Map<i32>
         + Get<K>
         + Insert<K>
@@ -329,7 +346,7 @@ pub fn test_delta_undo_redo_at_generated_indices<
 pub fn test_delta_undo_redo_at_specified_indices<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
-    C: Keyed<K>
+    C: Keyed<Key = K>
         + Map<V>
         + Get<K>
         + Insert<K>
@@ -338,7 +355,7 @@ pub fn test_delta_undo_redo_at_specified_indices<
         + ApplyDelta<DC>,
     DC: Clone
         + Default
-        + Keyed<K>
+        + Keyed<Key = K>
         + Map<V>
         + Get<K>
         + Insert<K>
@@ -433,7 +450,7 @@ pub fn test_delta_undo_redo_at_specified_indices<
 
 pub fn test_delta_undo_redo_on_set<
     K: Clone + FromUsize,
-    C: Keyed<K>
+    C: Keyed<Key = K>
         + Map<()>
         + Get<K>
         + Insert<K>
@@ -442,7 +459,7 @@ pub fn test_delta_undo_redo_on_set<
         + ApplyDelta<DC>,
     DC: Clone
         + Default
-        + Keyed<K>
+        + Keyed<Key = K>
         + Map<()>
         + Get<K>
         + Insert<K>
@@ -536,7 +553,7 @@ pub fn test_delta_undo_redo_on_set<
 pub fn test_snapshot_undo_redo<
     K: Clone + FromUsize + std::fmt::Debug + PartialEq,
     V: Clone + FromUsize + std::fmt::Debug + PartialEq,
-    C: Keyed<K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
+    C: Keyed<Key = K> + Map<V> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
 >(
     mut container: C,
 ) {
@@ -577,7 +594,7 @@ pub fn test_snapshot_undo_redo<
 
 pub fn test_snapshot_undo_redo_vec<
     K: Clone,
-    C: Keyed<K> + Map<i32> + Get<K> + Insert<K> + Remove<K> + Push<K> + IntoIter<K> + Clone,
+    C: Keyed<Key = K> + Map<i32> + Get<K> + Insert<K> + Remove<K> + Push<K> + IntoIter<K> + Clone,
 >(
     mut container: C,
 ) {
@@ -622,7 +639,7 @@ pub fn test_snapshot_undo_redo_vec<
 
 pub fn test_snapshot_undo_redo_set<
     K: Clone + FromUsize,
-    C: Keyed<K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
+    C: Keyed<Key = K> + Map<()> + Get<K> + Insert<K> + IntoIter<K> + Remove<K> + Clone,
 >(
     mut container: C,
 ) {
@@ -685,7 +702,7 @@ pub fn test_history_tree_command_checkout() {
 }
 
 pub fn test_recorder_apply_delta_and_reverse<
-    C: Keyed<usize> + Map<i32> + Get<usize> + Push<usize> + ApplyDelta<BTreeMap<usize, i32>>,
+    C: Keyed<Key = usize> + Map<i32> + Get<usize> + Push<usize> + ApplyDelta<BTreeMap<usize, i32>>,
 >(
     mut recorder: Recorder<C, BTreeMap<usize, i32>>,
 ) {
@@ -731,8 +748,12 @@ pub fn test_recorder_apply_delta_and_reverse<
 }
 
 pub fn test_recorder_push_and_pop<
-    C: Keyed<usize> + Map<i32> + Get<usize> + Push<usize> + Pop + Len,
-    DC: Keyed<usize> + Map<i32> + Get<usize> + Insert<usize> + Remove<usize, Output = Option<i32>>,
+    C: Keyed<Key = usize> + Map<i32> + Get<usize> + Push<usize> + Pop + Len,
+    DC: Keyed<Key = usize>
+        + Map<i32>
+        + Get<usize>
+        + Insert<usize>
+        + Remove<usize, Output = Option<i32>>,
 >(
     mut recorder: Recorder<C, DC>,
 ) {
@@ -757,7 +778,7 @@ pub fn test_recorder_push_and_pop<
 }
 
 pub fn test_delta_undo_redo<
-    C: Keyed<usize>
+    C: Keyed<Key = usize>
         + Map<i32>
         + Get<usize>
         + Push<usize>

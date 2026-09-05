@@ -22,48 +22,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.92
+      - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all -- --check
 
-  cargo-test-minrust:
+  cargo-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [1.92, stable]
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.92
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-hack
       - run: |
           cargo test --workspace
-          cargo test --workspace --no-default-features
-          cargo hack test --workspace --optional-deps --each-feature --examples --tests
-          cargo test --workspace --all-features --doc
 
-  cargo-test-stable:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-hack
-      - run: |
-          cargo test --workspace
-          cargo test --workspace --no-default-features
+          # --no-default-features must run without docs, so we pass `--lib --bins --tests`.
+          cargo test --workspace --no-default-features --lib --bins --tests
+
+          cargo test --workspace --all-features
           cargo hack test --workspace --optional-deps --each-feature --examples --tests
           cargo test --workspace --all-features --doc
 
   cargo-check-no-std:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain: [1.92, stable]
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.92
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: ${{ matrix.toolchain }}
           targets: thumbv6m-none-eabi
       - uses: Swatinem/rust-cache@v2
       # thumbv6m-none-eabi has no std, so let's build it to make sure we really

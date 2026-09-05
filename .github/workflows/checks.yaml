@@ -1,0 +1,71 @@
+# SPDX-FileCopyrightText: 2026 this project's contributors
+#
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  reuse-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: fsfe/reuse-action@v6
+        with:
+          args: lint
+
+  cargo-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@1.92
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+
+  cargo-test-minrust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@1.92
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
+      - run: |
+          cargo test --workspace
+          cargo test --workspace --no-default-features
+          cargo hack test --workspace --optional-deps --each-feature --examples --tests
+          cargo test --workspace --all-features --doc
+
+  cargo-test-stable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
+      - run: |
+          cargo test --workspace
+          cargo test --workspace --no-default-features
+          cargo hack test --workspace --optional-deps --each-feature --examples --tests
+          cargo test --workspace --all-features --doc
+
+  cargo-check-no-std:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@1.92
+        with:
+          targets: thumbv6m-none-eabi
+      - uses: Swatinem/rust-cache@v2
+      # thumbv6m-none-eabi has no std, so let's build it to make sure we really
+      # are `no_std` compatible.
+      - run: cargo check --target thumbv6m-none-eabi --no-default-features --features derive

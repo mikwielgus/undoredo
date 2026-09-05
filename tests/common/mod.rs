@@ -12,7 +12,7 @@ use std::vec::Vec;
 use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::maplike::abc::{Container, Keyed};
 use undoredo::maplike::iter::IntoIter;
-use undoredo::maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Set};
+use undoredo::maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Set, SwapRemove};
 use undoredo::{ApplyDelta, Delta, HistoryTree, Recorder, Snapshot, UndoRedo};
 
 pub(crate) trait Map<V>: Container<Value = V> {}
@@ -775,6 +775,113 @@ pub fn test_recorder_push_and_pop<
     assert_eq!(recorder.get(&4), Some(&40));
     assert_eq!(recorder.get(&5), None);
     assert_eq!(recorder.get(&6), None);
+}
+
+pub fn test_recorder_swap_remove<
+    C: Keyed<Key = usize>
+        + Map<i32>
+        + Get<usize>
+        + Push<usize>
+        + Len
+        + SwapRemove<usize, Output = i32>,
+    DC: Keyed<Key = usize>
+        + Map<i32>
+        + Get<usize>
+        + Insert<usize>
+        + Remove<usize, Output = Option<i32>>,
+>(
+    mut recorder: Recorder<C, DC>,
+) {
+    recorder.push(10);
+    recorder.push(20);
+    recorder.push(30);
+    recorder.push(40);
+    recorder.push(50);
+
+    assert_eq!(recorder.swap_remove(&1), 20);
+    assert_eq!(recorder.get(&0), Some(&10));
+    assert_eq!(recorder.get(&1), Some(&50));
+    assert_eq!(recorder.get(&2), Some(&30));
+    assert_eq!(recorder.get(&3), Some(&40));
+    assert_eq!(recorder.get(&4), None);
+
+    assert_eq!(recorder.swap_remove(&3), 40);
+    assert_eq!(recorder.get(&0), Some(&10));
+    assert_eq!(recorder.get(&1), Some(&50));
+    assert_eq!(recorder.get(&2), Some(&30));
+    assert_eq!(recorder.get(&3), None);
+    assert_eq!(recorder.get(&4), None);
+}
+
+pub fn test_delta_undo_redo_swap_remove<
+    C: Keyed<Key = usize>
+        + Map<i32>
+        + Get<usize>
+        + Push<usize>
+        + Len
+        + SwapRemove<usize, Output = i32>
+        + ApplyDelta<BTreeMap<usize, i32>>,
+>(
+    container: C,
+) {
+    let mut undoredo: UndoRedo<Delta<BTreeMap<usize, i32>>> = UndoRedo::new();
+
+    let container = undoredo.edit(container, |recorder| {
+        recorder.push(10);
+        recorder.push(20);
+        recorder.push(30);
+        recorder.push(40);
+        recorder.push(50);
+    });
+
+    let mut container = undoredo.edit(container, |recorder| {
+        recorder.swap_remove(&1);
+    });
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&50));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), Some(&40));
+    assert_eq!(container.get(&4), None);
+
+    assert!(undoredo.undo(&mut container).is_some());
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&20));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), Some(&40));
+    assert_eq!(container.get(&4), Some(&50));
+
+    assert!(undoredo.redo(&mut container).is_some());
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&50));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), Some(&40));
+    assert_eq!(container.get(&4), None);
+
+    let mut container = undoredo.edit(container, |recorder| {
+        recorder.swap_remove(&3);
+    });
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&50));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), None);
+
+    assert!(undoredo.undo(&mut container).is_some());
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&50));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), Some(&40));
+
+    assert!(undoredo.redo(&mut container).is_some());
+
+    assert_eq!(container.get(&0), Some(&10));
+    assert_eq!(container.get(&1), Some(&50));
+    assert_eq!(container.get(&2), Some(&30));
+    assert_eq!(container.get(&3), None);
 }
 
 pub fn test_delta_undo_redo<

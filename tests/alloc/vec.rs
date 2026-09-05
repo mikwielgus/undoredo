@@ -22,8 +22,18 @@ fn test_recorder_push_and_pop() {
 }
 
 #[test]
+fn test_recorder_swap_remove() {
+    common::test_recorder_swap_remove(Recorder::<Vec<i32>, VecHalfDelta<i32>>::new(Vec::new()));
+}
+
+#[test]
 fn test_delta_undo_redo() {
     common::test_delta_undo_redo(Vec::new());
+}
+
+#[test]
+fn test_delta_undo_redo_swap_remove() {
+    common::test_delta_undo_redo_swap_remove(Vec::new());
 }
 
 #[test]

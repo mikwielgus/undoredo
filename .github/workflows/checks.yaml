@@ -45,7 +45,8 @@ jobs:
       - run: |
           cargo test --workspace
 
-          # --no-default-features must run without docs, so we pass `--lib --bins --tests`.
+          # `--no-default-features` will break doctests, so we pass
+          # `--lib --bins --tests` (no `--doc`) to omit doctests.
           cargo test --workspace --no-default-features --lib --bins --tests
 
           cargo test --workspace --all-features

@@ -92,7 +92,7 @@ any derives.
 
 ### Usage examples
 
-#### Delta recorder over `BTreeMap`
+#### Delta recording on `BTreeMap`
 
 Following is a basic usage example of delta-recording undo-redo over `BTreeMap`.
 You can find more examples in the
@@ -142,6 +142,25 @@ fn main() {
     assert!(btreemap == BTreeMap::from([(1, 'A'), (2, 'B'), (3, 'C')]));
 }
 ```
+
+#### Delta-recording on `Vec`
+
+You can likewise have delta-recording undo-redo on `Vec`, but with a small
+caveat: you need to replace
+[`.remove()`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html#method.remove)
+method calls with
+[`.swap_remove()`](https://docs.rs/undoredo/latest/undoredo/struct.Recorder.html#method.swap_remove).
+
+This is because element removals (both
+[shift-removals](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.remove) and
+[swap-removals](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove))
+in `Vec`s invalidate indices, whilst `undoredo`'s (and `maplike`'s)
+interface is modeled after map-like datatypes, in which removal never
+invalidates indices.
+
+See
+[examples/vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/vec.rs)
+for a usage example on `Vec` where `.swap_remove()` is used.
 
 #### Delta recorder over custom `struct` or `enum`
 
@@ -293,7 +312,7 @@ the top of the *undone* stack.
 For a full usage example, see
 [examples/snapshots.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/snapshots.rs).
 
-#### Delta-recording on maps with pushing
+#### Delta recording on maps with pushing
 
 Some containers with map semantics also provide a special type of insertion
 where a value is inserted without specifying a key, which the container instead

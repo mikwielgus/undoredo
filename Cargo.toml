@@ -148,3 +148,7 @@ doc-scrape-examples = true
 name = "thunderdome"
 required-features = ["thunderdome"]
 doc-scrape-examples = true
+
+[[example]]
+name = "vec"
+doc-scrape-examples = true

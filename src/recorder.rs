@@ -11,7 +11,7 @@ use maplike::abc::{Container, Keyed};
 use maplike::iter::{IntoIter, IntoValues, Iter, Values};
 use maplike::ops::{
     Assign, Clear, Get, GetByLeft, GetByRight, Insert, Len, Modify, Pop, Push, Remove,
-    RemoveByLeft, RemoveByRight, Set,
+    RemoveByLeft, RemoveByRight, Set, SwapRemove,
 };
 
 use crate::{ApplyDelta, MergeDeltas, delta::Delta};
@@ -471,6 +471,78 @@ where
         }
 
         Some(value)
+    }
+}
+
+impl<V, C, DC> SwapRemove<usize> for Recorder<C, DC>
+where
+    C: Keyed<Value = V, Key = usize> + Get<usize> + Len + SwapRemove<usize, Output = V>,
+    DC: Keyed<Value = V, Key = usize>
+        + Get<usize>
+        + Insert<usize>
+        + Remove<usize, Output = Option<V>>,
+    V: Clone,
+{
+    type Output = V;
+
+    #[inline]
+    fn swap_remove(&mut self, key: &usize) -> V {
+        self.swap_remove(key)
+    }
+}
+
+impl<V, C, DC> Recorder<C, DC>
+where
+    C: Keyed<Value = V, Key = usize> + Get<usize> + Len + SwapRemove<usize, Output = V>,
+    DC: Keyed<Value = V, Key = usize>
+        + Get<usize>
+        + Insert<usize>
+        + Remove<usize, Output = Option<V>>,
+    V: Clone,
+{
+    /// Remove an element under a key by swapping it with the last element,
+    /// returning the removed value.
+    #[inline]
+    pub fn swap_remove(&mut self, key: &usize) -> V {
+        let last = self
+            .container
+            .len()
+            .checked_sub(1)
+            .expect("swap_remove index is out of bounds");
+
+        if *key == last {
+            // Since the key is the last element, there is no need to perform a
+            // swap, we only need to perform a plain remove.
+
+            let value = self.container.swap_remove(key);
+
+            // Same delta update logic as if it was plain `.remove(key)`.
+            if self.delta.inserted.remove(key).is_none() {
+                self.delta.removed.insert(*key, value.clone());
+            }
+
+            value
+        } else {
+            let last_value = self.container.get(&last).unwrap().clone();
+            let value = self.container.swap_remove(key);
+
+            // This delta update is like that of `.insert(key, ...)` or
+            // `.modify(key, ...)`, but we use `.swap_remove()`'s return value
+            // instead of a `.get()` call.
+
+            if self.delta.inserted.get(key).is_none() {
+                self.delta.removed.insert(*key, value.clone());
+            }
+
+            self.delta.inserted.insert(*key, last_value.clone());
+
+            // Now same delta update as if it was plain `.remove(last)`.
+            if self.delta.inserted.remove(&last).is_none() {
+                self.delta.removed.insert(last, last_value);
+            }
+
+            value
+        }
     }
 }
 

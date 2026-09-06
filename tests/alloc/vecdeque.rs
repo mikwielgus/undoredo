@@ -29,6 +29,15 @@ fn test_delta_undo_redo() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear_at_generated_indices::<
+        usize,
+        VecDeque<i32>,
+        VecDequeHalfDelta<i32>,
+    >(VecDeque::new());
+}
+
+#[test]
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo::<usize, i32, BTreeMap<usize, i32>>(BTreeMap::new());
 }

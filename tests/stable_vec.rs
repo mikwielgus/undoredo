@@ -49,6 +49,20 @@ fn test_delta_undo_redo_at_specified_indices() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear::<usize, i32, StableVec<i32>, StableVec<i32>>(
+        StableVec::new(),
+    );
+}
+
+#[test]
+fn test_delta_undo_redo_clear_at_generated_indices() {
+    common::test_delta_undo_redo_clear_at_generated_indices::<usize, StableVec<i32>, StableVec<i32>>(
+        StableVec::new(),
+    );
+}
+
+#[test]
 fn test_snapshot_undo_redo_vec() {
     common::test_snapshot_undo_redo_vec::<usize, StableVec<i32>>(StableVec::new());
 }

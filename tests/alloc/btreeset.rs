@@ -29,6 +29,13 @@ fn test_delta_undo_redo_on_set() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear::<i32, (), BTreeSet<i32>, BTreeSetHalfDelta<i32>>(
+        BTreeSet::new(),
+    );
+}
+
+#[test]
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo_set::<i32, BTreeSet<i32>>(BTreeSet::new());
 }

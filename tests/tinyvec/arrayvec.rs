@@ -30,6 +30,15 @@ fn test_delta_undo_redo() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear_at_generated_indices::<
+        usize,
+        ArrayVec<[i32; 8]>,
+        ArrayVecHalfDelta<[i32; 8]>,
+    >(ArrayVec::new());
+}
+
+#[test]
 fn test_history_tree_command_checkout() {
     common::test_history_tree_command_checkout();
 }

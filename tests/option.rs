@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use undoredo::aliases::OptionHalfDelta;
-use undoredo::{ApplyDelta, Delta, Recorder};
+use undoredo::{ApplyDelta, Delta, Recorder, UndoRedo};
 
 #[test]
 fn test_option_apply_delta_replace() {
@@ -27,6 +27,27 @@ fn test_option_apply_delta_clear() {
     ));
 
     assert_eq!(value, None);
+}
+
+#[test]
+fn test_option_delta_undo_redo_clear() {
+    let mut undoredo: UndoRedo<Delta<OptionHalfDelta<i32>>> = UndoRedo::new();
+    let mut recorder = Recorder::<Option<i32>>::new(None);
+
+    recorder.set(0, 10);
+    undoredo.commit(&mut recorder);
+    assert_eq!(*recorder.container(), Some(10));
+
+    recorder.set(0, 20);
+    recorder.clear();
+    undoredo.commit(&mut recorder);
+    assert_eq!(*recorder.container(), None);
+
+    assert!(undoredo.undo(&mut recorder).is_some());
+    assert_eq!(*recorder.container(), Some(10));
+
+    assert!(undoredo.redo(&mut recorder).is_some());
+    assert_eq!(*recorder.container(), None);
 }
 
 #[test]

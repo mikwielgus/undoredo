@@ -30,6 +30,13 @@ fn test_delta_undo_redo_on_set() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear::<i32, (), IndexSet<i32>, IndexSetHalfDelta<i32>>(
+        IndexSet::new(),
+    );
+}
+
+#[test]
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo_set::<i32, IndexSet<i32>>(IndexSet::new());
 }

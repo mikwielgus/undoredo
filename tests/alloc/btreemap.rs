@@ -32,6 +32,16 @@ fn test_delta_undo_redo_at_specified_indices() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear::<
+        usize,
+        i32,
+        BTreeMap<usize, i32>,
+        BTreeMapHalfDelta<usize, i32>,
+    >(BTreeMap::new());
+}
+
+#[test]
 fn test_snapshot_undo_redo() {
     common::test_snapshot_undo_redo::<usize, i32, BTreeMap<usize, i32>>(BTreeMap::new());
 }

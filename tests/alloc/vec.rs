@@ -32,6 +32,13 @@ fn test_delta_undo_redo() {
 }
 
 #[test]
+fn test_delta_undo_redo_clear() {
+    common::test_delta_undo_redo_clear_at_generated_indices::<usize, Vec<i32>, VecHalfDelta<i32>>(
+        Vec::new(),
+    );
+}
+
+#[test]
 fn test_delta_undo_redo_swap_remove() {
     common::test_delta_undo_redo_swap_remove(Vec::new());
 }

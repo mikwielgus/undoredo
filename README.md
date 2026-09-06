@@ -154,9 +154,9 @@ method calls with
 This is because element removals (both
 [shift-removals](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.remove) and
 [swap-removals](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.swap_remove))
-in `Vec`s invalidate indices, whilst `undoredo`'s (and `maplike`'s)
-interface is modeled after map-like datatypes, in which removal never
-invalidates indices.
+in `Vec`s invalidate indices, whilst `undoredo`'s (and `maplike`'s) interfaces
+are modeled after map-like datatypes, in which removal does not cause index
+invalidation.
 
 See
 [examples/vec.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/vec.rs)

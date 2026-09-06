@@ -565,7 +565,10 @@ where
     /// Remove all elements from the container.
     pub fn clear(&mut self) {
         for (key, value) in self.container.clone().into_iter() {
-            self.delta.removed.insert(key, value);
+            // The same delta update as if it was plain `.remove(key)`.
+            if self.delta.inserted.remove(&key).is_none() {
+                self.delta.removed.insert(key, value);
+            }
         }
 
         self.container.clear();

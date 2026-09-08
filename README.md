@@ -53,9 +53,10 @@ and for some third-party feature-gated types:
 and [`tinyvec::TinyVec`](https://docs.rs/tinyvec/latest/tinyvec/enum.TinyVec.html),
 (read more in the [Supported containers](#supported-containers) section).
 
-This crate has no `unsafe` code and is compatible with `serde` and `no_std`,
-though [`alloc`](https://doc.rust-lang.org/alloc/) is still required. There is
-no mandatory third-party dependencies, but there is a first-party dependency on
+This crate has no `unsafe` code and is compatible with
+[`serde`](https://docs.rs/serde/latest/serde/) and `no_std`, though
+[`alloc`](https://doc.rust-lang.org/alloc/) is still required. There is no
+mandatory third-party dependencies, but there is a first-party dependency on
 [`maplike`](https://github.com/mikwielgus/maplike), a library also developed by
 this library's authors.
 

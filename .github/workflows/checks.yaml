@@ -47,11 +47,10 @@ jobs:
 
           # `--no-default-features` will break doctests, so we pass
           # `--lib --bins --tests` (no `--doc`) to omit doctests.
-          cargo test --workspace --no-default-features --lib --bins --tests
+          cargo test --workspace --no-default-features --lib --bins --examples --tests
 
           cargo test --workspace --all-features
-          cargo hack test --workspace --optional-deps --each-feature --examples --tests
-          cargo test --workspace --all-features --doc
+          cargo hack test --workspace --optional-deps --each-feature --lib --bins --examples --tests
 
   cargo-check-no-std:
     runs-on: ubuntu-latest

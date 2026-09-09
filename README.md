@@ -12,24 +12,25 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 
 # undoredo
 
-`undoredo` is a Rust library that implements the Undo/Redo pattern on
-arbitrary data structures by automatically recording sparse deltas (aka.
-*diffs*, *patches*) of changes, or whole *snapshots* of past states ([Memento
+`undoredo` is a Rust library that implements the Undo/Redo pattern on arbitrary
+data structures by automatically recording sparse deltas (aka. *diffs*,
+*patches*) of changes, or whole (and dense) *snapshots* of past states ([Memento
 pattern](https://en.wikipedia.org/wiki/Memento_pattern)). These edits can then
-be stored in linear undo-redo bistack or non-linear history tree provided by
-the library. (Alternatively, the sparse deltas can be also sent across a computer
+be stored in linear undo-redo bistack or non-linear history tree provided by the
+library. (Alternatively, the sparse deltas can be also sent across a computer
 network in packets as a form of delta encoding.)
 
 This approach is much easier than the commonly used [Command
-pattern](https://en.wikipedia.org/wiki/Command_pattern), which is the principle
-of operation of many other Undo/Redo crates, as having to implement commands
+pattern](https://en.wikipedia.org/wiki/Command_pattern), the principle of
+operation of many other Undo/Redo crates, because having revertible commands
 requires maintenance of additional application logic that is often complicated
-and can lead to elusive bugs. But if needed, `undoredo` can also store a command
+and prone to elusive bugs. But if needed, `undoredo` can also store a command
 or other metadata along with every edit, allowing for easy use of the Command
 pattern as well.
 
-Delta recording requires creating a separate delta edit type for each
-data structure. For ease of use, `undoredo` has derive macro
+Delta recording has much, much smaller memory footprint than snapshotting, but
+requires creating a separate delta edit type for each data structure. So for
+ease of use, `undoredo` has derive macro
 [`#[derive(Delta)]`](https://docs.rs/undoredo/latest/undoredo/derive.Delta.html)
 to automatically generate these types on arbitrary custom `struct`s and `enum`s.
 There are also convenience implementations for standard library containers:
@@ -228,7 +229,7 @@ for the full example.
 
 #### Storing command metadata along with edits
 
-It is often desirable to store some metadata along with every recorded edit,
+It is often desirable to store some metadata alongside every recorded edit,
 usually some representation of the command that originated it. This can be done
 by instead committing the edit using the
 [`.cmd_commit()`](https://docs.rs/undoredo/latest/undoredo/struct.UndoRedo.html#method.cmd_commit)

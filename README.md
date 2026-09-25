@@ -59,13 +59,13 @@ This crate has no `unsafe` code and is compatible with
 [`alloc`](https://doc.rust-lang.org/alloc/) is still required. There is no
 mandatory third-party dependencies, but there is a first-party dependency on
 [`maplike`](https://github.com/mikwielgus/maplike), a library also developed by
-this library's authors.
+this library's authors. MSRV is 1.92.
 
 ## Demo
 
 ![Animation showing polygons being added and subtracted in the demo stored in
 `demos/polygon_set/` directory of the repository of the polygon_unionfind crate.
-](https://raw.githubusercontent.com/mikwielgus/undoredo/refs/heads/develop/polygon_set_demo.gif)
+](https://raw.githubusercontent.com/mikwielgus/undoredo/refs/heads/develop/polygonset_demo.gif)
 
 The above demo animation shows Undo/Redo action over dynamically added and
 subtracted polygons with R-tree spatial indexing. Neither commands nor snapshots

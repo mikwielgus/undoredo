@@ -75,7 +75,7 @@ pub struct HistoryTree<E, Cmd = ()> {
 }
 
 impl<Cmd: Default, E: Default> HistoryTree<E, Cmd> {
-    /// Create a new history tree.
+    /// Create a new empty history tree.
     #[inline]
     pub fn new() -> Self {
         Self {

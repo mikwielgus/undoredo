@@ -8,7 +8,7 @@ use maplike::ops::Get;
 
 use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
 
-/// An history bistack for linear undo-redo action.
+/// A history bistack for linear undo-redo action.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct UndoRedo<E, Cmd = ()> {
@@ -42,8 +42,8 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
 }
 
 impl<Cmd: Default, E> UndoRedo<E, Cmd> {
-    /// Flush the target container and push its changes as an edit onto the
-    /// *done* stack.
+    /// Flush the target and push its recent changes as an edit onto the *done*
+    /// stack as an edit.
     ///
     /// This clears the undone stack.
     #[inline]
@@ -56,8 +56,8 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
 }
 
 impl<Cmd, E> UndoRedo<E, Cmd> {
-    /// Flush the target container and push its changes as an edit onto the
-    /// *done* stack as an edit along with additional metadata ("cmd").
+    /// Flush the target and push its recent changes as an edit onto the *done*
+    /// stack as an edit along with additional metadata ("cmd").
     ///
     /// This clears the undone stack.
     #[inline]
@@ -74,7 +74,7 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
 }
 
 impl<Cmd> UndoRedo<(), Cmd> {
-    /// Push command onto the *done* stack without any edit (delta or snapshot).
+    /// Push command onto the *done* stack without any edit.
     ///
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern), equivalent to
@@ -125,8 +125,7 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
 
 impl<Cmd: Clone> UndoRedo<(), Cmd> {
     /// Pop the last done command from the *done* stack and push it onto the
-    /// *undone* stack, returning its clone. The underlying data is not anyhow
-    /// mutated otherwise.
+    /// *undone* stack, returning its clone. The target is not mutated anyhow.
     ///
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing
@@ -143,8 +142,7 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
     }
 
     /// Pop the last undone command from the *undone* stack and push it onto the
-    /// *done* stack, returning its clone. The underlying data is not anyhow
-    /// mutated otherwise.
+    /// *done* stack, returning its clone. The target is not mutated anyhow.
     ///
     /// This is a convenience interface for [Command
     /// pattern](https://en.wikipedia.org/wiki/Command_pattern). Implementing

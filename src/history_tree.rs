@@ -8,6 +8,7 @@ use alloc::vec::Vec;
 use crate::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
 
 /// Id of a node in [`HistoryTree`].
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct HistoryTreeNodeId(usize);
 
@@ -26,6 +27,7 @@ impl HistoryTreeNodeId {
 }
 
 /// A single history node in [`HistoryTree`].
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
@@ -65,6 +67,7 @@ impl<E, Cmd> HistoryTreeNode<E, Cmd> {
 }
 
 /// A history tree for non-linear undo-redo action.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct HistoryTree<E, Cmd = ()> {
     nodes: Vec<HistoryTreeNode<E, Cmd>>,

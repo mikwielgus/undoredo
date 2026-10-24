@@ -11,12 +11,12 @@ use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
 /// A history bistack for linear undo-redo action.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
-pub struct UndoRedo<E, Cmd = ()> {
+pub struct EditBistack<E, Cmd = ()> {
     done: Vec<CmdEdit<Cmd, E>>,
     undone: Vec<CmdEdit<Cmd, E>>,
 }
 
-impl<Cmd, E> UndoRedo<E, Cmd> {
+impl<Cmd, E> EditBistack<E, Cmd> {
     /// Create a new empty history bistack.
     #[inline]
     pub fn new() -> Self {
@@ -41,7 +41,7 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
     }
 }
 
-impl<Cmd: Default, E> UndoRedo<E, Cmd> {
+impl<Cmd: Default, E> EditBistack<E, Cmd> {
     /// Flush the target and push its recent changes as an edit onto the *done*
     /// stack as an edit.
     ///
@@ -55,7 +55,7 @@ impl<Cmd: Default, E> UndoRedo<E, Cmd> {
     }
 }
 
-impl<Cmd, E> UndoRedo<E, Cmd> {
+impl<Cmd, E> EditBistack<E, Cmd> {
     /// Flush the target and push its recent changes as an edit onto the *done*
     /// stack as an edit along with additional metadata ("cmd").
     ///
@@ -73,7 +73,7 @@ impl<Cmd, E> UndoRedo<E, Cmd> {
     }
 }
 
-impl<Cmd> UndoRedo<(), Cmd> {
+impl<Cmd> EditBistack<(), Cmd> {
     /// Push command onto the *done* stack without any edit.
     ///
     /// This is a convenience interface for [Command
@@ -85,7 +85,7 @@ impl<Cmd> UndoRedo<(), Cmd> {
     }
 }
 
-impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
+impl<Cmd: Clone, E: Clone> EditBistack<E, Cmd> {
     /// Undo the last done edit.
     ///
     /// The undone edit is popped from the *done* stack, reversed, reverted,
@@ -123,7 +123,7 @@ impl<Cmd: Clone, E: Clone> UndoRedo<E, Cmd> {
     }
 }
 
-impl<Cmd: Clone> UndoRedo<(), Cmd> {
+impl<Cmd: Clone> EditBistack<(), Cmd> {
     /// Pop the last done command from the *done* stack and push it onto the
     /// *undone* stack, returning its clone. The target is not mutated anyhow.
     ///
@@ -159,7 +159,7 @@ impl<Cmd: Clone> UndoRedo<(), Cmd> {
     }
 }
 
-impl<Cmd, DC: Keyed + Default> UndoRedo<Delta<DC>, Cmd> {
+impl<Cmd, DC: Keyed + Default> EditBistack<Delta<DC>, Cmd> {
     /// Make and record changes to the recorded container from within a closure,
     /// automatically committing them once the closure finishes.
     #[inline]

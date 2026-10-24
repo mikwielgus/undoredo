@@ -15,11 +15,11 @@ use crate::{CmdEdit, Delta, ExtractEdit, Recorder, RevertEdit};
 /// bistack, is sufficient for backtracking.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
-pub struct HistoryStack<E, Cmd = ()> {
+pub struct EditStack<E, Cmd = ()> {
     done: Vec<CmdEdit<Cmd, E>>,
 }
 
-impl<Cmd, E> HistoryStack<E, Cmd> {
+impl<Cmd, E> EditStack<E, Cmd> {
     /// Create a new empty undo stack.
     #[inline]
     pub fn new() -> Self {
@@ -33,7 +33,7 @@ impl<Cmd, E> HistoryStack<E, Cmd> {
     }
 }
 
-impl<Cmd: Default, E> HistoryStack<E, Cmd> {
+impl<Cmd: Default, E> EditStack<E, Cmd> {
     /// Flush the target and push its recent changes onto the undo stack as
     /// an edit.
     #[inline]
@@ -45,7 +45,7 @@ impl<Cmd: Default, E> HistoryStack<E, Cmd> {
     }
 }
 
-impl<Cmd, E> HistoryStack<E, Cmd> {
+impl<Cmd, E> EditStack<E, Cmd> {
     /// Flush the target and push its recent changes onto the stack as an edit
     /// along with additional metadata ("cmd").
     #[inline]
@@ -60,7 +60,7 @@ impl<Cmd, E> HistoryStack<E, Cmd> {
     }
 }
 
-impl<Cmd> HistoryStack<(), Cmd> {
+impl<Cmd> EditStack<(), Cmd> {
     /// Push command without any edit.
     #[inline]
     pub fn command(&mut self, command: Cmd) {
@@ -68,7 +68,7 @@ impl<Cmd> HistoryStack<(), Cmd> {
     }
 }
 
-impl<Cmd: Clone, E: Clone> HistoryStack<E, Cmd> {
+impl<Cmd: Clone, E: Clone> EditStack<E, Cmd> {
     /// Undo the last done edit.
     ///
     /// The undone edit is popped from the *done* stack, reversed, reverted, and
@@ -87,7 +87,7 @@ impl<Cmd: Clone, E: Clone> HistoryStack<E, Cmd> {
     }
 }
 
-impl<Cmd: Clone> HistoryStack<(), Cmd> {
+impl<Cmd: Clone> EditStack<(), Cmd> {
     /// Pop the last done command and return it.
     ///
     /// This is a convenience interface for [Command
@@ -101,7 +101,7 @@ impl<Cmd: Clone> HistoryStack<(), Cmd> {
     }
 }
 
-impl<Cmd, DC: Keyed + Default> HistoryStack<Delta<DC>, Cmd> {
+impl<Cmd, DC: Keyed + Default> EditStack<Delta<DC>, Cmd> {
     /// Make and record changes to the recorded container from within a closure,
     /// automatically committing them once the closure finishes.
     #[inline]

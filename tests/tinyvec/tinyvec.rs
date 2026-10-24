@@ -39,6 +39,6 @@ fn test_delta_undo_redo_clear() {
 }
 
 #[test]
-fn test_history_tree_command_checkout() {
-    common::test_history_tree_command_checkout();
+fn test_edit_tree_command_checkout() {
+    common::test_edit_tree_command_checkout();
 }

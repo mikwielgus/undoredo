@@ -7,11 +7,11 @@ use alloc::vec::Vec;
 
 use crate::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
 
-/// Id of a node in [`SharedHistoryTree`].
+/// Id of a node in [`SharedEditTree`].
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct SharedHistoryTreeNodeId(usize);
+pub struct SharedEditTreeNodeId(usize);
 
-impl SharedHistoryTreeNodeId {
+impl SharedEditTreeNodeId {
     /// Creates an id from a node index.
     #[inline]
     pub fn new(index: usize) -> Self {
@@ -25,20 +25,20 @@ impl SharedHistoryTreeNodeId {
     }
 }
 
-/// A single history node in [`SharedHistoryTree`].
+/// A single history node in [`SharedEditTree`].
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct SharedHistoryTreeNode<E, Cmd = ()> {
+pub struct SharedEditTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
     cmd_edit: CmdEdit<Cmd, E>,
     /// Parent node id. `None` for the root.
-    parent: Option<SharedHistoryTreeNodeId>,
+    parent: Option<SharedEditTreeNodeId>,
     /// Child node ids.
-    children: Vec<SharedHistoryTreeNodeId>,
+    children: Vec<SharedEditTreeNodeId>,
     /// Depth of this node in the tree. Root has depth `0`.
     depth: u64,
 }
 
-impl<E, Cmd> SharedHistoryTreeNode<E, Cmd> {
+impl<E, Cmd> SharedEditTreeNode<E, Cmd> {
     /// Returns command metadata together with the recorded edit at this node.
     #[inline]
     pub fn cmd_edit(&self) -> &CmdEdit<Cmd, E> {
@@ -47,13 +47,13 @@ impl<E, Cmd> SharedHistoryTreeNode<E, Cmd> {
 
     /// Returns parent node id. `None` for the root.
     #[inline]
-    pub fn parent(&self) -> Option<SharedHistoryTreeNodeId> {
+    pub fn parent(&self) -> Option<SharedEditTreeNodeId> {
         self.parent
     }
 
     /// Returns child node ids.
     #[inline]
-    pub fn children(&self) -> &[SharedHistoryTreeNodeId] {
+    pub fn children(&self) -> &[SharedEditTreeNodeId] {
         &self.children
     }
 
@@ -66,15 +66,15 @@ impl<E, Cmd> SharedHistoryTreeNode<E, Cmd> {
 
 /// A cursor that points to a node and owns the container subject to editing.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct SharedHistoryTreeCursor<C> {
-    curr_node: SharedHistoryTreeNodeId,
+pub struct SharedEditTreeCursor<C> {
+    curr_node: SharedEditTreeNodeId,
     container: C,
 }
 
-impl<C> SharedHistoryTreeCursor<C> {
+impl<C> SharedEditTreeCursor<C> {
     /// Returns the node the cursor is attached to.
     #[inline]
-    pub fn curr_node(&self) -> SharedHistoryTreeNodeId {
+    pub fn curr_node(&self) -> SharedEditTreeNodeId {
         self.curr_node
     }
 
@@ -97,26 +97,26 @@ impl<C> SharedHistoryTreeCursor<C> {
     }
 }
 
-impl<C> AsRef<C> for SharedHistoryTreeCursor<C> {
+impl<C> AsRef<C> for SharedEditTreeCursor<C> {
     #[inline]
     fn as_ref(&self) -> &C {
         &self.container
     }
 }
 
-/// A history tree for non-linear undo-redo action with multiple possible
-/// external cursors.
+/// An edit tree for non-linear undo-redo action with multiple possible external
+/// cursors.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct SharedHistoryTree<E, Cmd = ()> {
-    nodes: Vec<SharedHistoryTreeNode<E, Cmd>>,
+pub struct SharedEditTree<E, Cmd = ()> {
+    nodes: Vec<SharedEditTreeNode<E, Cmd>>,
 }
 
-impl<Cmd: Default, E: Default> SharedHistoryTree<E, Cmd> {
-    /// Create a new history tree with a single, root node.
+impl<Cmd: Default, E: Default> SharedEditTree<E, Cmd> {
+    /// Create a new shared edit tree with a single, root node.
     #[inline]
     pub fn new() -> Self {
         Self {
-            nodes: vec![SharedHistoryTreeNode {
+            nodes: vec![SharedEditTreeNode {
                 cmd_edit: CmdEdit::default(), // Empty edit.
                 parent: None,
                 children: Vec::new(),
@@ -126,55 +126,51 @@ impl<Cmd: Default, E: Default> SharedHistoryTree<E, Cmd> {
     }
 }
 
-impl<Cmd, E> SharedHistoryTree<E, Cmd> {
+impl<Cmd, E> SharedEditTree<E, Cmd> {
     /// Returns an immutable reference to the node with the given id.
     #[inline]
-    pub fn node(&self, id: SharedHistoryTreeNodeId) -> &SharedHistoryTreeNode<E, Cmd> {
+    pub fn node(&self, id: SharedEditTreeNodeId) -> &SharedEditTreeNode<E, Cmd> {
         &self.nodes[id.index()]
     }
 
     /// Returns parent node id of the node with the given id. `None` for the root.
     #[inline]
-    pub fn parent(&self, id: SharedHistoryTreeNodeId) -> Option<SharedHistoryTreeNodeId> {
+    pub fn parent(&self, id: SharedEditTreeNodeId) -> Option<SharedEditTreeNodeId> {
         self.nodes[id.index()].parent
     }
 
     /// Returns an immutable reference to the command metadata at the given node.
     #[inline]
-    pub fn cmd(&self, id: SharedHistoryTreeNodeId) -> &Cmd {
+    pub fn cmd(&self, id: SharedEditTreeNodeId) -> &Cmd {
         &self.nodes[id.index()].cmd_edit.cmd
     }
 
     /// Returns a mutable reference to the command metadata at the given node.
     #[inline]
-    pub fn cmd_mut(&mut self, id: SharedHistoryTreeNodeId) -> &mut Cmd {
+    pub fn cmd_mut(&mut self, id: SharedEditTreeNodeId) -> &mut Cmd {
         &mut self.nodes[id.index()].cmd_edit.cmd
     }
 
     /// Creates a new cursor to the root that owns the target container.
     #[inline]
-    pub fn root_cursor<T>(&self, target: T) -> SharedHistoryTreeCursor<T> {
-        self.cursor(SharedHistoryTreeNodeId::new(0), target)
+    pub fn root_cursor<T>(&self, target: T) -> SharedEditTreeCursor<T> {
+        self.cursor(SharedEditTreeNodeId::new(0), target)
     }
 
     #[inline]
-    fn cursor<T>(
-        &self,
-        curr_node: SharedHistoryTreeNodeId,
-        target: T,
-    ) -> SharedHistoryTreeCursor<T> {
-        SharedHistoryTreeCursor {
+    fn cursor<T>(&self, curr_node: SharedEditTreeNodeId, target: T) -> SharedEditTreeCursor<T> {
+        SharedEditTreeCursor {
             curr_node,
             container: target,
         }
     }
 }
 
-impl<Cmd: Default, E> SharedHistoryTree<E, Cmd> {
+impl<Cmd: Default, E> SharedEditTree<E, Cmd> {
     /// Flush the cursor's target container and insert its changes as an edit
     /// into a new tree leaf.
     #[inline]
-    pub fn commit<T>(&mut self, cursor: &mut SharedHistoryTreeCursor<T>)
+    pub fn commit<T>(&mut self, cursor: &mut SharedEditTreeCursor<T>)
     where
         E: ExtractEdit<T>,
     {
@@ -182,15 +178,15 @@ impl<Cmd: Default, E> SharedHistoryTree<E, Cmd> {
     }
 }
 
-impl<Cmd, E> SharedHistoryTree<E, Cmd> {
+impl<Cmd, E> SharedEditTree<E, Cmd> {
     /// Flush the cursor's target container and insert its changes into a new
     /// tree leaf as an edit along with additional metadata ("cmd").
     #[inline]
-    pub fn cmd_commit<T>(&mut self, cmd: Cmd, cursor: &mut SharedHistoryTreeCursor<T>)
+    pub fn cmd_commit<T>(&mut self, cmd: Cmd, cursor: &mut SharedEditTreeCursor<T>)
     where
         E: ExtractEdit<T>,
     {
-        self.nodes.push(SharedHistoryTreeNode {
+        self.nodes.push(SharedEditTreeNode {
             cmd_edit: CmdEdit {
                 cmd,
                 edit: E::extract_edit(cursor.container_mut()),
@@ -200,21 +196,21 @@ impl<Cmd, E> SharedHistoryTree<E, Cmd> {
             depth: self.nodes[cursor.curr_node.index()].depth + 1,
         });
 
-        let node_id = SharedHistoryTreeNodeId::new(self.nodes.len() - 1);
+        let node_id = SharedEditTreeNodeId::new(self.nodes.len() - 1);
         self.nodes[cursor.curr_node.index()].children.push(node_id);
 
         cursor.curr_node = node_id;
     }
 }
 
-impl<Cmd: Clone, E: Clone> SharedHistoryTree<E, Cmd> {
+impl<Cmd: Clone, E: Clone> SharedEditTree<E, Cmd> {
     /// Undo the edit at the cursor's current tree node, moving the cursor one
     /// step upwards to the node's parent.
     ///
     /// This does not cause any changes to the tree, only the target container
     /// and cursor are modified.
     #[inline]
-    pub fn undo<T>(&mut self, cursor: &mut SharedHistoryTreeCursor<T>) -> Option<Cmd>
+    pub fn undo<T>(&mut self, cursor: &mut SharedEditTreeCursor<T>) -> Option<Cmd>
     where
         E: RevertEdit<T>,
     {
@@ -235,8 +231,8 @@ impl<Cmd: Clone, E: Clone> SharedHistoryTree<E, Cmd> {
     #[inline]
     pub fn redo<T>(
         &mut self,
-        cursor: &mut SharedHistoryTreeCursor<T>,
-        node: SharedHistoryTreeNodeId,
+        cursor: &mut SharedEditTreeCursor<T>,
+        node: SharedEditTreeNodeId,
     ) -> Cmd
     where
         E: ApplyEdit<T> + RevertEdit<T>,
@@ -266,8 +262,8 @@ impl<Cmd: Clone, E: Clone> SharedHistoryTree<E, Cmd> {
     #[inline]
     pub fn checkout<T>(
         &mut self,
-        cursor: &mut SharedHistoryTreeCursor<T>,
-        target_node: SharedHistoryTreeNodeId,
+        cursor: &mut SharedEditTreeCursor<T>,
+        target_node: SharedEditTreeNodeId,
     ) -> Vec<Cmd>
     where
         E: ApplyEdit<T> + RevertEdit<T>,

@@ -384,14 +384,14 @@ See
 [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/bihashmap.rs)
 for an example of undo-redo performed on a bidirectional map.
 
-#### History tree
+#### Edit tree
 
 Sometimes, instead of a linear undo-redo made of two stacks
 (`UndoRedo`), it is desirable to store edits in a non-linear history
 tree. We provide a data structure for that purpose,
-[`HistoryTree`](https://docs.rs/undoredo/latest/undoredo/struct.HistoryTree.html).
+[`EditTree`](https://docs.rs/undoredo/latest/undoredo/tree/struct.EditTree.html).
 See
-[examples/history_tree.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/history_tree.rs)
+[examples/edit_tree.rs](https://github.com/mikwielgus/undoredo/tree/develop/examples/edit_tree.rs)
 for an example of its usage.
 
 #### Delta compression over network

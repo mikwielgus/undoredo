@@ -40,6 +40,6 @@ fn test_snapshot_undo_redo() {
 }
 
 #[test]
-fn test_history_tree_command_checkout() {
-    common::test_history_tree_command_checkout();
+fn test_edit_tree_command_checkout() {
+    common::test_edit_tree_command_checkout();
 }

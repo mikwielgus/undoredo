@@ -13,7 +13,8 @@ use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::maplike::abc::Keyed;
 use undoredo::maplike::iter::IntoIter;
 use undoredo::maplike::ops::{Clear, Get, Insert, Len, Pop, Push, Remove, Set, SwapRemove};
-use undoredo::{ApplyDelta, Delta, HistoryTree, Recorder, Snapshot, UndoRedo};
+use undoredo::tree::EditTree;
+use undoredo::{ApplyDelta, Delta, Recorder, Snapshot, UndoRedo};
 
 pub trait FromUsize {
     fn from_usize(u: usize) -> Self;
@@ -667,30 +668,30 @@ pub fn test_snapshot_undo_redo_set<
     assert_eq!(undoredo.redo(&mut container), None);
 }
 
-pub fn test_history_tree_command_checkout() {
-    let mut history_tree = HistoryTree::<(), u8>::new();
+pub fn test_edit_tree_command_checkout() {
+    let mut edit_tree = EditTree::<(), u8>::new();
     let mut state = ();
 
-    history_tree.cmd_commit(1, &mut state);
-    history_tree.cmd_commit(3, &mut state);
-    let left_leaf = history_tree.curr_node();
+    edit_tree.cmd_commit(1, &mut state);
+    edit_tree.cmd_commit(3, &mut state);
+    let left_leaf = edit_tree.curr_node();
 
-    assert_eq!(history_tree.undo(&mut state), Some(3));
-    assert_eq!(history_tree.undo(&mut state), Some(1));
+    assert_eq!(edit_tree.undo(&mut state), Some(3));
+    assert_eq!(edit_tree.undo(&mut state), Some(1));
 
-    history_tree.cmd_commit(2, &mut state);
-    history_tree.cmd_commit(4, &mut state);
-    let right_leaf = history_tree.curr_node();
+    edit_tree.cmd_commit(2, &mut state);
+    edit_tree.cmd_commit(4, &mut state);
+    let right_leaf = edit_tree.curr_node();
 
-    assert_eq!(history_tree.checkout(&mut state, left_leaf), vec![1, 3]);
-    assert_eq!(history_tree.curr_node(), left_leaf);
+    assert_eq!(edit_tree.checkout(&mut state, left_leaf), vec![1, 3]);
+    assert_eq!(edit_tree.curr_node(), left_leaf);
 
-    assert_eq!(history_tree.checkout(&mut state, right_leaf), vec![2, 4]);
-    assert_eq!(history_tree.curr_node(), right_leaf);
+    assert_eq!(edit_tree.checkout(&mut state, right_leaf), vec![2, 4]);
+    assert_eq!(edit_tree.curr_node(), right_leaf);
 
     // Checkouting to the same node again results in no commands emitted.
-    assert_eq!(history_tree.checkout(&mut state, right_leaf), vec![]);
-    assert_eq!(history_tree.curr_node(), right_leaf);
+    assert_eq!(edit_tree.checkout(&mut state, right_leaf), vec![]);
+    assert_eq!(edit_tree.curr_node(), right_leaf);
 }
 
 pub fn test_recorder_apply_delta_and_reverse<

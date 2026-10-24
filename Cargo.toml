@@ -29,7 +29,7 @@ default = ["std"]
 ## `ApplyDelta`, `FlushDelta`, `HalfDelta`, `MergeDelta`).
 derive = ["undoredo_derive"]
 
-## Enables `serde` support (derives `Serialize` and `Deserialize` traits).
+## Enables `serde` support (by deriving `Serialize` and `Deserialize` traits).
 serde = ["dep:serde"]
 
 ## Disable for `no_std` compatibility.
@@ -125,7 +125,7 @@ required-features = ["std", "derive"]
 doc-scrape-examples = true
 
 [[example]]
-name = "history_tree"
+name = "edit_tree"
 required-features = ["std"]
 doc-scrape-examples = true
 

@@ -7,12 +7,12 @@ use alloc::vec::Vec;
 
 use crate::{ApplyEdit, CmdEdit, ExtractEdit, RevertEdit};
 
-/// Id of a node in [`HistoryTree`].
+/// Id of a node in [`EditTree`].
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct HistoryTreeNodeId(usize);
+pub struct EditTreeNodeId(usize);
 
-impl HistoryTreeNodeId {
+impl EditTreeNodeId {
     /// Creates an id from a node index.
     #[inline]
     pub fn new(index: usize) -> Self {
@@ -26,21 +26,21 @@ impl HistoryTreeNodeId {
     }
 }
 
-/// A single history node in [`HistoryTree`].
+/// A single history node in [`EditTree`].
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct HistoryTreeNode<E, Cmd = ()> {
+pub struct EditTreeNode<E, Cmd = ()> {
     /// Command metadata together with the recorded edit at this node.
     cmd_edit: CmdEdit<Cmd, E>,
     /// Parent node id. `None` for the root.
-    parent: Option<HistoryTreeNodeId>,
+    parent: Option<EditTreeNodeId>,
     /// Child node ids.
-    children: Vec<HistoryTreeNodeId>,
+    children: Vec<EditTreeNodeId>,
     /// Depth of this node in the tree. Root has depth `0`.
     depth: u64,
 }
 
-impl<E, Cmd> HistoryTreeNode<E, Cmd> {
+impl<E, Cmd> EditTreeNode<E, Cmd> {
     /// Returns command metadata together with the recorded edit at this node.
     #[inline]
     pub fn cmd_edit(&self) -> &CmdEdit<Cmd, E> {
@@ -49,13 +49,13 @@ impl<E, Cmd> HistoryTreeNode<E, Cmd> {
 
     /// Returns parent node id. `None` for the root.
     #[inline]
-    pub fn parent(&self) -> Option<HistoryTreeNodeId> {
+    pub fn parent(&self) -> Option<EditTreeNodeId> {
         self.parent
     }
 
     /// Returns child node ids.
     #[inline]
-    pub fn children(&self) -> &[HistoryTreeNodeId] {
+    pub fn children(&self) -> &[EditTreeNodeId] {
         &self.children
     }
 
@@ -66,63 +66,63 @@ impl<E, Cmd> HistoryTreeNode<E, Cmd> {
     }
 }
 
-/// A history tree for non-linear undo-redo action.
+/// An edit tree for non-linear undo-redo action.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct HistoryTree<E, Cmd = ()> {
-    nodes: Vec<HistoryTreeNode<E, Cmd>>,
-    curr_node: HistoryTreeNodeId,
+pub struct EditTree<E, Cmd = ()> {
+    nodes: Vec<EditTreeNode<E, Cmd>>,
+    curr_node: EditTreeNodeId,
 }
 
-impl<Cmd: Default, E: Default> HistoryTree<E, Cmd> {
-    /// Create a new empty history tree.
+impl<Cmd: Default, E: Default> EditTree<E, Cmd> {
+    /// Create a new empty edit tree.
     #[inline]
     pub fn new() -> Self {
         Self {
-            nodes: vec![HistoryTreeNode {
+            nodes: vec![EditTreeNode {
                 cmd_edit: CmdEdit::default(), // Empty edit.
                 parent: None,
                 children: Vec::new(),
                 depth: 0,
             }],
-            curr_node: HistoryTreeNodeId::new(0),
+            curr_node: EditTreeNodeId::new(0),
         }
     }
 }
 
-impl<Cmd, E> HistoryTree<E, Cmd> {
+impl<Cmd, E> EditTree<E, Cmd> {
     /// Returns the id of the current node.
     #[inline]
-    pub fn curr_node(&self) -> HistoryTreeNodeId {
+    pub fn curr_node(&self) -> EditTreeNodeId {
         self.curr_node
     }
 
     /// Returns an immutable reference to the node with the given id.
     #[inline]
-    pub fn node(&self, id: HistoryTreeNodeId) -> &HistoryTreeNode<E, Cmd> {
+    pub fn node(&self, id: EditTreeNodeId) -> &EditTreeNode<E, Cmd> {
         &self.nodes[id.index()]
     }
 
     /// Returns parent node id of the node with the given id. `None` for the root.
     #[inline]
-    pub fn parent(&self, id: HistoryTreeNodeId) -> Option<HistoryTreeNodeId> {
+    pub fn parent(&self, id: EditTreeNodeId) -> Option<EditTreeNodeId> {
         self.nodes[id.index()].parent
     }
 
     /// Returns an immutable reference to the command metadata at the given node.
     #[inline]
-    pub fn cmd(&self, id: HistoryTreeNodeId) -> &Cmd {
+    pub fn cmd(&self, id: EditTreeNodeId) -> &Cmd {
         &self.nodes[id.index()].cmd_edit.cmd
     }
 
     /// Returns a mutable reference to the command metadata at the given node.
     #[inline]
-    pub fn cmd_mut(&mut self, id: HistoryTreeNodeId) -> &mut Cmd {
+    pub fn cmd_mut(&mut self, id: EditTreeNodeId) -> &mut Cmd {
         &mut self.nodes[id.index()].cmd_edit.cmd
     }
 }
 
-impl<Cmd: Default, E> HistoryTree<E, Cmd> {
+impl<Cmd: Default, E> EditTree<E, Cmd> {
     /// Flush the target container and insert its changes as an edit into a new
     /// tree leaf under the current node.
     #[inline]
@@ -134,7 +134,7 @@ impl<Cmd: Default, E> HistoryTree<E, Cmd> {
     }
 }
 
-impl<Cmd, E> HistoryTree<E, Cmd> {
+impl<Cmd, E> EditTree<E, Cmd> {
     /// Flush the target container and insert its changes into a new tree leaf
     /// under the current node as an edit along with additional metadata
     /// ("cmd").
@@ -143,7 +143,7 @@ impl<Cmd, E> HistoryTree<E, Cmd> {
     where
         E: ExtractEdit<T>,
     {
-        self.nodes.push(HistoryTreeNode {
+        self.nodes.push(EditTreeNode {
             cmd_edit: CmdEdit {
                 cmd,
                 edit: E::extract_edit(target),
@@ -153,14 +153,14 @@ impl<Cmd, E> HistoryTree<E, Cmd> {
             depth: self.nodes[self.curr_node.index()].depth + 1,
         });
 
-        let node_id = HistoryTreeNodeId::new(self.nodes.len() - 1);
+        let node_id = EditTreeNodeId::new(self.nodes.len() - 1);
         self.nodes[self.curr_node.index()].children.push(node_id);
 
         self.curr_node = node_id;
     }
 }
 
-impl<Cmd: Clone, E: Clone> HistoryTree<E, Cmd> {
+impl<Cmd: Clone, E: Clone> EditTree<E, Cmd> {
     /// Undo the edit at the current tree node, moving one step upwards to the
     /// node's parent.
     ///
@@ -185,7 +185,7 @@ impl<Cmd: Clone, E: Clone> HistoryTree<E, Cmd> {
     /// This does not cause any changes to the tree topology, only the target
     /// container and current node are modified.
     #[inline]
-    pub fn redo<T>(&mut self, target: &mut T, node: HistoryTreeNodeId) -> Cmd
+    pub fn redo<T>(&mut self, target: &mut T, node: EditTreeNodeId) -> Cmd
     where
         E: ApplyEdit<T> + RevertEdit<T>,
     {
@@ -208,7 +208,7 @@ impl<Cmd: Clone, E: Clone> HistoryTree<E, Cmd> {
     /// order they were applied. If already at `target_node`, an empty vector is
     /// returned.
     #[inline]
-    pub fn checkout<T>(&mut self, target: &mut T, target_node: HistoryTreeNodeId) -> Vec<Cmd>
+    pub fn checkout<T>(&mut self, target: &mut T, target_node: EditTreeNodeId) -> Vec<Cmd>
     where
         E: ApplyEdit<T> + RevertEdit<T>,
     {

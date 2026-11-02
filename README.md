@@ -539,3 +539,8 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this work by you will be dual-licensed as described above,
 without any additional terms or conditions.
+
+## Feature flags
+
+The feature flags are [documented at
+docs.rs](https://docs.rs/undoredo/latest/undoredo/#feature-flags).

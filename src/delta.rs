@@ -10,7 +10,7 @@ use alloc::{
 };
 use maplike::abc::Keyed;
 use maplike::iter::IntoIter;
-use maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Resize, Set};
+use maplike::ops::{Get, Insert, Len, Pop, Push, Remove, Set, SetOrExpandTo};
 
 #[cfg(any(feature = "std", feature = "indexmap"))]
 use core::hash::Hash;
@@ -223,7 +223,7 @@ where
 fn apply_delta_on_vec<V, C, DC>(container: &mut C, delta: Delta<DC>)
 where
     V: Clone,
-    C: Pop<Value = V> + Push<usize, Value = V> + Set<usize, Value = V> + Len + Resize,
+    C: Pop<Value = V> + Push<usize, Value = V> + SetOrExpandTo<usize, Output = Option<V>> + Len,
     DC: Clone + IntoIter<usize, Value = V>,
     DC::IntoIter: DoubleEndedIterator,
 {
@@ -244,13 +244,7 @@ where
     }
 
     for (inserted_index, inserted_value) in inserted.into_iter() {
-        if inserted_index == Len::len(container) {
-            Push::push(container, inserted_value);
-        } else if inserted_index < Len::len(container) {
-            Set::set(container, inserted_index, inserted_value);
-        } else {
-            Resize::resize(container, inserted_index + 1, inserted_value);
-        }
+        SetOrExpandTo::set_or_expand_to(container, inserted_index, inserted_value);
     }
 }
 
@@ -444,7 +438,7 @@ impl<V, DC: IntoIter<usize, Value = V>> ApplyDelta<DC> for Option<V> {
         }
 
         for (inserted_key, inserted_value) in inserted.into_iter() {
-            self.set(inserted_key, inserted_value);
+            Insert::insert(self, inserted_key, inserted_value);
         }
     }
 }

@@ -11,7 +11,7 @@ use maplike::abc::{Container, Keyed};
 use maplike::iter::{IntoIter, IntoValues, Iter, Values};
 use maplike::ops::{
     Assign, Clear, Get, GetByLeft, GetByRight, Insert, Len, Modify, Pop, Push, Remove,
-    RemoveByLeft, RemoveByRight, Set, SwapRemove,
+    RemoveByLeft, RemoveByRight, Set, SetOrExpandTo, SwapRemove,
 };
 
 use crate::{ApplyDelta, MergeDeltas, delta::Delta};
@@ -73,7 +73,7 @@ impl<C: Keyed, DC: Keyed> Keyed for Recorder<C, DC> {
 impl<C, DC> Assign<C> for Recorder<C, DC>
 where
     C: Assign + Clone + Keyed,
-    DC: Get<usize, Value = C> + Set<usize> + Keyed,
+    DC: Get<usize, Value = C> + SetOrExpandTo<usize> + Keyed,
 {
     #[inline]
     fn assign(&mut self, value: C) {
@@ -84,16 +84,18 @@ where
 impl<C, DC> Recorder<C, DC>
 where
     C: Assign + Clone + Keyed,
-    DC: Get<usize, Value = C> + Set<usize> + Keyed,
+    DC: Get<usize, Value = C> + SetOrExpandTo<usize> + Keyed,
 {
     /// Assign a new value to `*self`.
     #[inline]
     pub fn assign(&mut self, value: C) {
         if self.delta.inserted.get(&0).is_none() {
-            self.delta.removed.set(0, self.container.clone());
+            self.delta
+                .removed
+                .set_or_expand_to(0, self.container.clone());
         }
 
-        self.delta.inserted.set(0, value.clone());
+        self.delta.inserted.set_or_expand_to(0, value.clone());
         self.container.assign(value);
     }
 }
@@ -186,12 +188,12 @@ where
 
 impl<K, V, C, DC> Set<K> for Recorder<C, DC>
 where
-    C: Keyed<Value = V, Key = K> + Get<K> + Set<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + SetOrExpandTo<K>,
     DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
-    type Output = <C as Set<K>>::Output;
+    type Output = <C as SetOrExpandTo<K>>::Output;
 
     #[inline]
     fn set(&mut self, key: K, value: Self::Value) -> Self::Output {
@@ -201,14 +203,14 @@ where
 
 impl<K, V, C, DC> Recorder<C, DC>
 where
-    C: Keyed<Value = V, Key = K> + Get<K> + Set<K>,
+    C: Keyed<Value = V, Key = K> + Get<K> + SetOrExpandTo<K>,
     DC: Keyed<Value = V, Key = K> + Get<K> + Insert<K>,
     K: Clone,
     V: Clone,
 {
     /// Set the value of an already existing element under a key.
     #[inline]
-    pub fn set(&mut self, key: K, value: V) -> <C as Set<K>>::Output {
+    pub fn set(&mut self, key: K, value: V) -> <C as SetOrExpandTo<K>>::Output {
         if self.delta.inserted.get(&key).is_none() {
             if let Some(value_to_remove) = self.container.get(&key) {
                 self.delta
@@ -218,7 +220,7 @@ where
         }
 
         self.delta.inserted.insert(key.clone(), value.clone());
-        self.container.set(key, value)
+        SetOrExpandTo::set_or_expand_to(&mut self.container, key, value)
     }
 }
 

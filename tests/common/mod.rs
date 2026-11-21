@@ -12,7 +12,9 @@ use std::vec::Vec;
 use undoredo::aliases::{BTreeMapHalfDelta, BTreeSetHalfDelta};
 use undoredo::maplike::abc::Keyed;
 use undoredo::maplike::iter::IntoIter;
-use undoredo::maplike::ops::{Clear, Get, Insert, Len, Pop, Push, Remove, Set, SwapRemove};
+use undoredo::maplike::ops::{
+    Clear, Get, Insert, Len, Pop, Push, Remove, SetOrExpandTo, SwapRemove,
+};
 use undoredo::tree::EditTree;
 use undoredo::{ApplyDelta, Delta, Recorder, Snapshot, UndoRedo};
 
@@ -977,7 +979,7 @@ pub fn test_delta_undo_redo<
     C: Keyed<Key = usize, Value = i32>
         + Get<usize>
         + Push<usize>
-        + Set<usize>
+        + SetOrExpandTo<usize>
         + Pop
         + Len
         + ApplyDelta<BTreeMap<usize, i32>>,

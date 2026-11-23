@@ -47,7 +47,7 @@ There are also convenience implementations for standard library containers:
 and for some third-party feature-gated types:
 [`bidimap::BiBTreeMap` and `bidimap::BiHashMap`](https://docs.rs/bidimap/latest/bidimap/),
 [`indexmap::IndexMap` and `indexmap::IndexSet`](https://docs.rs/indexmap/latest/indexmap/),
-[`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/struct.RTree.html),
+[`rstar::RTree`](https://docs.rs/rstar/0.14.0/rstar/struct.RTree.html),
 [`StableVec`](https://docs.rs/stable-vec/latest/stable_vec/type.StableVec.html),
 [`thunderdome::Arena`](https://docs.rs/thunderdome/latest/thunderdome/),
 [`tinyvec::ArrayVec`](https://docs.rs/tinyvec/latest/tinyvec/struct.ArrayVec.html)
@@ -467,7 +467,7 @@ external crates:
   [examples/bihashmap.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/bihashmap.rs));
 - [`indexmap::IndexMap` and `indexmap::IndexSet`](https://docs.rs/indexmap/latest/indexmap/),
   gated by the `indexmap` feature flag;
-- [`rstar::RTree`](https://docs.rs/rstar/0.12.2/rstar/index.html), gated by the
+- [`rstar::RTree`](https://docs.rs/rstar/0.14.0/rstar/index.html), gated by the
   `rstar` feature flag (usage example: [examples/rstar.rs](https://github.com/mikwielgus/undoredo/blob/develop/examples/rstar.rs));
 - [`stable_vec::StableVec`](https://docs.rs/stable-vec/latest/stable_vec/),
   gated by the `stable-vec` feature flag (usage example:

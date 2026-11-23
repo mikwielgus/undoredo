@@ -72,8 +72,12 @@ serde = { version = "1.0", features = ["derive"] }
 stable-vec = "0.4"
 thunderdome = "0.6"
 tinyvec = { version = "1", features = ["alloc"] }
+numlike = { version = "0.10", default-features = false, features = ["std", "maplike", "undoredo"] }
 # This enables `derive` on the library, which we need for integration tests.
 undoredo = { path = ".", default-features = false, features = ["derive", "std", "indexmap", "tinyvec"] }
+
+[patch.crates-io]
+undoredo = { path = "." }
 
 # Version replacements apply only to this crate. We have to keep this here
 # and not in `release.toml` because the replacements are applied to each
